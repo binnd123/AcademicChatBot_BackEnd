@@ -3,10 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcademicChatBot.DAL.Contract;
+using AcademicChatBot.DAL.DBContext;
 
 namespace AcademicChatBot.DAL.Implementation
 {
-    internal class UnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
+        private AcademicChatBotDBContext _context;
+
+        public UnitOfWork(AcademicChatBotDBContext context)
+        {
+            _context = context;
+        }
+
+
+        public async Task<int> SaveChangeAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
     }
 }
