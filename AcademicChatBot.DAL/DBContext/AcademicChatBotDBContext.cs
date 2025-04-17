@@ -34,11 +34,8 @@ namespace AcademicChatBot.DAL.DBContext
         public DbSet<Models.Combo> Combos { get; set; } = null!;
         public DbSet<Models.Assessment> Assessments { get; set; } = null!;
         public DbSet<Models.AIChatLog> AIChatLogs { get; set; } = null!;
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("server=BINND;database=AcademicChatBotDB;uid=sa;pwd=12345;TrustServerCertificate=True;MultipleActiveResultSets=True;");
-        }
+            => optionsBuilder.UseSqlServer("Name=AcademicChatBotDB");
 
     }
 }

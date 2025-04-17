@@ -15,6 +15,7 @@ namespace AcademicChatBot.Common.DTOs.BussinessCode
         SIGN_UP_SUCCESSFULLY = 2001,
         SIGN_IN_SUCCESSFULLY = 2007,
         UPDATE_SUCCESSFULLY = 2004,
+        INSERT_SUCESSFULLY = 2005,
         DELETE_SUCCESSFULLY = 2006,
         SIGN_UP_FAILED = 2002,
         EXISTED_USER = 2003,
@@ -22,5 +23,6 @@ namespace AcademicChatBot.Common.DTOs.BussinessCode
         WRONG_PASSWORD = 405,
         ACCESS_DENIED = 403,
         INVALID_EMAIL_FPTU = 406,
+        DATA_NOT_FOUND = 407,
     }
 }
