@@ -39,6 +39,7 @@ namespace AcademicChatBot.Service.Implementation
                     {
                         dto.IsSucess = false;
                         dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Curriculum not found";
                         return dto;
                     }
                 }
@@ -60,11 +61,13 @@ namespace AcademicChatBot.Service.Implementation
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.INSERT_SUCESSFULLY;
                 dto.Data = subject;
+                dto.Message = "Subject created successfully";
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while creating the subject: " + ex.Message;
             }
             return dto;
         }
@@ -79,6 +82,7 @@ namespace AcademicChatBot.Service.Implementation
                 {
                     dto.IsSucess = false;
                     dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Subject not found";
                     return dto;
                 }
                 subject.IsDeleted = true;
@@ -87,11 +91,13 @@ namespace AcademicChatBot.Service.Implementation
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.DELETE_SUCCESSFULLY;
                 dto.Data = subject;
+                dto.Message = "Subject deleted successfully";
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while deleting the subject: " + ex.Message;
             }
             return dto;
         }
@@ -110,11 +116,13 @@ namespace AcademicChatBot.Service.Implementation
                     includes: s => s.Curriculum);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                dto.Message = "Subjects retrieved successfully";
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while retrieving subjects: " + ex.Message;
             }
             return dto;
         }
@@ -125,13 +133,22 @@ namespace AcademicChatBot.Service.Implementation
             try
             {
                 dto.Data = await _subjectRepository.GetById(subjectId);
+                if (dto.Data == null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Subject not found";
+                    return dto;
+                }
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                dto.Message = "Subject retrieved successfully";
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while retrieving the subject: " + ex.Message;
             }
             return dto;
         }
@@ -148,6 +165,7 @@ namespace AcademicChatBot.Service.Implementation
                     {
                         dto.IsSucess = false;
                         dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Curriculum not found";
                         return dto;
                     }
                 }
@@ -156,6 +174,7 @@ namespace AcademicChatBot.Service.Implementation
                 {
                     dto.IsSucess = false;
                     dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Subject not found";
                     return dto;
                 }
                 if (!string.IsNullOrEmpty(request.SubjectName)) subject.SubjectName = request.SubjectName;
@@ -175,11 +194,13 @@ namespace AcademicChatBot.Service.Implementation
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.UPDATE_SUCCESSFULLY;
                 dto.Data = subject;
+                dto.Message = "Subject updated successfully";
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while updating the subject: " + ex.Message;
             }
             return dto;
         }

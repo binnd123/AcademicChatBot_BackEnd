@@ -41,6 +41,7 @@ namespace AcademicChatBot.Service.Implementation
                 {
                     dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
                     dto.IsSucess = false;
+                    dto.Message = "Email is not correct";
                     return dto;
                 }
                 var isValid = BCrypt.Net.BCrypt.EnhancedVerify(loginRequest.Password, userDb.PasswordHash);
@@ -48,6 +49,7 @@ namespace AcademicChatBot.Service.Implementation
                 {
                     dto.BusinessCode = BusinessCode.WRONG_PASSWORD;
                     dto.IsSucess = false;
+                    dto.Message = "Password is not correct";
                     return dto;
                 }
 
@@ -65,11 +67,13 @@ namespace AcademicChatBot.Service.Implementation
                 };
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.SIGN_IN_SUCCESSFULLY;
+                dto.Message = "Login successfully";
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = ex.Message;
             }
             return dto;
         }
@@ -84,6 +88,7 @@ namespace AcademicChatBot.Service.Implementation
                 {
                     dto.BusinessCode = BusinessCode.INVALID_REFRESHTOKEN;
                     dto.IsSucess = false;
+                    dto.Message = "Refresh token is not correct";
                 }
                 else if (userDb.ExpiredRefreshToken > DateTime.Now)
                 {
@@ -98,17 +103,20 @@ namespace AcademicChatBot.Service.Implementation
                     };
                     dto.IsSucess = true;
                     dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                    dto.Message = "Refresh token successfully";
                 }
                 else
                 {
                     dto.IsSucess = false;
                     dto.BusinessCode = BusinessCode.EXPIRED_REFRESHTOKEN;
+                    dto.Message = "Refresh token is expired";
                 }
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = ex.Message;
             }
             return dto;
         }
@@ -122,6 +130,7 @@ namespace AcademicChatBot.Service.Implementation
                 {
                     dto.IsSucess = false;
                     dto.BusinessCode = BusinessCode.INVALID_EMAIL_FPTU;
+                    dto.Message = "Email is not correct fortmat FPT university";
                     return dto;
                 }
                 var userDb = await _userRepository.GetFirstByExpression(a => a.Email == signUpRequest.Email, null);
@@ -129,6 +138,7 @@ namespace AcademicChatBot.Service.Implementation
                 {
                     dto.IsSucess = false;
                     dto.BusinessCode = BusinessCode.EXISTED_USER;
+                    dto.Message = "Email is existed";
                     return dto;
                 }
                 string passWordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(signUpRequest.Password, 12);
@@ -157,11 +167,13 @@ namespace AcademicChatBot.Service.Implementation
                 await _unitOfWork.SaveChangeAsync();
                 dto.BusinessCode = BusinessCode.SIGN_UP_SUCCESSFULLY;
                 dto.IsSucess = true;
+                dto.Message = "Sign up successfully";
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = ex.Message;
             }
             return dto;
         }
