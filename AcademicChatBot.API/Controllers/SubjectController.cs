@@ -19,7 +19,6 @@ namespace AcademicChatBot.API.Controllers
             _subjectService = subjectService;
         }
 
-        [Authorize]
         [HttpGet("get-all-subjects")]
         public async Task<ResponseDTO> GetAllSubjects(
             [FromQuery] int pageNumber = 1,
@@ -31,7 +30,7 @@ namespace AcademicChatBot.API.Controllers
             pageSize = pageSize < 1 ? 5 : pageSize;
             return await _subjectService.GetAllSubjects(pageNumber, pageSize, search);
         }
-        [Authorize]
+        [Authorize(Roles = "Admin,Student")]
         [HttpGet("get-subject/{id}")]
         public async Task<ResponseDTO> GetSubjectById(Guid id)
         {
