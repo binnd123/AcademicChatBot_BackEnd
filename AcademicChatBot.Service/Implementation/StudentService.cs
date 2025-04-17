@@ -38,16 +38,19 @@ namespace AcademicChatBot.Service.Implementation
                 {
                     dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
                     dto.IsSucess = false;
+                    dto.Message = "Student not found";
                     return dto;
                 }
                 dto.Data = studentDb;
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                dto.Message = "Student profile retrieved successfully";
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while retrieving the student profile";
             }
             return dto;
         }
@@ -62,6 +65,7 @@ namespace AcademicChatBot.Service.Implementation
                 {
                     dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
                     dto.IsSucess = false;
+                    dto.Message = "Student not found";
                     return dto;
                 }
                 if (!string.IsNullOrEmpty(request.Address)) studentDb.Address = request.Address;
@@ -76,11 +80,13 @@ namespace AcademicChatBot.Service.Implementation
                 dto.Data = studentDb;
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.UPDATE_SUCCESSFULLY;
+                dto.Message = "Student profile updated successfully";
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while updating the student profile";
             }
             return dto;
         }

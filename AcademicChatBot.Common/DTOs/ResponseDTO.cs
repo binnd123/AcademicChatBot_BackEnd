@@ -12,5 +12,6 @@ namespace AcademicChatBot.Common.DTOs
         public bool IsSucess { get; set; } = true;
         public object Data { get; set; }
         public BusinessCode BusinessCode { get; set; }
+        public string Message { get; set; } = string.Empty;
     }
 }
