@@ -13,10 +13,12 @@ namespace AcademicChatBot.DAL.Models
     {
         [Key]
         public Guid UserId { get; set; }
-        public string UserName { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string PasswordHash { get; set; } = null!;
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
+        public string Role { get; set; } = "Student";
+        public string? RefreshToken { get; set; }
+        public DateTime? ExpiredRefreshToken { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
