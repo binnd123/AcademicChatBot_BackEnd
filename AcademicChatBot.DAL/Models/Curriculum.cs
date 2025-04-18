@@ -19,11 +19,15 @@ namespace AcademicChatBot.DAL.Models
         public string PreRequisite { get; set; } = "None";
         public bool IsActive { get; set; } = true;
         public bool IsApproved { get; set; } = true;
-        public bool IsDeleted { get; set; } = false;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public bool IsDeleted { get; set; } = false;
         public Guid? MajorId { get; set; }
         [ForeignKey(nameof(MajorId))]
         public Major? Major { get; set; }
+        public Guid? ProgramId { get; set; }
+        [ForeignKey(nameof(ProgramId))]
+        public Program? Program { get; set; }
     }
 }

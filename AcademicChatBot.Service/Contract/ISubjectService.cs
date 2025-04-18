@@ -10,10 +10,10 @@ namespace AcademicChatBot.Service.Contract
 {
     public interface ISubjectService
     {
-        Task<ResponseDTO> GetAllSubjects(int pageNumber, int pageSize, string search);
-        Task<ResponseDTO> GetSubjectById(Guid subjectId);
-        public Task<ResponseDTO> CreateSubject(CreateSubjectRequest request);
-        public Task<ResponseDTO> UpdateSubject(Guid SubjectId, UpdateSubjectRequest request);
-        public Task<ResponseDTO> DeleteSubject(Guid SubjectId);
+        Task<Response> GetAllSubjects(int pageNumber, int pageSize, string search);
+        Task<Response> GetSubjectById(Guid subjectId);
+        public Task<Response> CreateSubject(CreateSubjectRequest request);
+        public Task<Response> UpdateSubject(Guid SubjectId, UpdateSubjectRequest request);
+        public Task<Response> DeleteSubject(Guid SubjectId);
     }
 }

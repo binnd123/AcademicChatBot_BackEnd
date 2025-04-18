@@ -28,6 +28,7 @@ namespace AcademicChatBot.DAL.Contract
         Task<List<T>> InsertRange(IEnumerable<T> entities);
 
         Task<List<T>> DeleteRange(IEnumerable<T> entities);
+        Task<List<T>> DeleteByExpression(Expression<Func<T, bool>> filter);
 
         Task<T> Update(T entity);
 

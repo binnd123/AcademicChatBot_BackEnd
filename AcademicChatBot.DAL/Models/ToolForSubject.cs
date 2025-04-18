@@ -8,17 +8,15 @@ using System.Threading.Tasks;
 
 namespace AcademicChatBot.DAL.Models
 {
-    public class ComboSubject
+    public class ToolForSubject
     {
         [Key]
-        public Guid ComboSubjectId { get; set; }
-        public int SemesterNo { get; set; }
-        public string Note { get; set; } = string.Empty;
+        public Guid ToolForSubjectId { get; set; }
+        public Guid? ToolId { get; set; }
+        [ForeignKey(nameof(ToolId))]
+        public Tool? Tool { get; set; }
         public Guid? SubjectId { get; set; }
         [ForeignKey(nameof(SubjectId))]
         public Subject? Subject { get; set; }
-        public Guid? ComboId { get; set; }
-        [ForeignKey(nameof(ComboId))]
-        public Combo? Combo { get; set; }
     }
 }

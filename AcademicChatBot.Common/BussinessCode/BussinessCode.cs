@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AcademicChatBot.Common.DTOs.BussinessCode
+namespace AcademicChatBot.Common.BussinessCode
 {
     public enum BusinessCode
     {

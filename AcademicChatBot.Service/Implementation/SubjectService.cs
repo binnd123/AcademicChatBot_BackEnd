@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.DTOs;
-using AcademicChatBot.Common.DTOs.BussinessCode;
 using AcademicChatBot.Common.DTOs.Subjects;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Implementation;
@@ -18,18 +18,22 @@ namespace AcademicChatBot.Service.Implementation
     {
         private readonly IGenericRepository<Subject> _subjectRepository;
         private readonly IGenericRepository<Curriculum> _curriculumRepository;
+        private readonly IGenericRepository<ToolForSubject> _toolForSubjectRepository;
+        private readonly IGenericRepository<Tool> _toolRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public SubjectService(IGenericRepository<Subject> subjectRepository, IGenericRepository<Curriculum> curriculumRepository, IUnitOfWork unitOfWork)
+        public SubjectService(IGenericRepository<Subject> subjectRepository, IGenericRepository<Curriculum> curriculumRepository, IGenericRepository<ToolForSubject> toolForSubjectRepository, IGenericRepository<Tool> toolRepository, IUnitOfWork unitOfWork)
         {
             _subjectRepository = subjectRepository;
             _curriculumRepository = curriculumRepository;
+            _toolForSubjectRepository = toolForSubjectRepository;
+            _toolRepository = toolRepository;
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ResponseDTO> CreateSubject(CreateSubjectRequest request)
+        public async Task<Response> CreateSubject(CreateSubjectRequest request)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 if (request.CurriculumId != null)
@@ -55,8 +59,38 @@ namespace AcademicChatBot.Service.Implementation
                     NoCredit = request.NoCredit,
                     SubjectName = request.SubjectName,
                     CurriculumId = request.CurriculumId,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    DegreeLevel = request.DegreeLevel,
+                    Description = request.Description,
+                    SyllabusName = request.SyllabusName,
+                    TimeAllocation = request.TimeAllocation,
+                    StudentTasks = request.StudentTasks,
+                    ScoringScale = request.ScoringScale,
+                    MinAvgMarkToPass = request.MinAvgMarkToPass,
+                    Note = request.Note,
+                    SessionNo = request.SessionNo,
                 };
                 await _subjectRepository.Insert(subject);
+
+                if (request.ToolIds != null && request.ToolIds.Any())
+                {
+                    foreach (var toolId in request.ToolIds)
+                    {
+                        var tool = await _toolRepository.GetById(toolId);
+                        if (tool != null)
+                        {
+                            var toolForSubject = new ToolForSubject
+                            {
+                                ToolForSubjectId = Guid.NewGuid(),
+                                SubjectId = subject.SubjectId,
+                                ToolId = tool.ToolId                                
+                            };
+                            await _toolForSubjectRepository.Insert(toolForSubject);
+                        }
+                    }
+                }
+
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.INSERT_SUCESSFULLY;
@@ -72,9 +106,9 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> DeleteSubject(Guid SubjectId)
+        public async Task<Response> DeleteSubject(Guid SubjectId)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 var subject = await _subjectRepository.GetById(SubjectId);
@@ -102,9 +136,9 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> GetAllSubjects(int pageNumber, int pageSize, string search)
+        public async Task<Response> GetAllSubjects(int pageNumber, int pageSize, string search)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 dto.Data = await _subjectRepository.GetAllDataByExpression(
@@ -127,9 +161,9 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> GetSubjectById(Guid subjectId)
+        public async Task<Response> GetSubjectById(Guid subjectId)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 dto.Data = await _subjectRepository.GetById(subjectId);
@@ -153,9 +187,9 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> UpdateSubject(Guid SubjectId, UpdateSubjectRequest request)
+        public async Task<Response> UpdateSubject(Guid SubjectId, UpdateSubjectRequest request)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 if (request.CurriculumId != null)
@@ -177,19 +211,52 @@ namespace AcademicChatBot.Service.Implementation
                     dto.Message = "Subject not found";
                     return dto;
                 }
+
                 if (!string.IsNullOrEmpty(request.SubjectName)) subject.SubjectName = request.SubjectName;
-
                 if (!string.IsNullOrEmpty(request.SubjectCode)) subject.SubjectCode = request.SubjectCode;
-
                 if (!string.IsNullOrEmpty(request.DecisionNo)) subject.DecisionNo = request.DecisionNo;
-
-                if (request.ApprovedDate != null) subject.ApprovedDate = request.ApprovedDate;
+                if (request.ApprovedDate != default) subject.ApprovedDate = request.ApprovedDate;
 
                 subject.IsActive = request.IsActive;
                 subject.IsApproved = request.IsApproved;
-                subject.IsActive = request.IsActive;
-                subject.CurriculumId = request.CurriculumId;
+
+                if (request.NoCredit > 0) subject.NoCredit = request.NoCredit;
+                if (request.SessionNo > 0) subject.SessionNo = request.SessionNo;
+                if (!string.IsNullOrEmpty(request.SyllabusName)) subject.SyllabusName = request.SyllabusName;
+                if (!string.IsNullOrEmpty(request.DegreeLevel)) subject.DegreeLevel = request.DegreeLevel;
+                if (!string.IsNullOrEmpty(request.TimeAllocation)) subject.TimeAllocation = request.TimeAllocation;
+                if (!string.IsNullOrEmpty(request.Description)) subject.Description = request.Description;
+                if (!string.IsNullOrEmpty(request.StudentTasks)) subject.StudentTasks = request.StudentTasks;
+                if (request.ScoringScale > 0) subject.ScoringScale = request.ScoringScale;
+                if (request.MinAvgMarkToPass > 0) subject.MinAvgMarkToPass = request.MinAvgMarkToPass;
+                if (!string.IsNullOrEmpty(request.Note)) subject.Note = request.Note;
+                if (request.CurriculumId != null) subject.CurriculumId = request.CurriculumId;
+
+                subject.UpdatedAt = DateTime.Now;
+
                 await _subjectRepository.Update(subject);
+
+                await _toolForSubjectRepository.DeleteByExpression(filter: t => t.SubjectId == subject.SubjectId);
+
+                // Tạo lại liên kết với ToolIds mới
+                if (request.ToolIds != null && request.ToolIds.Any())
+                {
+                    foreach (var toolId in request.ToolIds)
+                    {
+                        var tool = await _toolRepository.GetById(toolId);
+                        if (tool != null)
+                        {
+                            var toolForSubject = new ToolForSubject
+                            {
+                                ToolForSubjectId = Guid.NewGuid(),
+                                SubjectId = subject.SubjectId,
+                                ToolId = toolId
+                            };
+                            await _toolForSubjectRepository.Insert(toolForSubject);
+                        }
+                    }
+                }
+
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.UPDATE_SUCCESSFULLY;

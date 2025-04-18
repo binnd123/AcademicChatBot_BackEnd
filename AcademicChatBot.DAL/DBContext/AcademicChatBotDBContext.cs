@@ -17,19 +17,23 @@ namespace AcademicChatBot.DAL.DBContext
         }
         
         public DbSet<Models.User> Users { get; set; } = null!;
-        public DbSet<Models.Syllabus> Syllabuss { get; set; } = null!;
+        public DbSet<Models.CourseLearningOutcome> CourseLearningOutcome { get; set; } = null!;
         public DbSet<Models.SubjectInCurriculum> SubjectInCurriculums { get; set; } = null!;
         public DbSet<Models.Subject> Subjects { get; set; } = null!;
         public DbSet<Models.Student> Students { get; set; } = null!;
-        public DbSet<Models.Session> Sessions { get; set; } = null!;
+        public DbSet<Models.Tool> Tool { get; set; } = null!;
         public DbSet<Models.PrerequisiteSubject> PrerequisiteSubjects { get; set; } = null!;
+        public DbSet<Models.PrerequisiteConstraint> PrerequisiteConstraint { get; set; } = null!;
         public DbSet<Models.Notification> Notifications { get; set; } = null!;
         public DbSet<Models.Message> Messages { get; set; } = null!;
         public DbSet<Models.Material> Materials { get; set; } = null!;
         public DbSet<Models.Major> Majors { get; set; } = null!;
-        public DbSet<Models.LearningOutcome> LearningOutcomes { get; set; } = null!;
+        public DbSet<Models.ToolForSubject> ToolForSubject { get; set; } = null!;
         public DbSet<Models.Curriculum> Curriculums { get; set; } = null!;
-        public DbSet<Models.ConstructiveQuestion> ConstructiveQuestions { get; set; } = null!;
+        public DbSet<Models.ProgramingLearningOutcome> ProgramingLearningOutcome { get; set; } = null!;
+        public DbSet<Models.ProgramingOutcome> ProgramingOutcome { get; set; } = null!;
+        public DbSet<Models.POMappingPLO> POMappingPLO { get; set; } = null!;
+        public DbSet<Models.Program> Program { get; set; } = null!;
         public DbSet<Models.ComboSubject> ComboSubjects { get; set; } = null!;
         public DbSet<Models.Combo> Combos { get; set; } = null!;
         public DbSet<Models.Assessment> Assessments { get; set; } = null!;

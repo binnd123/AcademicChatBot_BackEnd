@@ -14,7 +14,10 @@ namespace AcademicChatBot.DAL.Models
         public Guid NotificationId { get; set; }
         public string Message { get; set; } = string.Empty;
         public bool IsRead { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public bool IsDeleted { get; set; } = false;
         public Guid? UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         public User? User { get; set; }

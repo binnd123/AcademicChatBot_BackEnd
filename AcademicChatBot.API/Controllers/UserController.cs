@@ -17,19 +17,19 @@ namespace AcademicChatBot.API.Controllers
             _service = service;
         }
         [HttpPost("sign-up")]
-        public async Task<ResponseDTO> SignUp(AccountSignUpRequest request)
+        public async Task<Response> SignUp(AccountSignUpRequest request)
         {
             return await _service.SignUp(request);
         }
 
         [HttpPost("login")]
-        public async Task<ResponseDTO> Login(AccountLoginRequest request)
+        public async Task<Response> Login(AccountLoginRequest request)
         {
             return await _service.Login(request);
         }
 
         [HttpPost("refresh-token")]
-        public async Task<ResponseDTO> RefreshToken(string refreshToken)
+        public async Task<Response> RefreshToken(string refreshToken)
         {
             return await _service.HandleRefreshToken(refreshToken);
         }
