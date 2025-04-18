@@ -8,22 +8,55 @@ using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.DTOs;
 using AcademicChatBot.Common.DTOs.Accounts;
+using AcademicChatBot.Common.Enum;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AcademicChatBot.Service.Implementation
 {
-    public class JWTService : IJWTService
+    public class JwtService : IJwtService
     {
         private readonly IConfiguration _configuration;
 
-        public JWTService(IConfiguration configuration)
+        public JwtService(IConfiguration configuration)
         {
             _configuration = configuration;
         }
-        public string GenerateAccessToken(Guid userId, string role, string email)
+        public Guid? GetStudentIdFromToken(HttpRequest request, out string errorMessage)
+        {
+            errorMessage = string.Empty;
+            var token = request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            if (string.IsNullOrEmpty(token))
+            {
+                errorMessage = "No token provided";
+                return null;
+            }
+
+            try
+            {
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]!));
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var studentIdClaim = jwtToken?.Claims.FirstOrDefault(c => c.Type == "StudentId");
+
+                if (studentIdClaim == null)
+                {
+                    errorMessage = "StudentId claim not found";
+                    return null;
+                }
+
+                return Guid.Parse(studentIdClaim.Value);
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error parsing token: {ex.Message}";
+                return null;
+            }
+        }
+        public string GenerateAccessToken(Guid userId, RoleName role, string email, Guid? studentId = null)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -31,9 +64,13 @@ namespace AcademicChatBot.Service.Implementation
             {
                          new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                          new("AccountId", userId.ToString()),
-                          new Claim(ClaimTypes.Role,role),
+                          new Claim(ClaimTypes.Role,role.ToString()),
                           new Claim(ClaimTypes.Email, email),
                      };
+            if (studentId.HasValue)
+            {
+                claims.Add(new Claim("StudentId", studentId.Value.ToString()));
+            }
             var token = new JwtSecurityToken(
                 issuer: _configuration["JwtSettings:Issuer"],
                 audience: _configuration["JwtSettings:Audience"],

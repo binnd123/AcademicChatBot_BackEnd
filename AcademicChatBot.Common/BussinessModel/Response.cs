@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AcademicChatBot.Common.DTOs.BussinessCode;
+using AcademicChatBot.Common.BussinessCode;
 
 namespace AcademicChatBot.Common.DTOs
 {
-    public class ResponseDTO
+    public class Response
     {
         public bool IsSucess { get; set; } = true;
         public object Data { get; set; }

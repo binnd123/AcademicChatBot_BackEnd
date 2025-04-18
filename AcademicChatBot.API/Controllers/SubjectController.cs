@@ -21,7 +21,7 @@ namespace AcademicChatBot.API.Controllers
 
         [Authorize]
         [HttpGet("get-all-subjects")]
-        public async Task<ResponseDTO> GetAllSubjects(
+        public async Task<Response> GetAllSubjects(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string search = ""
@@ -33,22 +33,22 @@ namespace AcademicChatBot.API.Controllers
         }
         [Authorize]
         [HttpGet("get-subject/{id}")]
-        public async Task<ResponseDTO> GetSubjectById(Guid id)
+        public async Task<Response> GetSubjectById(Guid id)
         {
             return await _subjectService.GetSubjectById(id);
         }
         [HttpPost("create-subject")]
-        public async Task<ResponseDTO> CreateSubject([FromBody] CreateSubjectRequest request)
+        public async Task<Response> CreateSubject([FromBody] CreateSubjectRequest request)
         {
             return await _subjectService.CreateSubject(request);
         }
         [HttpPut("update-subject/{id}")]
-        public async Task<ResponseDTO> UpdateSubject(Guid id, UpdateSubjectRequest request)
+        public async Task<Response> UpdateSubject(Guid id, UpdateSubjectRequest request)
         {
             return await _subjectService.UpdateSubject(id, request);
         }
         [HttpPut("delete-subject/{id}")]
-        public async Task<ResponseDTO> DeleteSubject(Guid id)
+        public async Task<Response> DeleteSubject(Guid id)
         {
             return await _subjectService.DeleteSubject(id);
         }

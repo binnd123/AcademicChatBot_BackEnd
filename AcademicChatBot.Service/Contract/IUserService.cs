@@ -10,8 +10,8 @@ namespace AcademicChatBot.Service.Contract
 {
     public interface IUserService
     {
-        public Task<ResponseDTO> SignUp(AccountSignUpRequest signUpRequest);
-        public Task<ResponseDTO> Login(AccountLoginRequest loginRequest);
-        public Task<ResponseDTO> HandleRefreshToken(string refreshToken);
+        public Task<Response> SignUp(AccountSignUpRequest signUpRequest);
+        public Task<Response> Login(AccountLoginRequest loginRequest);
+        public Task<Response> HandleRefreshToken(string refreshToken);
     }
 }

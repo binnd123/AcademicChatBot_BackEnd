@@ -23,9 +23,12 @@ namespace AcademicChatBot.DAL.Models
         public string KnowledgeAndSkill { get; set; } = string.Empty;
         public string GradingGuide { get; set; } = string.Empty;
         public string Note { get; set; } = null!;
-        public bool IsDeleted { get; set; } = false;
-        public Guid? SyllabusId { get; set; }
-        [ForeignKey(nameof(SyllabusId))]
-        public Syllabus? Syllabus { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public bool IsDeleted { get; set; }
+        public Guid? SubjectId { get; set; }
+        [ForeignKey(nameof(SubjectId))]
+        public Subject? Subject { get; set; }
     }
 }

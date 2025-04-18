@@ -8,11 +8,15 @@ using System.Threading.Tasks;
 
 namespace AcademicChatBot.DAL.Models
 {
-    public class SubjectInCurriculum
+    public class PrerequisiteConstraint
     {
         [Key]
-        public Guid SubjectInCurriculumId { get; set; }
-        public int SemesterNo{ get; set; }
+        public Guid PrerequisiteConstraintId { get; set; }
+        public string PrerequisiteConstraintCode { get; set; } = null!;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public bool IsDeleted { get; set; } = false;
         public Guid? SubjectId { get; set; }
         [ForeignKey(nameof(SubjectId))]
         public Subject? Subject { get; set; }
