@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AcademicChatBot.DAL.Migrations
 {
     [DbContext(typeof(AcademicChatBotDBContext))]
-    [Migration("20250418072345_InitialCreate")]
+    [Migration("20250418084026_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -62,7 +62,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AIChatLogs");
+                    b.ToTable("AIChatLog");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Assessment", b =>
@@ -132,7 +132,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Assessments");
+                    b.ToTable("Assessment");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Combo", b =>
@@ -182,7 +182,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("MajorId");
 
-                    b.ToTable("Combos");
+                    b.ToTable("Combo");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.ComboSubject", b =>
@@ -210,7 +210,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("ComboSubjects");
+                    b.ToTable("ComboSubject");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.CourseLearningOutcome", b =>
@@ -314,7 +314,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("ProgramId");
 
-                    b.ToTable("Curriculums");
+                    b.ToTable("Curriculum");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Major", b =>
@@ -348,7 +348,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasKey("MajorId");
 
-                    b.ToTable("Majors");
+                    b.ToTable("Major");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Material", b =>
@@ -416,7 +416,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Materials");
+                    b.ToTable("Material");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Message", b =>
@@ -448,7 +448,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("AIChatLogId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Notification", b =>
@@ -483,7 +483,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notification");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.POMappingPLO", b =>
@@ -585,7 +585,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("PrerequisiteSubjects");
+                    b.ToTable("PrerequisiteSubject");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Program", b =>
@@ -759,7 +759,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Students");
+                    b.ToTable("Student");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Subject", b =>
@@ -844,7 +844,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("CurriculumId");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("Subject");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.SubjectInCurriculum", b =>
@@ -868,7 +868,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("SubjectInCurriculums");
+                    b.ToTable("SubjectInCurriculum");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Tool", b =>
@@ -982,7 +982,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.AIChatLog", b =>

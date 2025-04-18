@@ -15,6 +15,6 @@ namespace AcademicChatBot.Common.DTOs.Students
         public string PhoneNumber { get; set; }
         public DateTime DOB { get; set; }
         public DateTime IntakeYear { get; set; }
-        public GenderType Gender { get; set; }
+        public GenderType Gender { get; set; } = GenderType.Male;
     }
 }

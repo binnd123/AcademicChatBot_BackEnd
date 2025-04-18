@@ -12,7 +12,7 @@ namespace AcademicChatBot.DAL.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Majors",
+                name: "Major",
                 columns: table => new
                 {
                     MajorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -26,7 +26,7 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Majors", x => x.MajorId);
+                    table.PrimaryKey("PK_Major", x => x.MajorId);
                 });
 
             migrationBuilder.CreateTable(
@@ -70,7 +70,7 @@ namespace AcademicChatBot.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "User",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -87,11 +87,11 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.PrimaryKey("PK_User", x => x.UserId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Combos",
+                name: "Combo",
                 columns: table => new
                 {
                     ComboId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -109,16 +109,16 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Combos", x => x.ComboId);
+                    table.PrimaryKey("PK_Combo", x => x.ComboId);
                     table.ForeignKey(
-                        name: "FK_Combos_Majors_MajorId",
+                        name: "FK_Combo_Major_MajorId",
                         column: x => x.MajorId,
-                        principalTable: "Majors",
+                        principalTable: "Major",
                         principalColumn: "MajorId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Curriculums",
+                name: "Curriculum",
                 columns: table => new
                 {
                     CurriculumId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -138,14 +138,14 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Curriculums", x => x.CurriculumId);
+                    table.PrimaryKey("PK_Curriculum", x => x.CurriculumId);
                     table.ForeignKey(
-                        name: "FK_Curriculums_Majors_MajorId",
+                        name: "FK_Curriculum_Major_MajorId",
                         column: x => x.MajorId,
-                        principalTable: "Majors",
+                        principalTable: "Major",
                         principalColumn: "MajorId");
                     table.ForeignKey(
-                        name: "FK_Curriculums_Program_ProgramId",
+                        name: "FK_Curriculum_Program_ProgramId",
                         column: x => x.ProgramId,
                         principalTable: "Program",
                         principalColumn: "ProgramId");
@@ -176,7 +176,7 @@ namespace AcademicChatBot.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AIChatLogs",
+                name: "AIChatLog",
                 columns: table => new
                 {
                     AIChatLogId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -192,16 +192,16 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AIChatLogs", x => x.AIChatLogId);
+                    table.PrimaryKey("PK_AIChatLog", x => x.AIChatLogId);
                     table.ForeignKey(
-                        name: "FK_AIChatLogs_Users_UserId",
+                        name: "FK_AIChatLog_User_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "User",
                         principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Notifications",
+                name: "Notification",
                 columns: table => new
                 {
                     NotificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -215,16 +215,16 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Notifications", x => x.NotificationId);
+                    table.PrimaryKey("PK_Notification", x => x.NotificationId);
                     table.ForeignKey(
-                        name: "FK_Notifications_Users_UserId",
+                        name: "FK_Notification_User_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "User",
                         principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Students",
+                name: "Student",
                 columns: table => new
                 {
                     StudentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -245,16 +245,16 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Students", x => x.StudentId);
+                    table.PrimaryKey("PK_Student", x => x.StudentId);
                     table.ForeignKey(
-                        name: "FK_Students_Majors_MajorId",
+                        name: "FK_Student_Major_MajorId",
                         column: x => x.MajorId,
-                        principalTable: "Majors",
+                        principalTable: "Major",
                         principalColumn: "MajorId");
                     table.ForeignKey(
-                        name: "FK_Students_Users_UserId",
+                        name: "FK_Student_User_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "User",
                         principalColumn: "UserId");
                 });
 
@@ -276,14 +276,14 @@ namespace AcademicChatBot.DAL.Migrations
                 {
                     table.PrimaryKey("PK_ProgramingLearningOutcome", x => x.ProgramingLearningOutcomeId);
                     table.ForeignKey(
-                        name: "FK_ProgramingLearningOutcome_Curriculums_CurriculumId",
+                        name: "FK_ProgramingLearningOutcome_Curriculum_CurriculumId",
                         column: x => x.CurriculumId,
-                        principalTable: "Curriculums",
+                        principalTable: "Curriculum",
                         principalColumn: "CurriculumId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Subjects",
+                name: "Subject",
                 columns: table => new
                 {
                     SubjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -311,16 +311,16 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Subjects", x => x.SubjectId);
+                    table.PrimaryKey("PK_Subject", x => x.SubjectId);
                     table.ForeignKey(
-                        name: "FK_Subjects_Curriculums_CurriculumId",
+                        name: "FK_Subject_Curriculum_CurriculumId",
                         column: x => x.CurriculumId,
-                        principalTable: "Curriculums",
+                        principalTable: "Curriculum",
                         principalColumn: "CurriculumId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Messages",
+                name: "Message",
                 columns: table => new
                 {
                     MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -333,11 +333,11 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Messages", x => x.MessageId);
+                    table.PrimaryKey("PK_Message", x => x.MessageId);
                     table.ForeignKey(
-                        name: "FK_Messages_AIChatLogs_AIChatLogId",
+                        name: "FK_Message_AIChatLog_AIChatLogId",
                         column: x => x.AIChatLogId,
-                        principalTable: "AIChatLogs",
+                        principalTable: "AIChatLog",
                         principalColumn: "AIChatLogId");
                 });
 
@@ -365,7 +365,7 @@ namespace AcademicChatBot.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Assessments",
+                name: "Assessment",
                 columns: table => new
                 {
                     AssessmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -388,16 +388,16 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Assessments", x => x.AssessmentId);
+                    table.PrimaryKey("PK_Assessment", x => x.AssessmentId);
                     table.ForeignKey(
-                        name: "FK_Assessments_Subjects_SubjectId",
+                        name: "FK_Assessment_Subject_SubjectId",
                         column: x => x.SubjectId,
-                        principalTable: "Subjects",
+                        principalTable: "Subject",
                         principalColumn: "SubjectId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "ComboSubjects",
+                name: "ComboSubject",
                 columns: table => new
                 {
                     ComboSubjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -408,21 +408,21 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ComboSubjects", x => x.ComboSubjectId);
+                    table.PrimaryKey("PK_ComboSubject", x => x.ComboSubjectId);
                     table.ForeignKey(
-                        name: "FK_ComboSubjects_Combos_ComboId",
+                        name: "FK_ComboSubject_Combo_ComboId",
                         column: x => x.ComboId,
-                        principalTable: "Combos",
+                        principalTable: "Combo",
                         principalColumn: "ComboId");
                     table.ForeignKey(
-                        name: "FK_ComboSubjects_Subjects_SubjectId",
+                        name: "FK_ComboSubject_Subject_SubjectId",
                         column: x => x.SubjectId,
-                        principalTable: "Subjects",
+                        principalTable: "Subject",
                         principalColumn: "SubjectId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Materials",
+                name: "Material",
                 columns: table => new
                 {
                     MaterialId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -445,11 +445,11 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Materials", x => x.MaterialId);
+                    table.PrimaryKey("PK_Material", x => x.MaterialId);
                     table.ForeignKey(
-                        name: "FK_Materials_Subjects_SubjectId",
+                        name: "FK_Material_Subject_SubjectId",
                         column: x => x.SubjectId,
-                        principalTable: "Subjects",
+                        principalTable: "Subject",
                         principalColumn: "SubjectId");
                 });
 
@@ -470,19 +470,19 @@ namespace AcademicChatBot.DAL.Migrations
                 {
                     table.PrimaryKey("PK_PrerequisiteConstraint", x => x.PrerequisiteConstraintId);
                     table.ForeignKey(
-                        name: "FK_PrerequisiteConstraint_Curriculums_CurriculumId",
+                        name: "FK_PrerequisiteConstraint_Curriculum_CurriculumId",
                         column: x => x.CurriculumId,
-                        principalTable: "Curriculums",
+                        principalTable: "Curriculum",
                         principalColumn: "CurriculumId");
                     table.ForeignKey(
-                        name: "FK_PrerequisiteConstraint_Subjects_SubjectId",
+                        name: "FK_PrerequisiteConstraint_Subject_SubjectId",
                         column: x => x.SubjectId,
-                        principalTable: "Subjects",
+                        principalTable: "Subject",
                         principalColumn: "SubjectId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "SubjectInCurriculums",
+                name: "SubjectInCurriculum",
                 columns: table => new
                 {
                     SubjectInCurriculumId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -492,16 +492,16 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SubjectInCurriculums", x => x.SubjectInCurriculumId);
+                    table.PrimaryKey("PK_SubjectInCurriculum", x => x.SubjectInCurriculumId);
                     table.ForeignKey(
-                        name: "FK_SubjectInCurriculums_Curriculums_CurriculumId",
+                        name: "FK_SubjectInCurriculum_Curriculum_CurriculumId",
                         column: x => x.CurriculumId,
-                        principalTable: "Curriculums",
+                        principalTable: "Curriculum",
                         principalColumn: "CurriculumId");
                     table.ForeignKey(
-                        name: "FK_SubjectInCurriculums_Subjects_SubjectId",
+                        name: "FK_SubjectInCurriculum_Subject_SubjectId",
                         column: x => x.SubjectId,
-                        principalTable: "Subjects",
+                        principalTable: "Subject",
                         principalColumn: "SubjectId");
                 });
 
@@ -517,9 +517,9 @@ namespace AcademicChatBot.DAL.Migrations
                 {
                     table.PrimaryKey("PK_ToolForSubject", x => x.ToolForSubjectId);
                     table.ForeignKey(
-                        name: "FK_ToolForSubject_Subjects_SubjectId",
+                        name: "FK_ToolForSubject_Subject_SubjectId",
                         column: x => x.SubjectId,
-                        principalTable: "Subjects",
+                        principalTable: "Subject",
                         principalColumn: "SubjectId");
                     table.ForeignKey(
                         name: "FK_ToolForSubject_Tool_ToolId",
@@ -547,19 +547,19 @@ namespace AcademicChatBot.DAL.Migrations
                 {
                     table.PrimaryKey("PK_CourseLearningOutcome", x => x.CourseLearningOutcomeId);
                     table.ForeignKey(
-                        name: "FK_CourseLearningOutcome_Assessments_AssessmentId",
+                        name: "FK_CourseLearningOutcome_Assessment_AssessmentId",
                         column: x => x.AssessmentId,
-                        principalTable: "Assessments",
+                        principalTable: "Assessment",
                         principalColumn: "AssessmentId");
                     table.ForeignKey(
-                        name: "FK_CourseLearningOutcome_Subjects_SubjectId",
+                        name: "FK_CourseLearningOutcome_Subject_SubjectId",
                         column: x => x.SubjectId,
-                        principalTable: "Subjects",
+                        principalTable: "Subject",
                         principalColumn: "SubjectId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "PrerequisiteSubjects",
+                name: "PrerequisiteSubject",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -575,47 +575,47 @@ namespace AcademicChatBot.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PrerequisiteSubjects", x => x.Id);
+                    table.PrimaryKey("PK_PrerequisiteSubject", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PrerequisiteSubjects_PrerequisiteConstraint_PrerequisiteConstraintId",
+                        name: "FK_PrerequisiteSubject_PrerequisiteConstraint_PrerequisiteConstraintId",
                         column: x => x.PrerequisiteConstraintId,
                         principalTable: "PrerequisiteConstraint",
                         principalColumn: "PrerequisiteConstraintId");
                     table.ForeignKey(
-                        name: "FK_PrerequisiteSubjects_Subjects_PrerequisiteSubjectId",
+                        name: "FK_PrerequisiteSubject_Subject_PrerequisiteSubjectId",
                         column: x => x.PrerequisiteSubjectId,
-                        principalTable: "Subjects",
+                        principalTable: "Subject",
                         principalColumn: "SubjectId");
                     table.ForeignKey(
-                        name: "FK_PrerequisiteSubjects_Subjects_SubjectId",
+                        name: "FK_PrerequisiteSubject_Subject_SubjectId",
                         column: x => x.SubjectId,
-                        principalTable: "Subjects",
+                        principalTable: "Subject",
                         principalColumn: "SubjectId");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AIChatLogs_UserId",
-                table: "AIChatLogs",
+                name: "IX_AIChatLog_UserId",
+                table: "AIChatLog",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Assessments_SubjectId",
-                table: "Assessments",
+                name: "IX_Assessment_SubjectId",
+                table: "Assessment",
                 column: "SubjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Combos_MajorId",
-                table: "Combos",
+                name: "IX_Combo_MajorId",
+                table: "Combo",
                 column: "MajorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ComboSubjects_ComboId",
-                table: "ComboSubjects",
+                name: "IX_ComboSubject_ComboId",
+                table: "ComboSubject",
                 column: "ComboId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ComboSubjects_SubjectId",
-                table: "ComboSubjects",
+                name: "IX_ComboSubject_SubjectId",
+                table: "ComboSubject",
                 column: "SubjectId");
 
             migrationBuilder.CreateIndex(
@@ -629,28 +629,28 @@ namespace AcademicChatBot.DAL.Migrations
                 column: "SubjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Curriculums_MajorId",
-                table: "Curriculums",
+                name: "IX_Curriculum_MajorId",
+                table: "Curriculum",
                 column: "MajorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Curriculums_ProgramId",
-                table: "Curriculums",
+                name: "IX_Curriculum_ProgramId",
+                table: "Curriculum",
                 column: "ProgramId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Materials_SubjectId",
-                table: "Materials",
+                name: "IX_Material_SubjectId",
+                table: "Material",
                 column: "SubjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_AIChatLogId",
-                table: "Messages",
+                name: "IX_Message_AIChatLogId",
+                table: "Message",
                 column: "AIChatLogId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notifications_UserId",
-                table: "Notifications",
+                name: "IX_Notification_UserId",
+                table: "Notification",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -674,18 +674,18 @@ namespace AcademicChatBot.DAL.Migrations
                 column: "SubjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PrerequisiteSubjects_PrerequisiteConstraintId",
-                table: "PrerequisiteSubjects",
+                name: "IX_PrerequisiteSubject_PrerequisiteConstraintId",
+                table: "PrerequisiteSubject",
                 column: "PrerequisiteConstraintId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PrerequisiteSubjects_PrerequisiteSubjectId",
-                table: "PrerequisiteSubjects",
+                name: "IX_PrerequisiteSubject_PrerequisiteSubjectId",
+                table: "PrerequisiteSubject",
                 column: "PrerequisiteSubjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PrerequisiteSubjects_SubjectId",
-                table: "PrerequisiteSubjects",
+                name: "IX_PrerequisiteSubject_SubjectId",
+                table: "PrerequisiteSubject",
                 column: "SubjectId");
 
             migrationBuilder.CreateIndex(
@@ -699,29 +699,29 @@ namespace AcademicChatBot.DAL.Migrations
                 column: "ProgramId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_MajorId",
-                table: "Students",
+                name: "IX_Student_MajorId",
+                table: "Student",
                 column: "MajorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_UserId",
-                table: "Students",
+                name: "IX_Student_UserId",
+                table: "Student",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SubjectInCurriculums_CurriculumId",
-                table: "SubjectInCurriculums",
+                name: "IX_Subject_CurriculumId",
+                table: "Subject",
                 column: "CurriculumId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SubjectInCurriculums_SubjectId",
-                table: "SubjectInCurriculums",
+                name: "IX_SubjectInCurriculum_CurriculumId",
+                table: "SubjectInCurriculum",
+                column: "CurriculumId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubjectInCurriculum_SubjectId",
+                table: "SubjectInCurriculum",
                 column: "SubjectId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Subjects_CurriculumId",
-                table: "Subjects",
-                column: "CurriculumId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ToolForSubject_SubjectId",
@@ -738,43 +738,43 @@ namespace AcademicChatBot.DAL.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ComboSubjects");
+                name: "ComboSubject");
 
             migrationBuilder.DropTable(
                 name: "CourseLearningOutcome");
 
             migrationBuilder.DropTable(
-                name: "Materials");
+                name: "Material");
 
             migrationBuilder.DropTable(
-                name: "Messages");
+                name: "Message");
 
             migrationBuilder.DropTable(
-                name: "Notifications");
+                name: "Notification");
 
             migrationBuilder.DropTable(
                 name: "POMappingPLO");
 
             migrationBuilder.DropTable(
-                name: "PrerequisiteSubjects");
+                name: "PrerequisiteSubject");
 
             migrationBuilder.DropTable(
-                name: "Students");
+                name: "Student");
 
             migrationBuilder.DropTable(
-                name: "SubjectInCurriculums");
+                name: "SubjectInCurriculum");
 
             migrationBuilder.DropTable(
                 name: "ToolForSubject");
 
             migrationBuilder.DropTable(
-                name: "Combos");
+                name: "Combo");
 
             migrationBuilder.DropTable(
-                name: "Assessments");
+                name: "Assessment");
 
             migrationBuilder.DropTable(
-                name: "AIChatLogs");
+                name: "AIChatLog");
 
             migrationBuilder.DropTable(
                 name: "ProgramingLearningOutcome");
@@ -789,16 +789,16 @@ namespace AcademicChatBot.DAL.Migrations
                 name: "Tool");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "User");
 
             migrationBuilder.DropTable(
-                name: "Subjects");
+                name: "Subject");
 
             migrationBuilder.DropTable(
-                name: "Curriculums");
+                name: "Curriculum");
 
             migrationBuilder.DropTable(
-                name: "Majors");
+                name: "Major");
 
             migrationBuilder.DropTable(
                 name: "Program");
