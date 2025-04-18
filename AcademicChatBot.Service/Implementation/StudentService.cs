@@ -62,7 +62,7 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> UpdateStudentProfile(Guid studentId, StudentProfileRequest request)
+        public async Task<Response> UpdateStudentProfile(Guid? studentId, StudentProfileRequest request)
         {
             Response dto = new Response();
             try

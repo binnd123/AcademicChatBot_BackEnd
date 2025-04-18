@@ -20,6 +20,6 @@ namespace AcademicChatBot.Common.DTOs.Accounts
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-        public RoleName Role { get; set; }
+        public RoleName Role { get; set; } = RoleName.Student;
     }
 }
