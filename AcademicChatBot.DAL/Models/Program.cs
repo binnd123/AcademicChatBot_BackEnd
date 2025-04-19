@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace AcademicChatBot.DAL.Models
 {
-    public class Major
+    public class Program
     {
         [Key]
-        public Guid MajorId { get; set; }
-        public string MajorCode { get; set; } = null!;
-        public string MajorName { get; set; } = null!;
+        public Guid ProgramId { get; set; }
+        public string ProgramCode { get; set; } = null!;
+        public string ProgramName { get; set; } = null!;
         public DateTime StartAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

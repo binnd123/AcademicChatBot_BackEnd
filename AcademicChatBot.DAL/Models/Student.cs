@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.DAL.Models
 {
@@ -20,7 +21,11 @@ namespace AcademicChatBot.DAL.Models
         public string? PhoneNumber { get; set; }
         public DateTime DOB { get; set; }
         public DateTime IntakeYear { get; set; }
-        public bool Gender { get; set; } // true: Male ; false: female
+        public GenderType Gender { get; set; } = GenderType.Male;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public bool IsDeleted { get; set; } = false;
         public Guid? UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         public User? User { get; set; }

@@ -10,7 +10,7 @@ namespace AcademicChatBot.Service.Contract
 {
     public interface IStudentService
     {
-        public Task<ResponseDTO> GetStudentProfile(Guid studentId);
-        public Task<ResponseDTO> UpdateStudentProfile(Guid studentId, StudentProfileRequest request);
+        public Task<Response> GetStudentProfile(Guid? studentId);
+        public Task<Response> UpdateStudentProfile(Guid? studentId, StudentProfileRequest request);
     }
 }

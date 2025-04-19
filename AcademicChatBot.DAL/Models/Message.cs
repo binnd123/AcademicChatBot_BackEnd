@@ -4,16 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.DAL.Models
 {
-    public enum MessageType
-    {
-        Text,
-        Audio,
-        Video,
-        File,
-    }
     public class Message
     {
         public Message()

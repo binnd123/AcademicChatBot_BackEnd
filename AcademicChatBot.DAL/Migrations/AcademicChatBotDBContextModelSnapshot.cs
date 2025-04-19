@@ -31,8 +31,14 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("LastMessageTime")
                         .HasColumnType("datetime2");
@@ -53,7 +59,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AIChatLogs");
+                    b.ToTable("AIChatLog");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Assessment", b =>
@@ -69,6 +75,12 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<string>("CompletionCriteria")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Duration")
                         .IsRequired()
@@ -100,21 +112,24 @@ namespace AcademicChatBot.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("SyllabusId")
+                    b.Property<Guid?>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<double>("Weight")
                         .HasColumnType("float");
 
                     b.HasKey("AssessmentId");
 
-                    b.HasIndex("SyllabusId");
+                    b.HasIndex("SubjectId");
 
-                    b.ToTable("Assessments");
+                    b.ToTable("Assessment");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Combo", b =>
@@ -130,6 +145,12 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<string>("ComboName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -151,11 +172,14 @@ namespace AcademicChatBot.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("ComboId");
 
                     b.HasIndex("MajorId");
 
-                    b.ToTable("Combos");
+                    b.ToTable("Combo");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.ComboSubject", b =>
@@ -166,9 +190,6 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.Property<Guid?>("ComboId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Note")
                         .IsRequired()
@@ -186,39 +207,52 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("ComboSubjects");
+                    b.ToTable("ComboSubject");
                 });
 
-            modelBuilder.Entity("AcademicChatBot.DAL.Models.ConstructiveQuestion", b =>
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.CourseLearningOutcome", b =>
                 {
-                    b.Property<Guid>("ConstructiveQuestionId")
+                    b.Property<Guid>("CourseLearningOutcomeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Details")
+                    b.Property<Guid?>("AssessmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CourseLearningOutcomeCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CourseLearningOutcomeDetail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CourseLearningOutcomeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("SessionId")
+                    b.Property<Guid?>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("SyllabusId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("ConstructiveQuestionId");
+                    b.HasKey("CourseLearningOutcomeId");
 
-                    b.HasIndex("SessionId");
+                    b.HasIndex("AssessmentId");
 
-                    b.HasIndex("SyllabusId");
+                    b.HasIndex("SubjectId");
 
-                    b.ToTable("ConstructiveQuestions");
+                    b.ToTable("CourseLearningOutcome");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Curriculum", b =>
@@ -242,6 +276,9 @@ namespace AcademicChatBot.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -262,6 +299,9 @@ namespace AcademicChatBot.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("ProgramId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -269,59 +309,9 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("MajorId");
 
-                    b.ToTable("Curriculums");
-                });
+                    b.HasIndex("ProgramId");
 
-            modelBuilder.Entity("AcademicChatBot.DAL.Models.LearningOutcome", b =>
-                {
-                    b.Property<Guid>("LearningOutcomeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("AssessmentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CLODetails")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CLOName")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("CurriculumId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LODetails")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LOName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PLODescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PLOName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("SyllabusId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("LearningOutcomeId");
-
-                    b.HasIndex("AssessmentId");
-
-                    b.HasIndex("CurriculumId");
-
-                    b.HasIndex("SyllabusId");
-
-                    b.ToTable("LearningOutcomes");
+                    b.ToTable("Curriculum");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Major", b =>
@@ -331,6 +321,9 @@ namespace AcademicChatBot.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
@@ -352,7 +345,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasKey("MajorId");
 
-                    b.ToTable("Majors");
+                    b.ToTable("Major");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Material", b =>
@@ -364,6 +357,12 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<string>("Author")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Edition")
                         .IsRequired()
@@ -404,14 +403,17 @@ namespace AcademicChatBot.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("SyllabusId")
+                    b.Property<Guid?>("SubjectId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("MaterialId");
 
-                    b.HasIndex("SyllabusId");
+                    b.HasIndex("SubjectId");
 
-                    b.ToTable("Materials");
+                    b.ToTable("Material");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Message", b =>
@@ -443,7 +445,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("AIChatLogId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Notification", b =>
@@ -455,12 +457,21 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -469,7 +480,65 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notification");
+                });
+
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.POMappingPLO", b =>
+                {
+                    b.Property<Guid>("POMappingPLOId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ProgramingLearningOutcomeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ProgramingOutcomeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("POMappingPLOId");
+
+                    b.HasIndex("ProgramingLearningOutcomeId");
+
+                    b.HasIndex("ProgramingOutcomeId");
+
+                    b.ToTable("POMappingPLO");
+                });
+
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.PrerequisiteConstraint", b =>
+                {
+                    b.Property<Guid>("PrerequisiteConstraintId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CurriculumId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PrerequisiteConstraintCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("PrerequisiteConstraintId");
+
+                    b.HasIndex("CurriculumId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("PrerequisiteConstraint");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.PrerequisiteSubject", b =>
@@ -481,8 +550,17 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<int>("ConditionType")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<Guid?>("PrerequisiteConstraintId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("PrerequisiteSubjectId")
                         .HasColumnType("uniqueidentifier");
@@ -493,68 +571,132 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<Guid?>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PrerequisiteConstraintId");
 
                     b.HasIndex("PrerequisiteSubjectId");
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("PrerequisiteSubjects");
+                    b.ToTable("PrerequisiteSubject");
                 });
 
-            modelBuilder.Entity("AcademicChatBot.DAL.Models.Session", b =>
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.Program", b =>
                 {
-                    b.Property<Guid>("SessionId")
+                    b.Property<Guid>("ProgramId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Download")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProgramCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ITU")
+                    b.Property<string>("ProgramName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ProgramId");
+
+                    b.ToTable("Program");
+                });
+
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.ProgramingLearningOutcome", b =>
+                {
+                    b.Property<Guid>("ProgramingLearningOutcomeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CurriculumId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("LearningOutcomeId")
+                    b.Property<string>("ProgramingLearningOutcomeCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProgramingLearningOutcomeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ProgramingLearningOutcomeId");
+
+                    b.HasIndex("CurriculumId");
+
+                    b.ToTable("ProgramingLearningOutcome");
+                });
+
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.ProgramingOutcome", b =>
+                {
+                    b.Property<Guid>("ProgramingOutcomeId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("LearningTeachingType")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SessionNo")
-                        .HasColumnType("int");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("StudentMaterials")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StudentTasks")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("SyllabusId")
+                    b.Property<Guid?>("ProgramId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Topic")
+                    b.Property<string>("ProgramingOutcomeCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("URLs")
+                    b.Property<string>("ProgramingOutcomeName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("SessionId");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.HasIndex("LearningOutcomeId");
+                    b.HasKey("ProgramingOutcomeId");
 
-                    b.HasIndex("SyllabusId");
+                    b.HasIndex("ProgramId");
 
-                    b.ToTable("Sessions");
+                    b.ToTable("ProgramingOutcome");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Student", b =>
@@ -566,18 +708,27 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("DOB")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Gender")
-                        .HasColumnType("bit");
+                    b.Property<int>("Gender")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("IntakeYear")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -593,6 +744,9 @@ namespace AcademicChatBot.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -602,7 +756,7 @@ namespace AcademicChatBot.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Students");
+                    b.ToTable("Student");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Subject", b =>
@@ -614,75 +768,11 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<DateTime>("ApprovedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CurriculumId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("DecisionNo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsApproved")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("NoCredit")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SubjectCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SubjectName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("SubjectId");
-
-                    b.HasIndex("CurriculumId");
-
-                    b.ToTable("Subjects");
-                });
-
-            modelBuilder.Entity("AcademicChatBot.DAL.Models.SubjectInCurriculum", b =>
-                {
-                    b.Property<Guid>("SubjectInCurriculumId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CurriculumId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("SemesterNo")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("SubjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("SubjectInCurriculumId");
-
-                    b.HasIndex("CurriculumId");
-
-                    b.HasIndex("SubjectId");
-
-                    b.ToTable("SubjectInCurriculums");
-                });
-
-            modelBuilder.Entity("AcademicChatBot.DAL.Models.Syllabus", b =>
-                {
-                    b.Property<Guid>("SyllabusId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("ApprovedDate")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CurriculumId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("DecisionNo")
                         .IsRequired()
@@ -691,6 +781,9 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<string>("DegreeLevel")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -708,6 +801,9 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<double>("MinAvgMarkToPass")
                         .HasColumnType("float");
 
+                    b.Property<int>("NoCredit")
+                        .HasColumnType("int");
+
                     b.Property<string>("Note")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -715,14 +811,18 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<double>("ScoringScale")
                         .HasColumnType("float");
 
+                    b.Property<int>("SessionNo")
+                        .HasColumnType("int");
+
                     b.Property<string>("StudentTasks")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("SubjectId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SubjectCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SyllabusCode")
+                    b.Property<string>("SubjectName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -734,15 +834,109 @@ namespace AcademicChatBot.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Tools")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("SyllabusId");
+                    b.HasKey("SubjectId");
+
+                    b.HasIndex("CurriculumId");
+
+                    b.ToTable("Subject");
+                });
+
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.SubjectInCurriculum", b =>
+                {
+                    b.Property<Guid>("SubjectInCurriculumId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CurriculumId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("SemesterNo")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("SubjectInCurriculumId");
+
+                    b.HasIndex("CurriculumId");
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Syllabuss");
+                    b.ToTable("SubjectInCurriculum");
+                });
+
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.Tool", b =>
+                {
+                    b.Property<Guid>("ToolId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PublishedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Publisher")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ToolCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ToolName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ToolId");
+
+                    b.ToTable("Tool");
+                });
+
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.ToolForSubject", b =>
+                {
+                    b.Property<Guid>("ToolForSubjectId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ToolId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ToolForSubjectId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("ToolId");
+
+                    b.ToTable("ToolForSubject");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.User", b =>
@@ -752,6 +946,9 @@ namespace AcademicChatBot.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -764,6 +961,9 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -771,16 +971,15 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<string>("RefreshToken")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.AIChatLog", b =>
@@ -794,11 +993,11 @@ namespace AcademicChatBot.DAL.Migrations
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Assessment", b =>
                 {
-                    b.HasOne("AcademicChatBot.DAL.Models.Syllabus", "Syllabus")
+                    b.HasOne("AcademicChatBot.DAL.Models.Subject", "Subject")
                         .WithMany()
-                        .HasForeignKey("SyllabusId");
+                        .HasForeignKey("SubjectId");
 
-                    b.Navigation("Syllabus");
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Combo", b =>
@@ -825,19 +1024,19 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("AcademicChatBot.DAL.Models.ConstructiveQuestion", b =>
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.CourseLearningOutcome", b =>
                 {
-                    b.HasOne("AcademicChatBot.DAL.Models.Session", "Session")
+                    b.HasOne("AcademicChatBot.DAL.Models.Assessment", "Assessment")
                         .WithMany()
-                        .HasForeignKey("SessionId");
+                        .HasForeignKey("AssessmentId");
 
-                    b.HasOne("AcademicChatBot.DAL.Models.Syllabus", "Syllabus")
+                    b.HasOne("AcademicChatBot.DAL.Models.Subject", "Subject")
                         .WithMany()
-                        .HasForeignKey("SyllabusId");
+                        .HasForeignKey("SubjectId");
 
-                    b.Navigation("Session");
+                    b.Navigation("Assessment");
 
-                    b.Navigation("Syllabus");
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Curriculum", b =>
@@ -846,37 +1045,22 @@ namespace AcademicChatBot.DAL.Migrations
                         .WithMany()
                         .HasForeignKey("MajorId");
 
+                    b.HasOne("AcademicChatBot.DAL.Models.Program", "Program")
+                        .WithMany()
+                        .HasForeignKey("ProgramId");
+
                     b.Navigation("Major");
-                });
 
-            modelBuilder.Entity("AcademicChatBot.DAL.Models.LearningOutcome", b =>
-                {
-                    b.HasOne("AcademicChatBot.DAL.Models.Assessment", "Assessment")
-                        .WithMany()
-                        .HasForeignKey("AssessmentId");
-
-                    b.HasOne("AcademicChatBot.DAL.Models.Curriculum", "Curriculum")
-                        .WithMany()
-                        .HasForeignKey("CurriculumId");
-
-                    b.HasOne("AcademicChatBot.DAL.Models.Syllabus", "Syllabus")
-                        .WithMany()
-                        .HasForeignKey("SyllabusId");
-
-                    b.Navigation("Assessment");
-
-                    b.Navigation("Curriculum");
-
-                    b.Navigation("Syllabus");
+                    b.Navigation("Program");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Material", b =>
                 {
-                    b.HasOne("AcademicChatBot.DAL.Models.Syllabus", "Syllabus")
+                    b.HasOne("AcademicChatBot.DAL.Models.Subject", "Subject")
                         .WithMany()
-                        .HasForeignKey("SyllabusId");
+                        .HasForeignKey("SubjectId");
 
-                    b.Navigation("Syllabus");
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Message", b =>
@@ -897,8 +1081,42 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.POMappingPLO", b =>
+                {
+                    b.HasOne("AcademicChatBot.DAL.Models.ProgramingLearningOutcome", "ProgramingLearningOutcome")
+                        .WithMany()
+                        .HasForeignKey("ProgramingLearningOutcomeId");
+
+                    b.HasOne("AcademicChatBot.DAL.Models.ProgramingOutcome", "ProgramingOutcome")
+                        .WithMany()
+                        .HasForeignKey("ProgramingOutcomeId");
+
+                    b.Navigation("ProgramingLearningOutcome");
+
+                    b.Navigation("ProgramingOutcome");
+                });
+
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.PrerequisiteConstraint", b =>
+                {
+                    b.HasOne("AcademicChatBot.DAL.Models.Curriculum", "Curriculum")
+                        .WithMany()
+                        .HasForeignKey("CurriculumId");
+
+                    b.HasOne("AcademicChatBot.DAL.Models.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId");
+
+                    b.Navigation("Curriculum");
+
+                    b.Navigation("Subject");
+                });
+
             modelBuilder.Entity("AcademicChatBot.DAL.Models.PrerequisiteSubject", b =>
                 {
+                    b.HasOne("AcademicChatBot.DAL.Models.PrerequisiteConstraint", "PrerequisiteConstraint")
+                        .WithMany()
+                        .HasForeignKey("PrerequisiteConstraintId");
+
                     b.HasOne("AcademicChatBot.DAL.Models.Subject", "PrerequisiteSubjectInfo")
                         .WithMany()
                         .HasForeignKey("PrerequisiteSubjectId");
@@ -907,24 +1125,29 @@ namespace AcademicChatBot.DAL.Migrations
                         .WithMany()
                         .HasForeignKey("SubjectId");
 
+                    b.Navigation("PrerequisiteConstraint");
+
                     b.Navigation("PrerequisiteSubjectInfo");
 
                     b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("AcademicChatBot.DAL.Models.Session", b =>
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.ProgramingLearningOutcome", b =>
                 {
-                    b.HasOne("AcademicChatBot.DAL.Models.LearningOutcome", "LearningOutcome")
+                    b.HasOne("AcademicChatBot.DAL.Models.Curriculum", "Curriculum")
                         .WithMany()
-                        .HasForeignKey("LearningOutcomeId");
+                        .HasForeignKey("CurriculumId");
 
-                    b.HasOne("AcademicChatBot.DAL.Models.Syllabus", "Syllabus")
+                    b.Navigation("Curriculum");
+                });
+
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.ProgramingOutcome", b =>
+                {
+                    b.HasOne("AcademicChatBot.DAL.Models.Program", "Program")
                         .WithMany()
-                        .HasForeignKey("SyllabusId");
+                        .HasForeignKey("ProgramId");
 
-                    b.Navigation("LearningOutcome");
-
-                    b.Navigation("Syllabus");
+                    b.Navigation("Program");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.Student", b =>
@@ -966,13 +1189,19 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("AcademicChatBot.DAL.Models.Syllabus", b =>
+            modelBuilder.Entity("AcademicChatBot.DAL.Models.ToolForSubject", b =>
                 {
                     b.HasOne("AcademicChatBot.DAL.Models.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId");
 
+                    b.HasOne("AcademicChatBot.DAL.Models.Tool", "Tool")
+                        .WithMany()
+                        .HasForeignKey("ToolId");
+
                     b.Navigation("Subject");
+
+                    b.Navigation("Tool");
                 });
 #pragma warning restore 612, 618
         }

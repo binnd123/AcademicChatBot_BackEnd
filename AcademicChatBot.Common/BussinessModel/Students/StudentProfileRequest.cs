@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.Common.DTOs.Students
 {
@@ -14,6 +15,6 @@ namespace AcademicChatBot.Common.DTOs.Students
         public string PhoneNumber { get; set; }
         public DateTime DOB { get; set; }
         public DateTime IntakeYear { get; set; }
-        public bool Gender { get; set; }
+        public GenderType Gender { get; set; } = GenderType.Male;
     }
 }

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.Common.DTOs.Accounts
 {
@@ -19,6 +20,6 @@ namespace AcademicChatBot.Common.DTOs.Accounts
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-        public string Role { get; set; }
+        public RoleName Role { get; set; } = RoleName.Student;
     }
 }

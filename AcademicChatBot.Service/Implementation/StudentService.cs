@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.DTOs;
-using AcademicChatBot.Common.DTOs.BussinessCode;
 using AcademicChatBot.Common.DTOs.Students;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
@@ -28,11 +28,18 @@ namespace AcademicChatBot.Service.Implementation
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ResponseDTO> GetStudentProfile(Guid studentId)
+        public async Task<Response> GetStudentProfile(Guid? studentId)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
+                if (studentId == null)
+                {
+                    dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+                    dto.IsSucess = false;
+                    dto.Message = "Student not found";
+                    return dto;
+                }
                 var studentDb = await _studentRepository.GetById(studentId);
                 if (studentDb == null)
                 {
@@ -55,9 +62,9 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> UpdateStudentProfile(Guid studentId, StudentProfileRequest request)
+        public async Task<Response> UpdateStudentProfile(Guid? studentId, StudentProfileRequest request)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 var studentDb = await _studentRepository.GetById(studentId);

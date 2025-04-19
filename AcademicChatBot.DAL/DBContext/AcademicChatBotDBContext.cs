@@ -16,24 +16,28 @@ namespace AcademicChatBot.DAL.DBContext
         {
         }
         
-        public DbSet<Models.User> Users { get; set; } = null!;
-        public DbSet<Models.Syllabus> Syllabuss { get; set; } = null!;
-        public DbSet<Models.SubjectInCurriculum> SubjectInCurriculums { get; set; } = null!;
-        public DbSet<Models.Subject> Subjects { get; set; } = null!;
-        public DbSet<Models.Student> Students { get; set; } = null!;
-        public DbSet<Models.Session> Sessions { get; set; } = null!;
-        public DbSet<Models.PrerequisiteSubject> PrerequisiteSubjects { get; set; } = null!;
-        public DbSet<Models.Notification> Notifications { get; set; } = null!;
-        public DbSet<Models.Message> Messages { get; set; } = null!;
-        public DbSet<Models.Material> Materials { get; set; } = null!;
-        public DbSet<Models.Major> Majors { get; set; } = null!;
-        public DbSet<Models.LearningOutcome> LearningOutcomes { get; set; } = null!;
-        public DbSet<Models.Curriculum> Curriculums { get; set; } = null!;
-        public DbSet<Models.ConstructiveQuestion> ConstructiveQuestions { get; set; } = null!;
-        public DbSet<Models.ComboSubject> ComboSubjects { get; set; } = null!;
-        public DbSet<Models.Combo> Combos { get; set; } = null!;
-        public DbSet<Models.Assessment> Assessments { get; set; } = null!;
-        public DbSet<Models.AIChatLog> AIChatLogs { get; set; } = null!;
+        public DbSet<Models.User> User { get; set; } = null!;
+        public DbSet<Models.CourseLearningOutcome> CourseLearningOutcome { get; set; } = null!;
+        public DbSet<Models.SubjectInCurriculum> SubjectInCurriculum { get; set; } = null!;
+        public DbSet<Models.Subject> Subject { get; set; } = null!;
+        public DbSet<Models.Student> Student { get; set; } = null!;
+        public DbSet<Models.Tool> Tool { get; set; } = null!;
+        public DbSet<Models.PrerequisiteSubject> PrerequisiteSubject { get; set; } = null!;
+        public DbSet<Models.PrerequisiteConstraint> PrerequisiteConstraint { get; set; } = null!;
+        public DbSet<Models.Notification> Notification { get; set; } = null!;
+        public DbSet<Models.Message> Message { get; set; } = null!;
+        public DbSet<Models.Material> Material { get; set; } = null!;
+        public DbSet<Models.Major> Major { get; set; } = null!;
+        public DbSet<Models.ToolForSubject> ToolForSubject { get; set; } = null!;
+        public DbSet<Models.Curriculum> Curriculum { get; set; } = null!;
+        public DbSet<Models.ProgramingLearningOutcome> ProgramingLearningOutcome { get; set; } = null!;
+        public DbSet<Models.ProgramingOutcome> ProgramingOutcome { get; set; } = null!;
+        public DbSet<Models.POMappingPLO> POMappingPLO { get; set; } = null!;
+        public DbSet<Models.Program> Program { get; set; } = null!;
+        public DbSet<Models.ComboSubject> ComboSubject { get; set; } = null!;
+        public DbSet<Models.Combo> Combo { get; set; } = null!;
+        public DbSet<Models.Assessment> Assessment { get; set; } = null!;
+        public DbSet<Models.AIChatLog> AIChatLog { get; set; } = null!;
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseSqlServer("Name=AcademicChatBotDB");
 

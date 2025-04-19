@@ -132,5 +132,15 @@ namespace AcademicChatBot.DAL.Implementation
             }
             return entities.ToList();
         }
+        public async Task<List<T>> DeleteByExpression(Expression<Func<T, bool>> filter)
+        {
+            var entities = await _dbSet.Where(filter).ToListAsync();
+            if (entities.Any())
+            {
+                _dbSet.RemoveRange(entities);
+            }
+            return entities;
+        }
+
     }
 }

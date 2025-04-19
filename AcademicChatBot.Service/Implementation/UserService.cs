@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.DTOs;
 using AcademicChatBot.Common.DTOs.Accounts;
-using AcademicChatBot.Common.DTOs.BussinessCode;
+using AcademicChatBot.Common.Enum;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
@@ -19,21 +20,21 @@ namespace AcademicChatBot.Service.Implementation
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<Student> _studentRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IJWTService _jWTService;
+        private readonly IJwtService _jwtService;
         private readonly IConfiguration _configuration;
 
-        public UserService(IGenericRepository<User> userRepository, IGenericRepository<Student> studentRepository, IUnitOfWork unitOfWork, IJWTService jWTService, IConfiguration configuration)
+        public UserService(IGenericRepository<User> userRepository, IGenericRepository<Student> studentRepository, IUnitOfWork unitOfWork, IJwtService jwtService, IConfiguration configuration)
         {
             _userRepository = userRepository;
             _studentRepository = studentRepository;
             _unitOfWork = unitOfWork;
-            _jWTService = jWTService;
+            _jwtService = jwtService;
             _configuration = configuration;
         }
 
-        public async Task<ResponseDTO> Login(AccountLoginRequest loginRequest)
+        public async Task<Response> Login(AccountLoginRequest loginRequest)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 var userDb = await _userRepository.GetByExpression(a => a.Email == loginRequest.Email);
@@ -52,9 +53,22 @@ namespace AcademicChatBot.Service.Implementation
                     dto.Message = "Password is not correct";
                     return dto;
                 }
+                Guid? studentId = null;
+                if (userDb.Role == RoleName.Student)
+                {
+                    var studentDb = await _studentRepository.GetByExpression(a => a.UserId == userDb.UserId);
+                    if (studentDb == null)
+                    {
+                        dto.BusinessCode = BusinessCode.ACCESS_DENIED;
+                        dto.IsSucess = false;
+                        dto.Message = "Student is not valid";
+                        return dto;
+                    }
+                    studentId = studentDb.StudentId;
+                }
 
-                var accesstoken = _jWTService.GenerateAccessToken(userDb.UserId, userDb.Role, userDb.Email);
-                var refreshToken = _jWTService.GenerateRefreshToken();
+                var accesstoken = _jwtService.GenerateAccessToken(userDb.UserId, userDb.Role, userDb.Email, studentId);
+                var refreshToken = _jwtService.GenerateRefreshToken();
                 var expiredRefreshToken = DateTime.Now.AddMinutes(double.Parse(_configuration["JwtSettings:RefreshTokenExpirationDays"]));
                 userDb.RefreshToken = refreshToken;
                 userDb.ExpiredRefreshToken = expiredRefreshToken;
@@ -78,9 +92,9 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> HandleRefreshToken(string refreshToken)
+        public async Task<Response> HandleRefreshToken(string refreshToken)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 var userDb = await _userRepository.GetFirstByExpression(a => a.RefreshToken == refreshToken);
@@ -92,7 +106,7 @@ namespace AcademicChatBot.Service.Implementation
                 }
                 else if (userDb.ExpiredRefreshToken > DateTime.Now)
                 {
-                    var accessToken = _jWTService.GenerateAccessToken(userDb.UserId, userDb.Role, userDb.Email);
+                    var accessToken = _jwtService.GenerateAccessToken(userDb.UserId, userDb.Role, userDb.Email);
                     userDb.RefreshToken = string.Empty;
                     await _userRepository.Update(userDb);
                     await _unitOfWork.SaveChangeAsync();
@@ -121,9 +135,9 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> SignUp(AccountSignUpRequest signUpRequest)
+        public async Task<Response> SignUp(AccountSignUpRequest signUpRequest)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 if (!signUpRequest.Email.ToLower().EndsWith("@fpt.edu.vn", StringComparison.OrdinalIgnoreCase))
@@ -150,7 +164,7 @@ namespace AcademicChatBot.Service.Implementation
                     PasswordHash = passWordHash,
                     Role = signUpRequest.Role,
                 };
-                if (signUpRequest.Role.ToLower() == "student")
+                if (signUpRequest.Role == RoleName.Student)
                 {
                     var student = new Student()
                     {
