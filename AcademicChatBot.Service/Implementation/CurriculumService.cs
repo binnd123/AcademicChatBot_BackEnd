@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.DTOs;
-using AcademicChatBot.Common.DTOs.BussinessCode;
-using AcademicChatBot.Common.DTOs.Curriculum;
+using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
+using AcademicChatBot.Common.BussinessModel.Curriculum;
 
 namespace AcademicChatBot.Service.Implementation
 {
@@ -20,9 +20,9 @@ namespace AcademicChatBot.Service.Implementation
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ResponseDTO> CreateCurriculum(CreateCurriculumRequest request)
+        public async Task<Response> CreateCurriculum(CreateCurriculumRequest request)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 var curriculum = new Curriculum
@@ -56,9 +56,9 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> DeleteCurriculum(Guid curriculumId)
+        public async Task<Response> DeleteCurriculum(Guid curriculumId)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 var curriculum = await _curriculumRepository.GetById(curriculumId);
@@ -86,9 +86,9 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> GetAllCurriculum(int pageNumber, int pageSize, string search)
+        public async Task<Response> GetAllCurriculums(int pageNumber, int pageSize, string search)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 dto.Data = await _curriculumRepository.GetAllDataByExpression(
@@ -110,9 +110,9 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> GetCurriculumById(Guid curriculumId)
+        public async Task<Response> GetCurriculumById(Guid curriculumId)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 var curriculum = await _curriculumRepository.GetById(curriculumId);
@@ -137,9 +137,9 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> UpdateCurriculum(Guid curriculumId, UpdateCurriculumRequest request)
+        public async Task<Response> UpdateCurriculum(Guid curriculumId, UpdateCurriculumRequest request)
         {
-            ResponseDTO dto = new ResponseDTO();
+            Response dto = new Response();
             try
             {
                 var curriculum = await _curriculumRepository.GetById(curriculumId);

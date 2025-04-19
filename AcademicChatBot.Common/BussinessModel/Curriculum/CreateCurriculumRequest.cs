@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AcademicChatBot.Common.DTOs.Curriculum
+namespace AcademicChatBot.Common.BussinessModel.Curriculum
 {
     public class CreateCurriculumRequest
     {

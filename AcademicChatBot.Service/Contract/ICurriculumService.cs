@@ -1,14 +1,14 @@
-﻿using AcademicChatBot.Common.DTOs;
-using AcademicChatBot.Common.DTOs.Curriculum;
+﻿using AcademicChatBot.Common.BussinessModel.Curriculum;
+using AcademicChatBot.Common.DTOs;
 
 namespace AcademicChatBot.Service.Contract
 {
     public interface ICurriculumService
     {
-        Task<ResponseDTO> CreateCurriculum(CreateCurriculumRequest request);
-        Task<ResponseDTO> DeleteCurriculum(Guid curriculumId);
-        Task<ResponseDTO> GetAllCurriculum(int pageNumber, int pageSize, string search);
-        Task<ResponseDTO> GetCurriculumById(Guid curriculumId);
-        Task<ResponseDTO> UpdateCurriculum(Guid curriculumId, UpdateCurriculumRequest request);
+        Task<Response> CreateCurriculum(CreateCurriculumRequest request);
+        Task<Response> DeleteCurriculum(Guid curriculumId);
+        Task<Response> GetAllCurriculums(int pageNumber, int pageSize, string search);
+        Task<Response> GetCurriculumById(Guid curriculumId);
+        Task<Response> UpdateCurriculum(Guid curriculumId, UpdateCurriculumRequest request);
     }
 }
