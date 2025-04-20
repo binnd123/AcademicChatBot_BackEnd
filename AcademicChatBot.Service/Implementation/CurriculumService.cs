@@ -176,5 +176,39 @@ namespace AcademicChatBot.Service.Implementation
             }
             return dto;
         }
+        public async Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode)
+        {
+            Response dto = new Response();
+            try
+            {
+                var curriculum = await _curriculumRepository.GetAllDataByExpression(
+                filter: c => c.CurriculumCode.Contains(curriculumCode) && !c.IsDeleted,
+                pageNumber: pageNumber,
+                pageSize: pageSize,
+                orderBy: c => c.CurriculumName,
+                isAscending: true);
+
+                if (curriculum == null || !curriculum.Items.Any())
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "No curriculum found with the specified code";
+                    return dto;
+                }
+
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                dto.Data = curriculum.Items;
+                dto.Message = "curriculum retrieved successfully";
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while retrieving the curriculum: " + ex.Message;
+            }
+
+            return dto;
+        }
     }
 }

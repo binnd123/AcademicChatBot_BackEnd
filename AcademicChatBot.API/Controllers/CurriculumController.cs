@@ -37,6 +37,17 @@ namespace AcademicChatBot.API.Controllers
             return await _curriculumService.GetAllCurriculums(pageNumber, pageSize, search);
         }
 
+        [HttpGet("get-curriculum-by-code/{curriculumCode}")]
+        public async Task<Response> GetCurriculumByCode(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 5,
+            [FromQuery] string curriculumCode ="")
+        {
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            pageSize = pageSize < 1 ? 5 : pageSize;
+            return await _curriculumService.GetCurriculumByCode(pageNumber, pageSize, curriculumCode);
+        }
+
         [HttpPost("create-curriculum")]
         public async Task<Response> CreateCurriculum([FromBody] CreateCurriculumRequest request)
         {
