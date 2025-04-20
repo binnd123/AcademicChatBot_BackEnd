@@ -6,8 +6,6 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using AcademicChatBot.Common.DTOs;
-using AcademicChatBot.Common.DTOs.Accounts;
 using AcademicChatBot.Common.Enum;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
@@ -93,6 +91,38 @@ namespace AcademicChatBot.Service.Implementation
                                       .Replace("/", "_")
                                       .TrimEnd('=');
             return base64Token.Length > 40 ? base64Token.Substring(0, 40) : base64Token;
+        }
+
+        public Guid? GetUserIdFromToken(HttpRequest request, out string errorMessage)
+        {
+            errorMessage = string.Empty;
+            var token = request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            if (string.IsNullOrEmpty(token))
+            {
+                errorMessage = "No token provided";
+                return null;
+            }
+
+            try
+            {
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]!));
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var accountIdClaim = jwtToken?.Claims.FirstOrDefault(c => c.Type == "AccountId");
+
+                if (accountIdClaim == null)
+                {
+                    errorMessage = "AccountId claim not found";
+                    return null;
+                }
+
+                return Guid.Parse(accountIdClaim.Value);
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error parsing token: {ex.Message}";
+                return null;
+            }
         }
     }
 }

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
-using AcademicChatBot.Common.DTOs;
-using AcademicChatBot.Common.DTOs.Students;
+using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.BussinessModel.Students;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
@@ -76,8 +76,7 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
                 if (!string.IsNullOrEmpty(request.Address)) studentDb.Address = request.Address;
-                if (!string.IsNullOrEmpty(request.FirstName)) studentDb.FirstName = request.FirstName;
-                if (!string.IsNullOrEmpty(request.LastName)) studentDb.LastName = request.LastName;
+                if (!string.IsNullOrEmpty(request.FullName)) studentDb.FullName = request.FullName;
                 if (!string.IsNullOrEmpty(request.PhoneNumber)) studentDb.PhoneNumber = request.PhoneNumber;
                 studentDb.Gender = request.Gender;
                 studentDb.DOB = request.DOB;

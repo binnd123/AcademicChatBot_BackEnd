@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AcademicChatBot.Common.DTOs
+namespace AcademicChatBot.Common.BussinessModel
 {
     public class PageResult<T> where T : class
     {

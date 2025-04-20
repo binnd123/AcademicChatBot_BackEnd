@@ -24,5 +24,8 @@ namespace AcademicChatBot.Common.BussinessCode
         ACCESS_DENIED = 403,
         INVALID_EMAIL_FPTU = 406,
         DATA_NOT_FOUND = 407,
+        INVALID_GOOGLE_TOKEN = 408,
+        EXISTED_USER_WITH_PASSWORD = 409,
+        INVALID_EMAIL_DOMAIN = 410,
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
 
-namespace AcademicChatBot.Common.DTOs
+namespace AcademicChatBot.Common.BussinessModel
 {
     public class Response
     {

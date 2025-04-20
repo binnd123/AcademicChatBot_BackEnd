@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AcademicChatBot.Common.DTOs;
-using AcademicChatBot.Common.DTOs.Accounts;
+using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.BussinessModel.Accounts;
 
 namespace AcademicChatBot.Service.Contract
 {
@@ -13,5 +13,6 @@ namespace AcademicChatBot.Service.Contract
         public Task<Response> SignUp(AccountSignUpRequest signUpRequest);
         public Task<Response> Login(AccountLoginRequest loginRequest);
         public Task<Response> HandleRefreshToken(string refreshToken);
+        public Task<Response> GoogleLogin(AccountLoginGoogleRequest request);
     }
 }
