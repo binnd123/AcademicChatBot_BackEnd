@@ -15,12 +15,11 @@ namespace AcademicChatBot.DAL.Models
         [Key]
         public Guid StudentId { get; set; }
         public string StudentCode { get; set; } = null!;
-        public string FirstName { get; set; } = null!;
-        public string LastName { get; set; } = null!;
+        public string FullName { get; set; } = null!;
         public string? Address { get; set; }
         public string? PhoneNumber { get; set; }
-        public DateTime DOB { get; set; }
-        public DateTime IntakeYear { get; set; }
+        public DateTime? DOB { get; set; }
+        public DateTime? IntakeYear { get; set; }
         public GenderType Gender { get; set; } = GenderType.Male;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

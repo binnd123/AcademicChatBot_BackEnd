@@ -6,20 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.Enum;
 
-namespace AcademicChatBot.Common.DTOs.Accounts
+namespace AcademicChatBot.Common.BussinessModel.Accounts
 {
     public class AccountSignUpRequest
     {
         [Required]
         [DataType(DataType.EmailAddress)]
-        public string Email { get; set; }
+        public required string Email { get; set; }
         [Required]
-        public string FirstName { get; set; }
-        [Required]
-        public string LastName { get; set; }
+        public required string FullName { get; set; }
         [Required]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public required string Password { get; set; }
         public RoleName Role { get; set; } = RoleName.Student;
     }
 }

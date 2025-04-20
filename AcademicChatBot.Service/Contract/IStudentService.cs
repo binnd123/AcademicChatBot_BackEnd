@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AcademicChatBot.Common.DTOs;
-using AcademicChatBot.Common.DTOs.Students;
+using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.BussinessModel.Students;
 
 namespace AcademicChatBot.Service.Contract
 {

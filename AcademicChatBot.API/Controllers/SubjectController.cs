@@ -1,6 +1,8 @@
-﻿using AcademicChatBot.Common.DTOs;
-using AcademicChatBot.Common.DTOs.Subjects;
+﻿using AcademicChatBot.Common.BussinessCode;
+using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.BussinessModel.Subjects;
 using AcademicChatBot.Service.Contract;
+using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,8 +22,8 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("get-all-subjects")]
-        public async Task<Response> GetAllSubjects(
+        [HttpGet("subjects")]
+        public async Task<IActionResult> GetAllSubjects(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string search = ""
@@ -29,28 +31,63 @@ namespace AcademicChatBot.API.Controllers
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            return await _subjectService.GetAllSubjects(pageNumber, pageSize, search);
+            var response = await _subjectService.GetAllSubjects(pageNumber, pageSize, search);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
         [Authorize]
-        [HttpGet("get-subject/{id}")]
-        public async Task<Response> GetSubjectById(Guid id)
+        [HttpGet("subject/{id}")]
+        public async Task<IActionResult> GetSubjectById(Guid id)
         {
-            return await _subjectService.GetSubjectById(id);
+            var response = await _subjectService.GetSubjectById(id);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
-        [HttpPost("create-subject")]
-        public async Task<Response> CreateSubject([FromBody] CreateSubjectRequest request)
+        [HttpPost("subject")]
+        public async Task<IActionResult> CreateSubject([FromBody] CreateSubjectRequest request)
         {
-            return await _subjectService.CreateSubject(request);
+            var response = await _subjectService.CreateSubject(request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
-        [HttpPut("update-subject/{id}")]
-        public async Task<Response> UpdateSubject(Guid id, UpdateSubjectRequest request)
+        [HttpPut("subject/{id}")]
+        public async Task<IActionResult> UpdateSubject(Guid id, UpdateSubjectRequest request)
         {
-            return await _subjectService.UpdateSubject(id, request);
+            var response = await _subjectService.UpdateSubject(id, request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
-        [HttpPut("delete-subject/{id}")]
-        public async Task<Response> DeleteSubject(Guid id)
+        [HttpDelete("subject/{id}")]
+        public async Task<IActionResult> DeleteSubject(Guid id)
         {
-            return await _subjectService.DeleteSubject(id);
+            var response = await _subjectService.DeleteSubject(id);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
     }
 }

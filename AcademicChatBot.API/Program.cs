@@ -9,16 +9,24 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+using AcademicChatBot.Service.HubService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddSignalR();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
+//builder.Services.AddScoped<IClassificationService, ClassificationService>();
+//builder.Services.AddScoped<IGeminiAPIService, GeminiAPIService>();
+//builder.Services.AddScoped<IIntentDetectorService, IntentDetectorService>();
+//builder.Services.AddScoped<IMessageService, MessageService>();
+//builder.Services.AddScoped<IAIChatLogService, AIChatLogService>();
+//builder.Services.AddScoped<IHubService, HubService>();
 var secretKey = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]);
 
 builder.Services.AddAuthentication(options =>
@@ -104,7 +112,10 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<ChatHub>("/notifications");
 
 app.MapControllers();
 
