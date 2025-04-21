@@ -21,6 +21,7 @@ namespace AcademicChatBot.API.Controllers
             _subjectService = subjectService;
         }
 
+
         [Authorize]
         [HttpGet("subjects")]
         public async Task<IActionResult> GetAllSubjects(
@@ -40,6 +41,7 @@ namespace AcademicChatBot.API.Controllers
             }
             return Ok(response);
         }
+
         [Authorize]
         [HttpGet("subject/{id}")]
         public async Task<IActionResult> GetSubjectById(Guid id)
