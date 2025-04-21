@@ -1,5 +1,5 @@
-﻿using AcademicChatBot.Common.BussinessModel.Curriculum;
-using AcademicChatBot.Common.DTOs;
+﻿using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.BussinessModel.Curriculum;
 
 namespace AcademicChatBot.Service.Contract
 {

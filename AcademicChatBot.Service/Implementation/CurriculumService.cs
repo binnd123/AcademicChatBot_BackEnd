@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AcademicChatBot.Common.DTOs;
 using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
 using AcademicChatBot.Common.BussinessModel.Curriculum;
+using AcademicChatBot.Common.BussinessModel;
 
 namespace AcademicChatBot.Service.Implementation
 {

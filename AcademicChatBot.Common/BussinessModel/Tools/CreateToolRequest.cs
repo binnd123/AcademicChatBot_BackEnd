@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AcademicChatBot.Common.DTOs.Tool
+namespace AcademicChatBot.Common.BussinessModel.Tools
 {
     public class CreateToolRequest
     {
