@@ -82,8 +82,9 @@ namespace AcademicChatBot.API.Controllers
             }
             return Ok(response);
         }
-        [HttpDelete("subject/{id}")]
-        public async Task<IActionResult> DeleteSubject(Guid id)
+
+        [HttpDelete("delete-subject/{id}")]
+        public async Task<Response> DeleteSubject(Guid id)
         {
             var response = await _subjectService.DeleteSubject(id);
             if (response.IsSucess == false)

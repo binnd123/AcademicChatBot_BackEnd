@@ -49,7 +49,7 @@ namespace AcademicChatBot.API.Controllers
             return await _materialService.UpdateMaterial(id, request);
         }
 
-        [HttpPut("delete-material/{id}")]
+        [HttpDelete("delete-material/{id}")]
         public async Task<Response> DeleteMaterial(Guid id)
         {
             return await _materialService.DeleteMaterial(id);
