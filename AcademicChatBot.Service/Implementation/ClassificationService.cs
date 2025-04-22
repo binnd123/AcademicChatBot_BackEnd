@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessModel.Intents;
+using AcademicChatBot.Common.MLModels;
 using AcademicChatBot.Service.Contract;
 using Microsoft.ML;
 
@@ -13,9 +14,10 @@ namespace AcademicChatBot.Service.Implementation
     {
         private readonly PredictionEngine<IntentData, IntentPrediction> _intentPredictionEngine;
 
-        public ClassificationService(PredictionEngine<IntentData, IntentPrediction> intentPredictionEngine)
+        public ClassificationService(IMLModel mlModel)
         {
-            _intentPredictionEngine = intentPredictionEngine;
+            // Sử dụng các model đã được load trong MLModel singleton
+            _intentPredictionEngine = mlModel.MlContext.Model.CreatePredictionEngine<IntentData, IntentPrediction>(mlModel.IntentModel);
         }
 
         public async Task<int> ClassificationIntent(string message)

@@ -25,25 +25,25 @@ namespace AcademicChatBot.API.Controllers
             _jwtService = jwtService;
         }
 
-        [HttpGet("student-profile")]
-        public async Task<IActionResult> GetCurrentStudent()
-        {
-            var studentId = _jwtService.GetStudentIdFromToken(HttpContext.Request, out var errorMessage);
-            if (studentId == null) return Unauthorized(new Response
-            {
-                IsSucess = false,
-                BusinessCode = BusinessCode.AUTH_NOT_FOUND,
-                Message = errorMessage
-            });
-            var response = await _studentService.GetStudentProfile(studentId);
-            if (response.IsSucess == false)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
+        //[HttpGet("current-student")]
+        //public async Task<IActionResult> GetCurrentStudent()
+        //{
+        //    var studentId = _jwtService.GetStudentIdFromToken(HttpContext.Request, out var errorMessage);
+        //    if (studentId == null) return Unauthorized(new Response
+        //    {
+        //        IsSucess = false,
+        //        BusinessCode = BusinessCode.AUTH_NOT_FOUND,
+        //        Message = errorMessage
+        //    });
+        //    var response = await _studentService.GetStudentProfile(studentId);
+        //    if (response.IsSucess == false)
+        //    {
+        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
+        //            return StatusCode(500, response);
+        //        return NotFound(response);
+        //    }
+        //    return Ok(response);
+        //}
         [HttpPut("student-profile")]
         public async Task<IActionResult> UpdateStudentProfile([FromBody] StudentProfileRequest request)
         {

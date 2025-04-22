@@ -48,7 +48,25 @@ namespace AcademicChatBot.Service.Implementation
                     dto.Message = "Student not found";
                     return dto;
                 }
-                dto.Data = studentDb;
+                var studentResponse = new StudentProfileResponse
+                {
+                    StudentId = studentDb.StudentId,
+                    FullName = studentDb.FullName,
+                    Address = studentDb.Address,
+                    CreatedAt = studentDb.CreatedAt,
+                    UpdatedAt = studentDb.UpdatedAt,
+                    DeletedAt = studentDb.DeletedAt,
+                    DOB = studentDb.DOB,
+                    Gender = studentDb.Gender,
+                    PhoneNumber = studentDb.PhoneNumber,
+                    IntakeYear = studentDb.IntakeYear,
+                    IsDeleted = studentDb.IsDeleted,
+                    StudentCode = studentDb.StudentCode,
+                    MajorId = studentDb.MajorId ,
+                    MajorCode = studentDb.MajorId != null ? studentDb.Major.MajorCode : null,
+                    MajorName = studentDb.MajorId != null ? studentDb.Major.MajorName : null,
+                };
+                dto.Data = studentResponse;
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Student profile retrieved successfully";

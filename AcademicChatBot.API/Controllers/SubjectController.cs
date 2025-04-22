@@ -1,6 +1,7 @@
 ﻿using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Subjects;
+using AcademicChatBot.Common.Enum;
 using AcademicChatBot.Service.Contract;
 using Azure;
 using Microsoft.AspNetCore.Authorization;
@@ -27,12 +28,14 @@ namespace AcademicChatBot.API.Controllers
         public async Task<IActionResult> GetAllSubjects(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
-            [FromQuery] string search = ""
+            [FromQuery] string search = "",
+            [FromQuery] SortBy sortBy = SortBy.Default,
+            [FromQuery] SortType sortType = SortType.Ascending
             )
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            var response = await _subjectService.GetAllSubjects(pageNumber, pageSize, search);
+            var response = await _subjectService.GetAllSubjects(pageNumber, pageSize, search, sortBy, sortType);
             if (response.IsSucess == false)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)

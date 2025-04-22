@@ -10,23 +10,27 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using AcademicChatBot.Service.HubService;
+using AcademicChatBot.Common.BussinessModel.Accounts;
+using AcademicChatBot.Common.MLModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddSignalR();
+//Initial Model AI
+builder.Services.AddSingleton<IMLModel, MLModel>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
-//builder.Services.AddScoped<IClassificationService, ClassificationService>();
-//builder.Services.AddScoped<IGeminiAPIService, GeminiAPIService>();
-//builder.Services.AddScoped<IIntentDetectorService, IntentDetectorService>();
-//builder.Services.AddScoped<IMessageService, MessageService>();
-//builder.Services.AddScoped<IAIChatLogService, AIChatLogService>();
-//builder.Services.AddScoped<IHubService, HubService>();
+builder.Services.AddScoped<IClassificationService, ClassificationService>();
+builder.Services.AddHttpClient<IGeminiAPIService, GeminiAPIService>();
+builder.Services.AddScoped<IIntentDetectorService, IntentDetectorService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IAIChatLogService, AIChatLogService>();
+builder.Services.AddScoped<IHubService, HubService>();
 builder.Services.AddScoped<ICurriculumService, CurriculumService>();
 builder.Services.AddScoped<IToolService, ToolService>();
 var secretKey = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]);
@@ -49,6 +53,8 @@ builder.Services.AddAuthentication(options =>
             IssuerSigningKey = new SymmetricSecurityKey(secretKey)
         };
     });
+builder.Services.Configure<AdminAccountOptions>(
+    builder.Configuration.GetSection("AdminAccount"));
 builder.Services.AddAuthorization();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
