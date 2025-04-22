@@ -3,10 +3,13 @@ using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Service.Contract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AcademicChatBot.Common.BussinessCode;
+using AcademicChatBot.DAL.Models;
+using AcademicChatBot.Service.Implementation;
+using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Authorize(Roles = "Admin")]
     [Route("api/programing-learning-outcome")]
     [ApiController]
     public class ProgramingLearningOutcomeController : ControllerBase
@@ -18,41 +21,82 @@ namespace AcademicChatBot.API.Controllers
             _programingLearningOutcomeService = programingLearningOutcomeService;
         }
 
-        [Authorize(Roles = "Admin,Student")]
-        [HttpGet("get-programing-learning-outcome/{id}")]
-        public async Task<Response> GetProgramingLearningOutcomeById(Guid id)
+        [Authorize]
+        [HttpGet("get-programing-learning-outcome-by-id/{pLOId}")]
+        public async Task<IActionResult> GetProgramingLearningOutcomeById(Guid pLOId)
         {
-            return await _programingLearningOutcomeService.GetProgramingLearningOutcomeById(id);
+            var response = await _programingLearningOutcomeService.GetProgramingLearningOutcomeById(pLOId);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("get-all-programing-learning-outcomes")]
-        public async Task<Response> GetAllProgramingLearningOutcomes(
+        public async Task<IActionResult> GetAllProgramingLearningOutcomes(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
-            [FromQuery] string search = ""
-        )
+            [FromQuery] string search = "",
+            [FromQuery] SortBy sortBy = SortBy.Default,
+            [FromQuery] SortType sortType = SortType.Ascending
+    )
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            return await _programingLearningOutcomeService.GetAllProgramingLearningOutcomes(pageNumber, pageSize, search);
+            var response = await _programingLearningOutcomeService.GetAllProgramingLearningOutcomes(pageNumber, pageSize, search, sortBy, sortType);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create-programing-learning-outcome")]
-        public async Task<Response> CreateProgramingLearningOutcome([FromBody] CreateProgramingLearningOutcomeRequest request)
+        public async Task<IActionResult> CreateProgramingLearningOutcome([FromBody] CreateProgramingLearningOutcomeRequest request)
         {
-            return await _programingLearningOutcomeService.CreateProgramingLearningOutcome(request);
+            var response = await _programingLearningOutcomeService.CreateProgramingLearningOutcome(request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
-        [HttpPut("update-programing-learning-outcome/{id}")]
-        public async Task<Response> UpdateProgramingLearningOutcome(Guid id, [FromBody] UpdateProgramingLearningOutcomeRequest request)
+        [Authorize(Roles = "Admin")]
+        [HttpPut("update-programing-learning-outcome/{pLOId}")]
+        public async Task<IActionResult> UpdateProgramingLearningOutcome(Guid pLOId, [FromBody] UpdateProgramingLearningOutcomeRequest request)
         {
-            return await _programingLearningOutcomeService.UpdateProgramingLearningOutcome(id, request);
+            var response = await _programingLearningOutcomeService.UpdateProgramingLearningOutcome(pLOId, request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
-        [HttpDelete("delete-programing-learning-outcome/{id}")]
-        public async Task<Response> DeleteProgramingLearningOutcome(Guid id)
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("delete-programing-learning-outcome/{pLOId}")]
+        public async Task<IActionResult> DeleteProgramingLearningOutcome(Guid pLOId)
         {
-            return await _programingLearningOutcomeService.DeleteProgramingLearningOutcome(id);
+            var response = await _programingLearningOutcomeService.DeleteProgramingLearningOutcome(pLOId);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
     }
 }

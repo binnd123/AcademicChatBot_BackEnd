@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Accounts;
+using AcademicChatBot.Common.Enum;
 using Microsoft.AspNetCore.Http;
 
 namespace AcademicChatBot.Service.Contract

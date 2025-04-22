@@ -1,12 +1,15 @@
-﻿using AcademicChatBot.Common.BussinessModel;
+﻿using AcademicChatBot.Common.BussinessCode;
+using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Material;
+using AcademicChatBot.Common.Enum;
+using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
+using AcademicChatBot.Service.Implementation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Authorize(Roles = "Admin")]
     [Route("api/material")]
     [ApiController]
     public class MaterialController : ControllerBase
@@ -18,41 +21,82 @@ namespace AcademicChatBot.API.Controllers
             _materialService = materialService;
         }
 
-        [Authorize(Roles = "Admin,Student")]
-        [HttpGet("get-material/{id}")]
-        public async Task<Response> GetMaterialById(Guid id)
+        [Authorize]
+        [HttpGet("get-material-by-id/{materialId}")]
+        public async Task<IActionResult> GetMaterialById(Guid materialId)
         {
-            return await _materialService.GetMaterialById(id);
+            var response = await _materialService.GetMaterialById(materialId);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("get-all-materials")]
-        public async Task<Response> GetAllMaterials(
+        public async Task<IActionResult> GetAllMaterials(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
-            [FromQuery] string search = ""
+            [FromQuery] string search = "",
+            [FromQuery] SortBy sortBy = SortBy.Default,
+            [FromQuery] SortType sortType = SortType.Ascending
         )
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            return await _materialService.GetAllMaterials(pageNumber, pageSize, search);
+            var response = await _materialService.GetAllMaterials(pageNumber, pageSize, search, sortBy, sortType);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create-material")]
-        public async Task<Response> CreateMaterial([FromBody] CreateMaterialRequest request)
+        public async Task<IActionResult> CreateMaterial([FromBody] CreateMaterialRequest request)
         {
-            return await _materialService.CreateMaterial(request);
+            var response = await _materialService.CreateMaterial(request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
-        [HttpPut("update-material/{id}")]
-        public async Task<Response> UpdateMaterial(Guid id, [FromBody] UpdateMaterialRequest request)
+        [Authorize(Roles = "Admin")]
+        [HttpPut("update-material/{materialId}")]
+        public async Task<IActionResult> UpdateMaterial(Guid materialId, [FromBody] UpdateMaterialRequest request)
         {
-            return await _materialService.UpdateMaterial(id, request);
+            var response = await _materialService.UpdateMaterial(materialId, request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
-        [HttpDelete("delete-material/{id}")]
-        public async Task<Response> DeleteMaterial(Guid id)
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("delete-material/{materialId}")]
+        public async Task<IActionResult> DeleteMaterial(Guid materialId)
         {
-            return await _materialService.DeleteMaterial(id);
+            var response = await _materialService.DeleteMaterial(materialId);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
     }
 }

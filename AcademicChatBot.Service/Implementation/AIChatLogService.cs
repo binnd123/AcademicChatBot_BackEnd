@@ -284,8 +284,8 @@ Bắt đầu nhé! 🎉
                 await _aIChatLogRepository.Update(existingChat);
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
-                dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
-                dto.Message = "AI chat log retrieved successfully";
+                dto.BusinessCode = BusinessCode.UPDATE_SUCCESSFULLY;
+                dto.Message = "AI chat log update successfully";
                 dto.Data = existingChat;
             }
             catch (Exception ex)

@@ -1,12 +1,15 @@
-﻿using AcademicChatBot.Common.BussinessModel;
+﻿using AcademicChatBot.Common.BussinessCode;
+using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Curriculum;
+using AcademicChatBot.Common.Enum;
+using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
+using AcademicChatBot.Service.Implementation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Authorize(Roles = "Admin")]
     [Route("api/curriculum")]
     [ApiController]
     public class CurriculumController : ControllerBase
@@ -18,53 +21,92 @@ namespace AcademicChatBot.API.Controllers
             _curriculumService = curriculumService;
         }
 
-        [Authorize(Roles = "Admin,Student")]
-        [HttpGet("get-curriculum/{id}")]
-        public async Task<Response> GetCurriculumById(Guid id)
+        [Authorize]
+        [HttpGet("get-curriculum/{curriculumId}")]
+        public async Task<IActionResult> GetCurriculumById(Guid curriculumId)
         {
-            return await _curriculumService.GetCurriculumById(id);
+            var response = await _curriculumService.GetCurriculumById(curriculumId);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
         [HttpGet("get-all-curriculums")]
-        public async Task<Response> GetAllCurriculums(
+        public async Task<IActionResult> GetAllCurriculums(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
-            [FromQuery] string search = ""
+            [FromQuery] string search = "",
+            [FromQuery] SortBy sortBy = SortBy.Default,
+            [FromQuery] SortType sortType = SortType.Ascending
         )
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            return await _curriculumService.GetAllCurriculums(pageNumber, pageSize, search);
+            var response = await _curriculumService.GetAllCurriculums(pageNumber, pageSize, search, sortBy, sortType);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
-        [HttpGet("get-curriculum-by-code")]
-        public async Task<Response> GetCurriculumByCode(
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 5,
-            [FromQuery] string curriculumCode = ""
-        )
-        {
-            pageNumber = pageNumber < 1 ? 1 : pageNumber;
-            pageSize = pageSize < 1 ? 5 : pageSize;
-            return await _curriculumService.GetCurriculumByCode(pageNumber, pageSize, curriculumCode);
-        }
+        //[HttpGet("get-curriculum-by-code")]
+        //public async Task<Response> GetCurriculumByCode(
+        //    [FromQuery] int pageNumber = 1,
+        //    [FromQuery] int pageSize = 5,
+        //    [FromQuery] string curriculumCode = ""
+        //)
+        //{
+        //    pageNumber = pageNumber < 1 ? 1 : pageNumber;
+        //    pageSize = pageSize < 1 ? 5 : pageSize;
+        //    return await _curriculumService.GetCurriculumByCode(pageNumber, pageSize, curriculumCode);
+        //}
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create-curriculum")]
-        public async Task<Response> CreateCurriculum([FromBody] CreateCurriculumRequest request)
+        public async Task<IActionResult> CreateCurriculum([FromBody] CreateCurriculumRequest request)
         {
-            return await _curriculumService.CreateCurriculum(request);
+            var response = await _curriculumService.CreateCurriculum(request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
-        [HttpPut("update-curriculum/{id}")]
-        public async Task<Response> UpdateCurriculum(Guid id, [FromBody] UpdateCurriculumRequest request)
+        [HttpPut("update-curriculum/{curriculumId}")]
+        public async Task<IActionResult> UpdateCurriculum(Guid curriculumId, [FromBody] UpdateCurriculumRequest request)
         {
-            return await _curriculumService.UpdateCurriculum(id, request);
+            var response = await _curriculumService.UpdateCurriculum(curriculumId, request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
-        [HttpDelete("delete-curriculum/{id}")]
-        public async Task<Response> DeleteCurriculum(Guid id)
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("delete-curriculum/{curriculumId}")]
+        public async Task<IActionResult> DeleteCurriculum(Guid curriculumId)
         {
-            return await _curriculumService.DeleteCurriculum(id);
+            var response = await _curriculumService.DeleteCurriculum(curriculumId);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
     }
 }

@@ -6,6 +6,7 @@ using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
 using AcademicChatBot.Common.BussinessModel.Curriculum;
 using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.Service.Implementation
 {
@@ -86,17 +87,17 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllCurriculums(int pageNumber, int pageSize, string search)
+        public async Task<Response> GetAllCurriculums(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _curriculumRepository.GetAllDataByExpression(
-                    filter: c => c.CurriculumName.ToLower().Contains(search.ToLower()) && !c.IsDeleted,
+                    filter: c => c.CurriculumName.ToLower().Contains(search.ToLower()) || c.CurriculumCode.ToLower().Contains(search.ToLower()),
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: c => c.CurriculumName,
-                    isAscending: true);
+                    orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.CurriculumName : s.CurriculumCode,
+                    isAscending: sortType == SortType.Ascending);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Curriculum retrieved successfully";

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Tools;
+using AcademicChatBot.Common.Enum;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
@@ -88,17 +89,17 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllTools(int pageNumber, int pageSize, string search)
+        public async Task<Response> GetAllTools(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _toolRepository.GetAllDataByExpression(
-                    filter: t => t.ToolName.ToLower().Contains(search.ToLower()) && !t.IsDeleted,
+                    filter: t => t.ToolName.ToLower().Contains(search.ToLower()) || t.ToolCode.ToLower().Contains(search.ToLower()),
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: t => t.ToolName,
-                    isAscending: true);
+                    orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.ToolName : s.ToolCode,
+                    isAscending: sortType == SortType.Ascending);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Tools retrieved successfully";

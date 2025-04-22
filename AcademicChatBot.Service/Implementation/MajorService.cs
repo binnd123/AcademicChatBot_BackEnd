@@ -9,6 +9,7 @@ using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
+using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.Service.Implementation
 {
@@ -84,17 +85,17 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllMajors(int pageNumber, int pageSize, string search)
+        public async Task<Response> GetAllMajors(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _majorRepository.GetAllDataByExpression(
-                    filter: m => m.MajorName.ToLower().Contains(search.ToLower()) && !m.IsDeleted,
+                    filter: m => m.MajorName.ToLower().Contains(search.ToLower()) || m.MajorCode.ToLower().Contains(search.ToLower()),
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: m => m.MajorName,
-                    isAscending: true);
+                    orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.MajorName : s.MajorCode,
+                    isAscending: sortType == SortType.Ascending);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Majors retrieved successfully";

@@ -9,6 +9,7 @@ using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
+using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.Service.Implementation
 {
@@ -99,7 +100,7 @@ namespace AcademicChatBot.Service.Implementation
             try
             {
                 dto.Data = await _assessmentRepository.GetAllDataByExpression(
-                    filter: a => a.Category.ToLower().Contains(search.ToLower()) && !a.IsDeleted,
+                    filter: a => a.Category.ToLower().Contains(search.ToLower()),
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: a => a.Category,

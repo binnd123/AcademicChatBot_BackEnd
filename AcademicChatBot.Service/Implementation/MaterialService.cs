@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Material;
+using AcademicChatBot.Common.Enum;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
@@ -93,17 +94,17 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllMaterials(int pageNumber, int pageSize, string search)
+        public async Task<Response> GetAllMaterials(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _materialRepository.GetAllDataByExpression(
-                    filter: m => m.MaterialDescription.ToLower().Contains(search.ToLower()) && !m.IsDeleted,
+                    filter: m => m.MaterialCode.ToLower().Contains(search.ToLower()) || m.MaterialDescription.ToLower().Contains(search.ToLower()),
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: m => m.MaterialDescription,
-                    isAscending: true);
+                    orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.MaterialDescription : s.MaterialCode,
+                    isAscending: sortType == SortType.Ascending);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Materials retrieved successfully";
