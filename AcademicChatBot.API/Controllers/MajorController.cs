@@ -1,12 +1,15 @@
-﻿using AcademicChatBot.Common.BussinessModel;
+﻿using AcademicChatBot.Common.BussinessCode;
+using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Major;
+using AcademicChatBot.Common.Enum;
+using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
+using AcademicChatBot.Service.Implementation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Authorize(Roles = "Admin")]
     [Route("api/major")]
     [ApiController]
     public class MajorController : ControllerBase
@@ -18,41 +21,82 @@ namespace AcademicChatBot.API.Controllers
             _majorService = majorService;
         }
 
-        [Authorize(Roles = "Admin,Student")]
-        [HttpGet("get-major/{id}")]
-        public async Task<Response> GetMajorById(Guid id)
+        [Authorize]
+        [HttpGet("get-major-by-id/{majorId}")]
+        public async Task<IActionResult> GetMajorById(Guid majorId)
         {
-            return await _majorService.GetMajorById(id);
+            var response = await _majorService.GetMajorById(majorId);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("get-all-majors")]
-        public async Task<Response> GetAllMajors(
+        public async Task<IActionResult> GetAllMajors(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
-            [FromQuery] string search = ""
+            [FromQuery] string search = "",
+            [FromQuery] SortBy sortBy = SortBy.Default,
+            [FromQuery] SortType sortType = SortType.Ascending
         )
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            return await _majorService.GetAllMajors(pageNumber, pageSize, search);
+            var response = await _majorService.GetAllMajors(pageNumber, pageSize, search, sortBy, sortType);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create-major")]
-        public async Task<Response> CreateMajor([FromBody] CreateMajorRequest request)
+        public async Task<IActionResult> CreateMajor([FromBody] CreateMajorRequest request)
         {
-            return await _majorService.CreateMajor(request);
+            var response = await _majorService.CreateMajor(request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
-        [HttpPut("update-major/{id}")]
-        public async Task<Response> UpdateMajor(Guid id, [FromBody] UpdateMajorRequest request)
+        [Authorize(Roles = "Admin")]
+        [HttpPut("update-major/{majorId}")]
+        public async Task<IActionResult> UpdateMajor(Guid majorId, [FromBody] UpdateMajorRequest request)
         {
-            return await _majorService.UpdateMajor(id, request);
+            var response = await _majorService.UpdateMajor(majorId, request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
-        [HttpDelete("delete-major/{id}")]
-        public async Task<Response> DeleteMajor(Guid id)
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("delete-major/{majorId}")]
+        public async Task<IActionResult> DeleteMajor(Guid majorId)
         {
-            return await _majorService.DeleteMajor(id);
+            var response = await _majorService.DeleteMajor(majorId);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
     }
 }

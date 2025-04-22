@@ -441,11 +441,7 @@ namespace AcademicChatBot.Service.Implementation
                     dto.IsSucess = true;
                     dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                     dto.Message = "User profile retrieved successfully";
-                    dto.Data = new
-                    {
-                        User = userResponse,
-                        Student = studentResponse.Data
-                    };
+                    dto.Data = studentResponse.Data;
                     return dto;
                 }
 

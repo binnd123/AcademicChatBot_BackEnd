@@ -65,14 +65,6 @@ namespace AcademicChatBot.API.Controllers
             return Ok(result);
         }
 
-        [HttpPost("init-admin")]
-        public async Task<IActionResult> InitAdmin()
-        {
-            var result = await _userService.CreateAdminIfNotExistsAsync();
-            if (result.IsSucess) return Ok(result);
-            return BadRequest(result);
-        }
-
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
         {

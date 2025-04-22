@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Students;
+using AcademicChatBot.Common.Enum;
 using AcademicChatBot.Service.Contract;
 using AcademicChatBot.Service.Implementation;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Authorize(Roles = "Student")]
+    
     [Route("api/student")]
     [ApiController]
     public class StudentController : ControllerBase
@@ -44,7 +45,8 @@ namespace AcademicChatBot.API.Controllers
         //    }
         //    return Ok(response);
         //}
-        [HttpPut("student-profile")]
+        [Authorize(Roles = "Student")]
+        [HttpPut("update-student-profile")]
         public async Task<IActionResult> UpdateStudentProfile([FromBody] StudentProfileRequest request)
         {
             var studentId = _jwtService.GetStudentIdFromToken(HttpContext.Request, out var errorMessage);

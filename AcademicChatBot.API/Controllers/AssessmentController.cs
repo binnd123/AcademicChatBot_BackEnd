@@ -1,12 +1,15 @@
-﻿using AcademicChatBot.Common.BussinessModel;
+﻿using AcademicChatBot.Common.BussinessCode;
+using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Assessment;
+using AcademicChatBot.Common.Enum;
+using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
+using AcademicChatBot.Service.Implementation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Authorize(Roles = "Admin")]
     [Route("api/assessment")]
     [ApiController]
     public class AssessmentController : ControllerBase
@@ -18,15 +21,23 @@ namespace AcademicChatBot.API.Controllers
             _assessmentService = assessmentService;
         }
 
-        [Authorize(Roles = "Admin,Student")]
-        [HttpGet("get-assessment/{id}")]
-        public async Task<Response> GetAssessmentById(Guid id)
+        [Authorize]
+        [HttpGet("get-assessment-by-id/{assessmentId}")]
+        public async Task<IActionResult> GetAssessmentById(Guid assessmentId)
         {
-            return await _assessmentService.GetAssessmentById(id);
+            var response = await _assessmentService.GetAssessmentById(assessmentId);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("get-all-assessments")]
-        public async Task<Response> GetAllAssessments(
+        public async Task<IActionResult> GetAllAssessments(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string search = ""
@@ -34,25 +45,56 @@ namespace AcademicChatBot.API.Controllers
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            return await _assessmentService.GetAllAssessments(pageNumber, pageSize, search);
+            var response = await _assessmentService.GetAllAssessments(pageNumber, pageSize, search);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create-assessment")]
-        public async Task<Response> CreateAssessment([FromBody] CreateAssessmentRequest request)
+        public async Task<IActionResult> CreateAssessment([FromBody] CreateAssessmentRequest request)
         {
-            return await _assessmentService.CreateAssessment(request);
+            var response = await _assessmentService.CreateAssessment(request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
-        [HttpPut("update-assessment/{id}")]
-        public async Task<Response> UpdateAssessment(Guid id, [FromBody] UpdateAssessmentRequest request)
+        [Authorize(Roles = "Admin")]
+        [HttpPut("update-assessment/{assessmentId}")]
+        public async Task<IActionResult> UpdateAssessment(Guid assessmentId, [FromBody] UpdateAssessmentRequest request)
         {
-            return await _assessmentService.UpdateAssessment(id, request);
+            var response = await _assessmentService.UpdateAssessment(assessmentId, request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
-        [HttpDelete("delete-assessment/{id}")]
-        public async Task<Response> DeleteAssessment(Guid id)
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("delete-assessment/{assessmentId}")]
+        public async Task<IActionResult> DeleteAssessment(Guid assessmentId)
         {
-            return await _assessmentService.DeleteAssessment(id);
+            var response = await _assessmentService.DeleteAssessment(assessmentId);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
     }
 }

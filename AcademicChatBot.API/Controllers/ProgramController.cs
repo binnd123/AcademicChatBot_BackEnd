@@ -1,81 +1,52 @@
 ﻿using AcademicChatBot.Common.BussinessCode;
-using AcademicChatBot.Common.BussinessModel;
-using AcademicChatBot.Common.BussinessModel.Subjects;
+using AcademicChatBot.Common.BussinessModel.Programs;
+using AcademicChatBot.Common.BussinessModel.Tools;
 using AcademicChatBot.Common.Enum;
-using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
-using Azure;
+using AcademicChatBot.Service.Implementation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/subject")]
+    [Route("api/program")]
     [ApiController]
-    public class SubjectController : ControllerBase
+    public class ProgramController : ControllerBase
     {
-        private readonly ISubjectService _subjectService;
+        private readonly IProgramService _programService;
 
-        public SubjectController(ISubjectService subjectService)
+        public ProgramController(IProgramService programService)
         {
-            _subjectService = subjectService;
+            _programService = programService;
+        }
+        [Authorize]
+        [HttpGet("get-program-by-id/{programId}")]
+        public async Task<IActionResult> GetProgramById(Guid programId)
+        {
+            var response = await _programService.GetProgramById(programId);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
-
         [Authorize]
-        [HttpGet("get-all-subjects")]
-        public async Task<IActionResult> GetAllSubjects(
+        [HttpGet("get-all-programs")]
+        public async Task<IActionResult> GetAllPrograms(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string search = "",
             [FromQuery] SortBy sortBy = SortBy.Default,
             [FromQuery] SortType sortType = SortType.Ascending
-            )
+        )
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            var response = await _subjectService.GetAllSubjects(pageNumber, pageSize, search, sortBy, sortType);
-            if (response.IsSucess == false)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
-
-        [Authorize]
-        [HttpGet("get-subject-by-id/{subjectId}")]
-        public async Task<IActionResult> GetSubjectById(Guid subjectId)
-        {
-            var response = await _subjectService.GetSubjectById(subjectId);
-            if (response.IsSucess == false)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpPost("create-subject")]
-        public async Task<IActionResult> CreateSubject([FromBody] CreateSubjectRequest request)
-        {
-            var response = await _subjectService.CreateSubject(request);
-            if (response.IsSucess == false)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpPut("update-subject/{subjectId}")]
-        public async Task<IActionResult> UpdateSubject(Guid subjectId, UpdateSubjectRequest request)
-        {
-            var response = await _subjectService.UpdateSubject(subjectId, request);
+            var response = await _programService.GetAllPrograms(pageNumber, pageSize, search, sortBy, sortType);
             if (response.IsSucess == false)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
@@ -86,10 +57,38 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-subject/{subjectId}")]
-        public async Task<IActionResult> DeleteSubject(Guid subjectId)
+        [HttpPost("create-program")]
+        public async Task<IActionResult> CreateProgram([FromBody] CreateProgramRequest request)
         {
-            var response = await _subjectService.DeleteSubject(subjectId);
+            var response = await _programService.CreateProgram(request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("update-program/{programId}")]
+        public async Task<IActionResult> UpdateProgram(Guid programId, [FromBody] UpdateProgramRequest request)
+        {
+            var response = await _programService.UpdateProgram(programId, request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("delete-program/{programId}")]
+        public async Task<IActionResult> DeleteProgram(Guid programId)
+        {
+            var response = await _programService.DeleteProgram(programId);
             if (response.IsSucess == false)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)

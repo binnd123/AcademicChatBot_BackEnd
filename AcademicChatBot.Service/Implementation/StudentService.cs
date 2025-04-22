@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.BussinessModel.Accounts;
 using AcademicChatBot.Common.BussinessModel.Students;
+using AcademicChatBot.Common.Enum;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
@@ -26,6 +28,31 @@ namespace AcademicChatBot.Service.Implementation
             _userRepository = userRepository;
             _studentRepository = studentRepository;
             _unitOfWork = unitOfWork;
+        }
+
+        public async Task<Response> GetAllStudents(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
+        {
+            Response dto = new Response();
+            try
+            {
+                dto.Data = await _studentRepository.GetAllDataByExpression(
+                    filter: s => s.StudentCode.ToLower().Contains(search) || s.FullName.ToLower().Contains(search),
+                    pageNumber: pageNumber,
+                    pageSize: pageSize,
+                    orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.FullName : s.StudentCode,
+                    isAscending: sortType == SortType.Ascending,
+                    includes: s => s.User);
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                dto.Message = "Students retrieved successfully";
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while retrieving students: " + ex.Message;
+            }
+            return dto;
         }
 
         public async Task<Response> GetStudentProfile(Guid? studentId)
@@ -66,7 +93,30 @@ namespace AcademicChatBot.Service.Implementation
                     MajorCode = studentDb.MajorId != null ? studentDb.Major.MajorCode : null,
                     MajorName = studentDb.MajorId != null ? studentDb.Major.MajorName : null,
                 };
-                dto.Data = studentResponse;
+                var userDb = await _userRepository.GetById(studentDb.UserId);
+                if (userDb == null || !userDb.IsActive)
+                {
+                    dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+                    dto.IsSucess = false;
+                    dto.Message = "User not found";
+                    return dto;
+                }
+                var userResponse = new UserAccountResponse()
+                {
+                    UserId = userDb.UserId,
+                    Email = userDb.Email,
+                    Role = userDb.Role,
+                    IsActive = userDb.IsActive,
+                    CreatedAt = userDb.CreatedAt,
+                    UpdatedAt = userDb.UpdatedAt,
+                    IsDeleted = userDb.IsDeleted,
+                    DeletedAt = userDb.DeletedAt,
+                };
+                dto.Data = new
+                {
+                    Student = studentResponse,
+                    User = userResponse
+                };
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Student profile retrieved successfully";

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Tools;
+using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.Service.Contract
 {
@@ -12,7 +13,7 @@ namespace AcademicChatBot.Service.Contract
     {
         Task<Response> CreateTool(CreateToolRequest request);
         Task<Response> DeleteTool(Guid toolId);
-        Task<Response> GetAllTools(int pageNumber, int pageSize, string search);
+        Task<Response> GetAllTools(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType);
         Task<Response> GetToolById(Guid toolId);
         Task<Response> UpdateTool(Guid toolId, UpdateToolRequest request);
     }

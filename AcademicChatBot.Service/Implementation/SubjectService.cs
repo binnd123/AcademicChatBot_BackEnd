@@ -143,7 +143,7 @@ namespace AcademicChatBot.Service.Implementation
             try
             {
                 dto.Data = await _subjectRepository.GetAllDataByExpression(
-                    filter: s => s.SubjectCode.ToLower().Contains(search), 
+                    filter: s => s.SubjectCode.ToLower().Contains(search) || s.SubjectName.ToLower().Contains(search), 
                     pageNumber: pageNumber, 
                     pageSize: pageSize, 
                     orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.SubjectName : s.SubjectCode, 
