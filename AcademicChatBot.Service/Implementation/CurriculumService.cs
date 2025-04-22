@@ -7,6 +7,8 @@ using AcademicChatBot.Service.Contract;
 using AcademicChatBot.Common.BussinessModel.Curriculum;
 using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.Enum;
+using System.Globalization;
+
 
 namespace AcademicChatBot.Service.Implementation
 {
@@ -34,6 +36,12 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                if (request.MajorId != null)
+                {
+                    var major = await _majorRepository.GetById(request.MajorId.Value);
+                    if (major == null)
+                    {
+                        dto.IsSucess = false;
                         dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
                         dto.Message = "Major not found";
                         return dto;
@@ -66,6 +74,7 @@ namespace AcademicChatBot.Service.Implementation
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                     MajorId = request.MajorId,
+                    ProgramId = request.ProgramId
                 };
 
                 await _curriculumRepository.Insert(curriculum);
