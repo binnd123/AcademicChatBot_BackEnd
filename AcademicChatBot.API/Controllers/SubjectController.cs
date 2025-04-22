@@ -46,7 +46,7 @@ namespace AcademicChatBot.API.Controllers
         {
             return await _subjectService.UpdateSubject(id, request);
         }
-        [HttpPut("delete-subject/{id}")]
+        [HttpDelete("delete-subject/{id}")]
         public async Task<Response> DeleteSubject(Guid id)
         {
             return await _subjectService.DeleteSubject(id);

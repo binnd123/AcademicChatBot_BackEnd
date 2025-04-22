@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [Route("api/curriculum")]
     [ApiController]
     public class CurriculumController : ControllerBase
@@ -25,7 +25,7 @@ namespace AcademicChatBot.API.Controllers
             return await _curriculumService.GetCurriculumById(id);
         }
 
-        [HttpGet("get-all-curriculum")]
+        [HttpGet("get-all-curriculums")]
         public async Task<Response> GetAllCurriculums(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
@@ -37,11 +37,12 @@ namespace AcademicChatBot.API.Controllers
             return await _curriculumService.GetAllCurriculums(pageNumber, pageSize, search);
         }
 
-        [HttpGet("get-curriculum-by-code/{curriculumCode}")]
+        [HttpGet("get-curriculum-by-code")]
         public async Task<Response> GetCurriculumByCode(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
-            [FromQuery] string curriculumCode ="")
+            [FromQuery] string curriculumCode = ""
+        )
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
@@ -60,7 +61,7 @@ namespace AcademicChatBot.API.Controllers
             return await _curriculumService.UpdateCurriculum(id, request);
         }
 
-        [HttpPut("delete-curriculum/{id}")]
+        [HttpDelete("delete-curriculum/{id}")]
         public async Task<Response> DeleteCurriculum(Guid id)
         {
             return await _curriculumService.DeleteCurriculum(id);
