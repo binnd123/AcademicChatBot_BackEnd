@@ -23,6 +23,7 @@ builder.Services.AddScoped<ICurriculumService, CurriculumService>();
 builder.Services.AddScoped<IToolService, ToolService>();
 builder.Services.AddScoped<IProgramingOutcomeService, ProgramingOutcomeService>();
 builder.Services.AddScoped<IProgramingLearningOutcomeService, ProgramingLearningOutcomeService>();
+builder.Services.AddScoped<IMajorService, MajorService>();
 var secretKey = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]);
 
 builder.Services.AddAuthentication(options =>
