@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessModel.Assessment;
 using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.Service.Contract
 {
@@ -12,7 +13,7 @@ namespace AcademicChatBot.Service.Contract
     {
         Task<Response> CreateAssessment(CreateAssessmentRequest request);
         Task<Response> DeleteAssessment(Guid assessmentId);
-        Task<Response> GetAllAssessments(int pageNumber, int pageSize, string search);
+        Task<Response> GetAllAssessments(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType);
         Task<Response> GetAssessmentById(Guid assessmentId);
         Task<Response> UpdateAssessment(Guid assessmentId, UpdateAssessmentRequest request);
     }

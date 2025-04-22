@@ -16,11 +16,16 @@ namespace AcademicChatBot.Service.Implementation
     public class ProgramingOutcomeService : IProgramingOutcomeService
     {
         private readonly IGenericRepository<ProgramingOutcome> _programingOutcomeRepository;
+        private readonly IGenericRepository<Program> _programRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ProgramingOutcomeService(IGenericRepository<ProgramingOutcome> programingOutcomeRepository, IUnitOfWork unitOfWork)
+        public ProgramingOutcomeService(
+            IGenericRepository<ProgramingOutcome> programingOutcomeRepository,
+            IGenericRepository<Program> programRepository,
+            IUnitOfWork unitOfWork)
         {
             _programingOutcomeRepository = programingOutcomeRepository;
+            _programRepository = programRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -29,6 +34,18 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                if (request.ProgramId != null)
+                {
+                    var program = await _programRepository.GetById(request.ProgramId.Value);
+                    if (program == null)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Program not found";
+                        return dto;
+                    }
+                }
+
                 var programingOutcome = new ProgramingOutcome
                 {
                     ProgramingOutcomeId = Guid.NewGuid(),
@@ -37,7 +54,8 @@ namespace AcademicChatBot.Service.Implementation
                     Description = request.Description,
                     ProgramId = request.ProgramId,
                     CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    UpdatedAt = DateTime.UtcNow,
+                    IsDeleted = false
                 };
                 await _programingOutcomeRepository.Insert(programingOutcome);
                 await _unitOfWork.SaveChangeAsync();
@@ -96,7 +114,8 @@ namespace AcademicChatBot.Service.Implementation
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.ProgramingOutcomeName : s.ProgramingOutcomeCode,
-                    isAscending: sortType == SortType.Ascending);
+                    isAscending: sortType == SortType.Ascending,
+                    includes: p => p.Program);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "ProgramingOutcomes retrieved successfully";
@@ -142,6 +161,18 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                if (request.ProgramId != null)
+                {
+                    var program = await _programRepository.GetById(request.ProgramId.Value);
+                    if (program == null)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Program not found";
+                        return dto;
+                    }
+                }
+
                 var programingOutcome = await _programingOutcomeRepository.GetById(programingOutcomeId);
                 if (programingOutcome == null)
                 {

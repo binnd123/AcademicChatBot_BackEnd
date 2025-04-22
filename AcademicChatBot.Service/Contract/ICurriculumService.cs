@@ -11,6 +11,6 @@ namespace AcademicChatBot.Service.Contract
         Task<Response> GetAllCurriculums(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType);
         Task<Response> GetCurriculumById(Guid curriculumId);
         Task<Response> UpdateCurriculum(Guid curriculumId, UpdateCurriculumRequest request);
-        Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode);
+        Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode, SortBy sortBy, SortType sortType);
     }
 }

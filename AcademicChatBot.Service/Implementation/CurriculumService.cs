@@ -13,11 +13,19 @@ namespace AcademicChatBot.Service.Implementation
     public class CurriculumService : ICurriculumService
     {
         private readonly IGenericRepository<Curriculum> _curriculumRepository;
+        private readonly IGenericRepository<Major> _majorRepository;
+        private readonly IGenericRepository<Program> _programRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CurriculumService(IGenericRepository<Curriculum> curriculumRepository, IUnitOfWork unitOfWork)
+        public CurriculumService(
+            IGenericRepository<Curriculum> curriculumRepository,
+            IGenericRepository<Major> majorRepository,
+            IGenericRepository<Program> programRepository,
+            IUnitOfWork unitOfWork)
         {
             _curriculumRepository = curriculumRepository;
+            _majorRepository = majorRepository;
+            _programRepository = programRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -26,6 +34,24 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Major not found";
+                        return dto;
+                    }
+                }
+
+                if (request.ProgramId != null)
+                {
+                    var program = await _programRepository.GetById(request.ProgramId.Value);
+                    if (program == null)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Program not found";
+                        return dto;
+                    }
+                }
+
                 var curriculum = new Curriculum
                 {
                     CurriculumId = Guid.NewGuid(),
@@ -39,10 +65,12 @@ namespace AcademicChatBot.Service.Implementation
                     IsDeleted = false,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
-                    MajorId = request.MajorId
+                    MajorId = request.MajorId,
                 };
+
                 await _curriculumRepository.Insert(curriculum);
                 await _unitOfWork.SaveChangeAsync();
+
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.INSERT_SUCESSFULLY;
                 dto.Data = curriculum;
@@ -96,17 +124,20 @@ namespace AcademicChatBot.Service.Implementation
                     filter: c => c.CurriculumName.ToLower().Contains(search.ToLower()) || c.CurriculumCode.ToLower().Contains(search.ToLower()),
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.CurriculumName : s.CurriculumCode,
-                    isAscending: sortType == SortType.Ascending);
+                    orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.CurriculumName : c.CurriculumCode,
+                    isAscending: sortType == SortType.Ascending,
+                    includes: c => new { c.Major, c.Program }
+                );
+
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
-                dto.Message = "Curriculum retrieved successfully";
+                dto.Message = "Curriculums retrieved successfully";
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
-                dto.Message = "An error occurred while retrieving curriculum: " + ex.Message;
+                dto.Message = "An error occurred while retrieving curriculums: " + ex.Message;
             }
             return dto;
         }
@@ -124,6 +155,7 @@ namespace AcademicChatBot.Service.Implementation
                     dto.Message = "Curriculum not found";
                     return dto;
                 }
+
                 dto.Data = curriculum;
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
@@ -143,6 +175,30 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                if (request.MajorId != null)
+                {
+                    var major = await _majorRepository.GetById(request.MajorId.Value);
+                    if (major == null)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Major not found";
+                        return dto;
+                    }
+                }
+
+                if (request.ProgramId != null)
+                {
+                    var program = await _programRepository.GetById(request.ProgramId.Value);
+                    if (program == null)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Program not found";
+                        return dto;
+                    }
+                }
+
                 var curriculum = await _curriculumRepository.GetById(curriculumId);
                 if (curriculum == null)
                 {
@@ -161,9 +217,11 @@ namespace AcademicChatBot.Service.Implementation
                 curriculum.IsApproved = request.IsApproved;
                 curriculum.UpdatedAt = DateTime.UtcNow;
                 curriculum.MajorId = request.MajorId ?? curriculum.MajorId;
+                curriculum.ProgramId = request.ProgramId ?? curriculum.ProgramId;
 
                 await _curriculumRepository.Update(curriculum);
                 await _unitOfWork.SaveChangeAsync();
+
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.UPDATE_SUCCESSFULLY;
                 dto.Data = curriculum;
@@ -177,7 +235,7 @@ namespace AcademicChatBot.Service.Implementation
             }
             return dto;
         }
-        public async Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode)
+        public async Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode, SortBy sortBy, SortType sortType)
         {
             Response dto = new Response();
             try
@@ -186,8 +244,9 @@ namespace AcademicChatBot.Service.Implementation
                 filter: c => c.CurriculumCode.Contains(curriculumCode) && !c.IsDeleted,
                 pageNumber: pageNumber,
                 pageSize: pageSize,
-                orderBy: c => c.CurriculumName,
-                isAscending: true);
+                orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.CurriculumName : c.CurriculumCode,
+                isAscending: sortType == SortType.Ascending,
+                includes: c => new { c.Major, c.Program });
 
                 if (curriculum == null || !curriculum.Items.Any())
                 {

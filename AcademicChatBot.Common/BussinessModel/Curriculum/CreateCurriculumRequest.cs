@@ -12,5 +12,6 @@ namespace AcademicChatBot.Common.BussinessModel.Curriculum
         public bool IsActive { get; set; } = true;
         public bool IsApproved { get; set; } = true;
         public Guid? MajorId { get; set; }
+        public Guid? ProgramId { get; set; }
     }
 }
