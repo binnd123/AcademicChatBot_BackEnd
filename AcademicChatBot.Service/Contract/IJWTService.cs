@@ -14,6 +14,7 @@ namespace AcademicChatBot.Service.Contract
     {
         Guid? GetStudentIdFromToken(HttpRequest request, out string errorMessage);
         Guid? GetUserIdFromToken(HttpRequest request, out string errorMessage);
+        string GetRoleFromToken(HttpRequest request, out string errorMessage);
         public string GenerateAccessToken(Guid userId, RoleName role, string email, Guid? studentId = null);
         public string GenerateRefreshToken();
     }

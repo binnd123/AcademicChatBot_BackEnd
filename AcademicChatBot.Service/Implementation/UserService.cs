@@ -12,6 +12,8 @@ using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
 using Azure.Core;
 using Google.Apis.Auth;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.SqlServer.Server;
 
@@ -23,14 +25,16 @@ namespace AcademicChatBot.Service.Implementation
         private readonly IGenericRepository<Student> _studentRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IJwtService _jwtService;
+        private readonly IStudentService _studentService;
         private readonly IConfiguration _configuration;
 
-        public UserService(IGenericRepository<User> userRepository, IGenericRepository<Student> studentRepository, IUnitOfWork unitOfWork, IJwtService jwtService, IConfiguration configuration)
+        public UserService(IGenericRepository<User> userRepository, IGenericRepository<Student> studentRepository, IUnitOfWork unitOfWork, IJwtService jwtService, IStudentService studentService, IConfiguration configuration)
         {
             _userRepository = userRepository;
             _studentRepository = studentRepository;
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
+            _studentService = studentService;
             _configuration = configuration;
         }
 
@@ -71,7 +75,7 @@ namespace AcademicChatBot.Service.Implementation
 
                 var accesstoken = _jwtService.GenerateAccessToken(userDb.UserId, userDb.Role, userDb.Email, studentId);
                 var refreshToken = _jwtService.GenerateRefreshToken();
-                var expiredRefreshToken = DateTime.Now.AddMinutes(double.Parse(_configuration["JwtSettings:RefreshTokenExpirationDays"]));
+                var expiredRefreshToken = DateTime.Now.AddDays(double.Parse(_configuration["JwtSettings:RefreshTokenExpirationDays"]));
                 userDb.RefreshToken = refreshToken;
                 userDb.ExpiredRefreshToken = expiredRefreshToken;
                 await _userRepository.Update(userDb);
@@ -142,13 +146,13 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                //if (signUpRequest.Role == RoleName.Admin)
-                //{
-                //    dto.IsSucess = false;
-                //    dto.BusinessCode = BusinessCode.SIGN_UP_FAILED;
-                //    dto.Message = "Can not sign up with role Admin!";
-                //    return dto;
-                //}
+                if (signUpRequest.Role == RoleName.Admin)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.SIGN_UP_FAILED;
+                    dto.Message = "Can not sign up with role Admin!";
+                    return dto;
+                }
                 if (!signUpRequest.Email.ToLower().EndsWith("@fpt.edu.vn", StringComparison.OrdinalIgnoreCase))
                 {
                     dto.IsSucess = false;
@@ -175,6 +179,8 @@ namespace AcademicChatBot.Service.Implementation
                     CreatedAt = DateTime.UtcNow,
                     IsActive = true,
                     UpdatedAt = DateTime.UtcNow,
+                    DeletedAt = null,
+                    IsDeleted = false,
                 };
                 if (signUpRequest.Role == RoleName.Student)
                 {
@@ -186,6 +192,13 @@ namespace AcademicChatBot.Service.Implementation
                         FullName = signUpRequest.FullName,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow,
+                        IsDeleted = false,
+                        DeletedAt = null,
+                        Gender = GenderType.Male,
+                        Address = null,
+                        DOB = null,
+                        PhoneNumber = null,
+                        IntakeYear = null,
                     };
                     await _studentRepository.Insert(student);
                 }
@@ -305,6 +318,297 @@ namespace AcademicChatBot.Service.Implementation
                 RefreshToken = refreshToken
             };
 
+            return dto;
+        }
+        public async Task<Response> CreateAdminIfNotExistsAsync()
+        {
+            var dto = new Response();
+            try
+            {
+                var email = _configuration["AdminAccount:Email"];
+                var password = _configuration["AdminAccount:Password"];
+
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Admin email or password is missing in config";
+                    return dto;
+                }
+
+                var adminDb = await _userRepository.GetByExpression(
+                    a => a.Email == email && 
+                    a.Role == RoleName.Admin && 
+                    a.IsDeleted == false && 
+                    a.IsActive == true);
+                if (adminDb != null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXISTED_USER;
+                    dto.Message = "Admin account already exists";
+                    return dto;
+                }
+
+                var passHash = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 12);
+                var admin = new User
+                {
+                    UserId = Guid.NewGuid(),
+                    Email = email,
+                    PasswordHash = passHash,
+                    Role = RoleName.Admin,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                };
+
+                await _userRepository.Insert(admin);
+                await _unitOfWork.SaveChangeAsync();
+
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.SIGN_UP_SUCCESSFULLY;
+                dto.Message = "Admin account created successfully";
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = ex.Message;
+            }
+
+            return dto;
+        }
+
+        public async Task<Response> GetUserProfile(HttpRequest request)
+        {
+            Response dto = new Response();
+            try
+            {
+
+                var role = _jwtService.GetRoleFromToken(request, out var errorMessageRole);
+                if (role == null)
+                {
+                    dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+                    dto.IsSucess = false;
+                    dto.Message = errorMessageRole;
+                    return dto;
+                }
+
+                var userId = _jwtService.GetUserIdFromToken(request, out var errorMessageUser);
+                if (userId == null)
+                {
+                    dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+                    dto.IsSucess = false;
+                    dto.Message = errorMessageUser;
+                    return dto;
+                }
+
+                var userDb = await _userRepository.GetById(userId);
+                if (userDb == null || !userDb.IsActive)
+                {
+                    dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+                    dto.IsSucess = false;
+                    dto.Message = "User not found";
+                    return dto;
+                }
+                var userResponse = new UserAccountResponse()
+                {
+                    UserId = userDb.UserId,
+                    Email = userDb.Email,
+                    Role = userDb.Role,
+                    IsActive = userDb.IsActive,
+                    CreatedAt = userDb.CreatedAt,
+                    UpdatedAt = userDb.UpdatedAt,
+                    IsDeleted = userDb.IsDeleted,
+                    DeletedAt = userDb.DeletedAt,
+                };
+
+                if (role == RoleName.Student.ToString())
+                {
+                    var studentId = _jwtService.GetStudentIdFromToken(request, out var errorMessageStudent);
+                    if (studentId == null)
+                    {
+                        dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+                        dto.IsSucess = false;
+                        dto.Message = errorMessageStudent;
+                        return dto;
+                    }
+
+                    var studentResponse = await _studentService.GetStudentProfile(studentId);
+                    if (studentResponse.IsSucess == false)
+                    {
+                        return studentResponse;
+                    }
+                    dto.IsSucess = true;
+                    dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                    dto.Message = "User profile retrieved successfully";
+                    dto.Data = new
+                    {
+                        User = userResponse,
+                        Student = studentResponse.Data
+                    };
+                    return dto;
+                }
+
+                dto.Data = userResponse;
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                dto.Message = "User profile retrieved successfully";
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while retrieving the User profile";
+            }
+            return dto;
+        }
+
+        public async Task<Response> UpdateUserProfile(Guid? userId, UpdateAccountRequest request)
+        {
+            Response dto = new Response();
+            try
+            {
+                var userDb = await _userRepository.GetById(userId);
+                if (userDb == null)
+                {
+                    dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+                    dto.IsSucess = false;
+                    dto.Message = "User not found";
+                    return dto;
+                }
+                if (!request.Email.ToLower().EndsWith("@fpt.edu.vn", StringComparison.OrdinalIgnoreCase))
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.INVALID_EMAIL_FPTU;
+                    dto.Message = "Email is not correct fortmat FPT university";
+                    return dto;
+                }
+                var userEmail = await _userRepository.GetFirstByExpression(a => a.Email == request.Email, null);
+                if (userEmail != null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXISTED_USER;
+                    dto.Message = "Email is existed";
+                    return dto;
+                }
+                if (!string.IsNullOrEmpty(request.Email)) userDb.Email = request.Email;
+                userDb.IsActive = request.IsActive;
+                var userResponse = new UserAccountResponse()
+                {
+                    UserId = userDb.UserId,
+                    Email = userDb.Email,
+                    Role = userDb.Role,
+                    IsActive = userDb.IsActive,
+                    CreatedAt = userDb.CreatedAt,
+                    UpdatedAt = userDb.UpdatedAt,
+                    IsDeleted = userDb.IsDeleted,
+                    DeletedAt = userDb.DeletedAt,
+                };
+                await _userRepository.Update(userDb);
+                await _unitOfWork.SaveChangeAsync();
+                dto.Data = userResponse;
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.UPDATE_SUCCESSFULLY;
+                dto.Message = "User updated successfully";
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while updating the user profile";
+            }
+            return dto;
+        }
+
+        public async Task<Response> ChangePassword(Guid? userId, ChangePasswordRequest request)
+        {
+            Response dto = new Response();
+            try
+            {
+                var userDb = await _userRepository.GetById(userId);
+                if (userDb == null)
+                {
+                    dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+                    dto.IsSucess = false;
+                    dto.Message = "User not found";
+                    return dto;
+                }
+                if (!BCrypt.Net.BCrypt.EnhancedVerify(request.OldPassword, userDb.PasswordHash))
+                {
+                    dto.BusinessCode = BusinessCode.WRONG_PASSWORD;
+                    dto.IsSucess = false;
+                    dto.Message = "Wrong password";
+                    return dto;
+                }
+                userDb.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(request.NewPassword, 12);
+
+                await _userRepository.Update(userDb);
+                await _unitOfWork.SaveChangeAsync();
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.UPDATE_SUCCESSFULLY;
+                dto.Message = "Change password successfully";
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while updating the new password";
+            }
+            return dto;
+        }
+
+        public async Task<Response> DeleteUser(Guid? userId)
+        {
+            Response dto = new Response();
+            try
+            {
+                var userDb = await _userRepository.GetById(userId);
+                if (userDb == null)
+                {
+                    dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+                    dto.IsSucess = false;
+                    dto.Message = "User not found";
+                    return dto;
+                }
+                userDb.IsDeleted = true;
+                userDb.DeletedAt = DateTime.UtcNow;
+                userDb.IsActive = false;
+                userDb.UpdatedAt = DateTime.UtcNow;
+                if (userDb.Role == RoleName.Student)
+                {
+                    var studentDb = await _studentRepository.GetByExpression(a => a.UserId == userDb.UserId);
+                    if (studentDb != null)
+                    {
+                        studentDb.IsDeleted = true;
+                        studentDb.DeletedAt = DateTime.UtcNow;
+                        studentDb.UpdatedAt = DateTime.UtcNow;
+                        await _studentRepository.Update(studentDb);
+                    }
+                }
+                var userResponse = new UserAccountResponse()
+                {
+                    UserId = userDb.UserId,
+                    Email = userDb.Email,
+                    Role = userDb.Role,
+                    IsActive = userDb.IsActive,
+                    CreatedAt = userDb.CreatedAt,
+                    UpdatedAt = userDb.UpdatedAt,
+                    IsDeleted = userDb.IsDeleted,
+                    DeletedAt = userDb.DeletedAt,
+                };
+                await _userRepository.Update(userDb);
+                await _unitOfWork.SaveChangeAsync();
+                dto.Data = userResponse;
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.DELETE_SUCCESSFULLY;
+                dto.Message = "User deleted successfully";
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while delete the user profile";
+            }
             return dto;
         }
     }

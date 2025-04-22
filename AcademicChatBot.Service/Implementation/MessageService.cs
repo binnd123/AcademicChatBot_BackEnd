@@ -34,102 +34,107 @@ namespace AcademicChatBot.Service.Implementation
             _hubService = hubService;
         }
 
-        public async Task<Response> SendMessage(Guid senderId, Guid? aIChatLogId, string content)
-        {
-            var response = new Response();
-            try
-            {
-                var sender = await _userRepository.GetFirstByExpression(u => u.UserId.Equals(senderId));
-                if (sender == null)
-                {
-                    response.IsSucess = false;
-                    response.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
-                    response.Message = "Sender not found";
-                    return response;
-                }
+        //public async Task<Response> SendMessage(Guid senderId, string content)
+        //{
+        //    var response = new Response();
+        //    try
+        //    {
+        //        var sender = await _userRepository.GetFirstByExpression(u => u.UserId.Equals(senderId));
+        //        if (sender == null)
+        //        {
+        //            response.IsSucess = false;
+        //            response.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+        //            response.Message = "Sender not found";
+        //            return response;
+        //        }
+        //        var aIChatLog = await _aIChatLogRepository.GetFirstByExpression
+        //            (filter: x => x.UserId == senderId && 
+        //            x.Status == StatusChat.Actived && 
+        //            x.IsDeleted == false && 
+        //            x.EndTime == null
+        //            );
+        //        if (aIChatLog == null)
+        //        {
+        //            var aIChatLogRequest = new AIChatLogRequest
+        //            {
+        //                LastMessageTime = DateTime.UtcNow,
+        //            };
+        //            aIChatLogId = await aIChatLogService.AddChatAsync(senderId, aIChatLogRequest);
+        //        }
+        //        else
+        //        {
+        //            var aIChatLog = await _aIChatLogRepository.GetById(aIChatLogId);
+        //            if (aIChatLog == null)
+        //            {
+        //                response.IsSucess = false;
+        //                response.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+        //                response.Message = "AIChatLog not found";
+        //                return response;
+        //            }
+        //        }
 
-                if (aIChatLogId == null || aIChatLogId == Guid.Empty)
-                {
-                    var aIChatLogRequest = new AIChatLogRequest
-                    {
-                        LastMessageTime = DateTime.UtcNow,
-                    };
-                    aIChatLogId = await aIChatLogService.AddChatAsync(senderId, aIChatLogRequest);
-                }
-                else
-                {
-                    var aIChatLog = await _aIChatLogRepository.GetById(aIChatLogId);
-                    if (aIChatLog == null)
-                    {
-                        response.IsSucess = false;
-                        response.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        response.Message = "AIChatLog not found";
-                        return response;
-                    }
-                }
+        //        // Tạo đối tượng tin nhắn của người dùng  
+        //        var messageUserRequest = new Message
+        //        {
+        //            MessageId = Guid.NewGuid(),
+        //            MessageContent = content,
+        //            SenderId = senderId,
+        //            MessageType = MessageType.Text,
+        //            IsBotResponse = false,
+        //            AIChatLogId = aIChatLogId,
+        //            SentTime = DateTime.UtcNow,
+        //        };
+        //        // Lưu tin nhắn người dùng  
+        //        await _messageRepository.Insert(messageUserRequest);
 
-                // Tạo đối tượng tin nhắn của người dùng  
-                var messageUserRequest = new Message
-                {
-                    MessageId = Guid.NewGuid(),
-                    MessageContent = content,
-                    SenderId = senderId,
-                    MessageType = MessageType.Text,
-                    IsBotResponse = false,
-                    AIChatLogId = aIChatLogId,
-                    SentTime = DateTime.UtcNow,
-                };
-                // Lưu tin nhắn người dùng  
-                await _messageRepository.Insert(messageUserRequest);
+        //        // Gọi IChatService để generate câu trả lời từ AI  
+        //        var botResponse = await aIChatLogService.GenerateResponseAsync(senderId, content);
 
-                // Gọi IChatService để generate câu trả lời từ AI  
-                var botResponse = await aIChatLogService.GenerateResponseAsync(senderId, content);
+        //        // Tạo đối tượng tin nhắn của bot với nội dung trả lời từ AI  
+        //        var messageBotResponse = new Message
+        //        {
+        //            MessageId = Guid.NewGuid(),
+        //            SenderId = Guid.Empty, // hoặc sử dụng một Guid đại diện cho bot nếu có  
+        //            MessageContent = botResponse.Data.ToString(),
+        //            MessageType = MessageType.Text,
+        //            IsBotResponse = true,
+        //            AIChatLogId = aIChatLogId,
+        //            SentTime = DateTime.UtcNow,
+        //        };
 
-                // Tạo đối tượng tin nhắn của bot với nội dung trả lời từ AI  
-                var messageBotResponse = new Message
-                {
-                    MessageId = Guid.NewGuid(),
-                    SenderId = Guid.Empty, // hoặc sử dụng một Guid đại diện cho bot nếu có  
-                    MessageContent = botResponse.Data.ToString(),
-                    MessageType = MessageType.Text,
-                    IsBotResponse = true,
-                    AIChatLogId = aIChatLogId,
-                    SentTime = DateTime.UtcNow,
-                };
+        //        // Lưu tin nhắn của bot  
+        //        await _messageRepository.Insert(messageBotResponse);
 
-                // Lưu tin nhắn của bot  
-                await _messageRepository.Insert(messageBotResponse);
+        //        // Cập nhật lại thông tin cuộc trò chuyện (ví dụ: thời gian tin nhắn cuối)  
+        //        await aIChatLogService.UpdateChatAsync(senderId, (Guid)aIChatLogId, new AIChatLogRequest { LastMessageTime = DateTime.UtcNow });
 
-                // Cập nhật lại thông tin cuộc trò chuyện (ví dụ: thời gian tin nhắn cuối)  
-                await aIChatLogService.UpdateChatAsync(senderId, (Guid)aIChatLogId, new AIChatLogRequest { LastMessageTime = DateTime.UtcNow });
+        //        // Gửi câu trả lời của bot về cho client  
+        //        await _hubService.SendMessageToUserAsync(senderId, HubMethod.LOAD_BOT_RESPONSE_MESSAGE.ToString(), messageBotResponse);
+        //        await _unitOfWork.SaveChangeAsync();
+        //        var messageResponse = new MessageResponse
+        //        {
+        //            MessageId = messageUserRequest.MessageId,
+        //            MessageContent = messageUserRequest.MessageContent,
+        //            SenderId = messageUserRequest.SenderId,
+        //            MessageType = messageUserRequest.MessageType,
+        //            IsBotResponse = messageUserRequest.IsBotResponse,
+        //            AIChatLogId = messageUserRequest.AIChatLogId,
+        //            SentTime = messageUserRequest.SentTime,
+        //        };
 
-                // Gửi câu trả lời của bot về cho client  
-                await _hubService.SendMessageToUserAsync(senderId, HubMethod.LOAD_BOT_RESPONSE_MESSAGE.ToString(), messageBotResponse);
-                await _unitOfWork.SaveChangeAsync();
-                var messageResponse = new MessageResponse
-                {
-                    MessageId = messageUserRequest.MessageId,
-                    MessageContent = messageUserRequest.MessageContent,
-                    SenderId = messageUserRequest.SenderId,
-                    MessageType = messageUserRequest.MessageType,
-                    IsBotResponse = messageUserRequest.IsBotResponse,
-                    AIChatLogId = messageUserRequest.AIChatLogId,
-                    SentTime = messageUserRequest.SentTime,
-                };
-
-                response.IsSucess = true;
-                response.BusinessCode = BusinessCode.INSERT_SUCESSFULLY;
-                response.Data = messageResponse;
-                response.Message = "Message sent successfully";
-            }
-            catch (Exception ex)
-            {
-                response.IsSucess = false;
-                response.BusinessCode = BusinessCode.EXCEPTION;
-                response.Message = "An error occurred while sending the message: " + ex.Message;
-            }
-            return response;
-        }
+        //        response.IsSucess = true;
+        //        response.BusinessCode = BusinessCode.INSERT_SUCESSFULLY;
+        //        response.Data = messageResponse;
+        //        response.Message = "Message sent successfully";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        response.IsSucess = false;
+        //        response.BusinessCode = BusinessCode.EXCEPTION;
+        //        response.Message = "An error occurred while sending the message: " + ex.Message;
+        //    }
+        //    return response;
+        //}
 
         public async Task<Response> GetMessageByChatIdAsync(Guid aIChatLogId, int pageNumber, int pageSize)
         {

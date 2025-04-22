@@ -1,7 +1,11 @@
 ﻿using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Accounts;
+using AcademicChatBot.Common.BussinessModel.Students;
+using AcademicChatBot.Common.Enum;
 using AcademicChatBot.Service.Contract;
+using AcademicChatBot.Service.Implementation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,16 +15,19 @@ namespace AcademicChatBot.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private IUserService _service;
+        private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
 
-        public UserController(IUserService service)
+        public UserController(IUserService userService, IJwtService jwtService)
         {
-            _service = service;
+            _userService = userService;
+            _jwtService = jwtService;
         }
+
         [HttpPost("sign-up")]
         public async Task<IActionResult> SignUp([FromBody] AccountSignUpRequest request)
         {
-            var response = await _service.SignUp(request);
+            var response = await _userService.SignUp(request);
             if (!response.IsSucess)
             {
                 return response.BusinessCode switch
@@ -36,7 +43,7 @@ namespace AcademicChatBot.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] AccountLoginRequest request)
         {
-            var result = await _service.Login(request);
+            var result = await _userService.Login(request);
 
             if (!result.IsSucess)
             {
@@ -58,11 +65,18 @@ namespace AcademicChatBot.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost("init-admin")]
+        public async Task<IActionResult> InitAdmin()
+        {
+            var result = await _userService.CreateAdminIfNotExistsAsync();
+            if (result.IsSucess) return Ok(result);
+            return BadRequest(result);
+        }
 
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
         {
-            var response = await _service.HandleRefreshToken(refreshToken);
+            var response = await _userService.HandleRefreshToken(refreshToken);
             if (!response.IsSucess)
             {
                 return response.BusinessCode switch
@@ -80,7 +94,7 @@ namespace AcademicChatBot.API.Controllers
         [HttpPost("google-login")]
         public async Task<IActionResult> GoogleLogin([FromBody] AccountLoginGoogleRequest request)
         {
-            var result = await _service.GoogleLogin(request);
+            var result = await _userService.GoogleLogin(request);
 
             if (!result.IsSucess)
             {
@@ -95,6 +109,76 @@ namespace AcademicChatBot.API.Controllers
             }
 
             return Ok(result);
+        }
+        [Authorize]
+        [HttpGet("current-user")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var response = await _userService.GetUserProfile(HttpContext.Request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
+        [HttpPut("update-user")]
+        public async Task<IActionResult> UpdateStudentProfile([FromBody] UpdateAccountRequest request)
+        {
+            var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
+            if (userId == null) return Unauthorized(new Response
+            {
+                IsSucess = false,
+                BusinessCode = BusinessCode.AUTH_NOT_FOUND,
+                Message = errorMessage
+            });
+            var response = await _userService.UpdateUserProfile(userId, request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
+            if (userId == null) return Unauthorized(new Response
+            {
+                IsSucess = false,
+                BusinessCode = BusinessCode.AUTH_NOT_FOUND,
+                Message = errorMessage
+            });
+            var response = await _userService.ChangePassword(userId, request);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
+        [HttpDelete("delete-user")]
+        public async Task<IActionResult> DeleteUser()
+        {
+            var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
+            if (userId == null) return Unauthorized(new Response
+            {
+                IsSucess = false,
+                BusinessCode = BusinessCode.AUTH_NOT_FOUND,
+                Message = errorMessage
+            });
+            var response = await _userService.DeleteUser(userId);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
         }
     }
 }

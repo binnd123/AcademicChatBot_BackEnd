@@ -11,7 +11,7 @@ namespace AcademicChatBot.Common.MLModels
     public class MLModel : IMLModel
     {
         public MLContext MlContext { get; }
-        public ITransformer TransactionModel { get; }
+        //public ITransformer TransactionModel { get; }
         public ITransformer IntentModel { get; }
 
         public MLModel(IConfiguration configuration)

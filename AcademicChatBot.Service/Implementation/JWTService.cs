@@ -54,6 +54,38 @@ namespace AcademicChatBot.Service.Implementation
                 return null;
             }
         }
+        public string GetRoleFromToken(HttpRequest request, out string errorMessage)
+        {
+            errorMessage = string.Empty;
+            var token = request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            if (string.IsNullOrEmpty(token))
+            {
+                errorMessage = "No token provided";
+                return null;
+            }
+
+            try
+            {
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var roleClaim = jwtToken?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+
+                if (roleClaim == null)
+                {
+                    errorMessage = "Role claim not found";
+                    return null;
+                }
+
+                return roleClaim.Value;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error parsing token: {ex.Message}";
+                return null;
+            }
+        }
+
         public string GenerateAccessToken(Guid userId, RoleName role, string email, Guid? studentId = null)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));

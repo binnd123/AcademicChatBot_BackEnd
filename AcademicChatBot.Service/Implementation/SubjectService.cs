@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Subjects;
+using AcademicChatBot.Common.Enum;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Implementation;
 using AcademicChatBot.DAL.Models;
@@ -136,17 +137,17 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllSubjects(int pageNumber, int pageSize, string search)
+        public async Task<Response> GetAllSubjects(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _subjectRepository.GetAllDataByExpression(
-                    filter: s => (s.SubjectCode.ToLower().Contains(search) && s.IsActive && s.IsApproved && !s.IsDeleted), 
+                    filter: s => s.SubjectCode.ToLower().Contains(search), 
                     pageNumber: pageNumber, 
                     pageSize: pageSize, 
-                    orderBy: s => s.SubjectCode, 
-                    isAscending: true, 
+                    orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.SubjectName : s.SubjectCode, 
+                    isAscending: sortType == SortType.Ascending,
                     includes: s => s.Curriculum);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;

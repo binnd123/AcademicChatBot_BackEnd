@@ -10,7 +10,7 @@ namespace AcademicChatBot.Common.MLModels
     public interface IMLModel
     {
         MLContext MlContext { get; }
-        ITransformer TransactionModel { get; }
+        //ITransformer TransactionModel { get; }
         ITransformer IntentModel { get; }
     }
 }

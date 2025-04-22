@@ -48,6 +48,8 @@ namespace AcademicChatBot.DAL.Implementation
             var result = new PageResult<T>
             {
                 Items = null,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
                 TotalPages = 0
             };
             if (pageNumber > 0 && pageSize > 0)
