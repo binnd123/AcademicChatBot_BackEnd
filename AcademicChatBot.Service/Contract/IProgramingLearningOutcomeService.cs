@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessModel.ProgramingLearningOutcome;
-using AcademicChatBot.Common.DTOs;
+using AcademicChatBot.Common.BussinessModel;
 
 namespace AcademicChatBot.Service.Contract
 {

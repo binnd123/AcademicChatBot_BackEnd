@@ -1,5 +1,5 @@
-﻿using AcademicChatBot.Common.BussinessModel.Major;
-using AcademicChatBot.Common.DTOs;
+﻿using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.BussinessModel.Major;
 using AcademicChatBot.Service.Contract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
