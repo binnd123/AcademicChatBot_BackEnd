@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/combo")]
     [ApiController]
     public class ComboController : ControllerBase
     {

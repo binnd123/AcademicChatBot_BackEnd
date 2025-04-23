@@ -101,7 +101,8 @@ namespace AcademicChatBot.Service.Implementation
                     p => p.Curriculum
                 };
                 dto.Data = await _prerequisiteConstraintRepository.GetAllDataByExpression(
-                    filter: p => p.PrerequisiteConstraintCode.ToLower().Contains(search.ToLower()) && p.IsDeleted == isDelete,
+                    filter: p => (p.PrerequisiteConstraintCode.ToLower().Contains(search.ToLower()))
+                    && p.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: p => p.PrerequisiteConstraintCode,

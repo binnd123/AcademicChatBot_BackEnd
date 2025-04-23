@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/prerequisite-subject")]
     [ApiController]
     public class PrerequisiteSubjectController : ControllerBase
     {

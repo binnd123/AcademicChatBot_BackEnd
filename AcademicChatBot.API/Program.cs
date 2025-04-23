@@ -29,6 +29,7 @@ builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IComboSubjectService, ComboSubjectService>();
 builder.Services.AddScoped<IToolForSubjectService, ToolForSubjectService>();
 builder.Services.AddScoped<IClassificationService, ClassificationService>();
+builder.Services.AddScoped<IPOMappingPLOService, POMappingPLOService>();
 builder.Services.AddHttpClient<IGeminiAPIService, GeminiAPIService>();
 builder.Services.AddScoped<IIntentDetectorService, IntentDetectorService>();
 builder.Services.AddScoped<IMessageService, MessageService>();

@@ -116,8 +116,8 @@ namespace AcademicChatBot.Service.Implementation
                     filter: a => a.Category.ToLower().Contains(search.ToLower()) && a.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: a => sortBy == SortBy.Default ? null : a.Category,
-                    isAscending: sortType == SortType.Ascending,
+                    orderBy: null,
+                    isAscending: true,
                     includes: a => a.Subject);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;

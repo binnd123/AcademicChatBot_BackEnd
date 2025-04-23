@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.BussinessModel;
-using AcademicChatBot.Common.BussinessModel.AIChatLogs;
 using AcademicChatBot.Common.BussinessModel.Messages;
 using AcademicChatBot.Common.Enum;
 using AcademicChatBot.DAL.Contract;

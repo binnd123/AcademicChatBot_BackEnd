@@ -104,7 +104,8 @@ namespace AcademicChatBot.Service.Implementation
                 };
 
                 dto.Data = await _courseLearningOutcomeRepository.GetAllDataByExpression(
-                    filter: c => (c.CourseLearningOutcomeName.ToLower().Contains(search.ToLower()) || c.CourseLearningOutcomeCode.ToLower().Contains(search.ToLower())) && c.IsDeleted == isDelete,
+                    filter: c => (c.CourseLearningOutcomeName.ToLower().Contains(search.ToLower()) || c.CourseLearningOutcomeCode.ToLower().Contains(search.ToLower()))
+                    && c.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.CourseLearningOutcomeName : c.CourseLearningOutcomeCode,
