@@ -99,7 +99,7 @@ namespace AcademicChatBot.Service.Implementation
                     && t.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.ToolName : s.ToolCode,
+                    orderBy: t => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? t.ToolName : t.ToolCode,
                     isAscending: sortType == SortType.Ascending);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessModel.Assessment;
 using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.Service.Contract
 {

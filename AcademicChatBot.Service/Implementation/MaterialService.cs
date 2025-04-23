@@ -16,11 +16,13 @@ namespace AcademicChatBot.Service.Implementation
     public class MaterialService : IMaterialService
     {
         private readonly IGenericRepository<Material> _materialRepository;
+        private readonly IGenericRepository<Subject> _subjectRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public MaterialService(IGenericRepository<Material> materialRepository, IUnitOfWork unitOfWork)
+        public MaterialService(IGenericRepository<Material> materialRepository, IGenericRepository<Subject> subjectRepository, IUnitOfWork unitOfWork)
         {
             _materialRepository = materialRepository;
+            _subjectRepository = subjectRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -29,6 +31,18 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                if (request.SubjectId != null)
+                {
+                    var subject = await _subjectRepository.GetById(request.SubjectId.Value);
+                    if (subject == null)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Subject not found";
+                        return dto;
+                    }
+                }
+
                 var material = new Material
                 {
                     MaterialId = Guid.NewGuid(),
@@ -104,8 +118,9 @@ namespace AcademicChatBot.Service.Implementation
                     && m.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.MaterialDescription : s.MaterialCode,
-                    isAscending: sortType == SortType.Ascending);
+                    orderBy: m => sortBy == SortBy.Default ? null : m.MaterialCode,
+                    isAscending: sortType == SortType.Ascending,
+                    includes: m => m.Subject);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Materials retrieved successfully";
@@ -151,6 +166,18 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                if (request.SubjectId != null)
+                {
+                    var subject = await _subjectRepository.GetById(request.SubjectId.Value);
+                    if (subject == null)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Subject not found";
+                        return dto;
+                    }
+                }
+
                 var material = await _materialRepository.GetById(materialId);
                 if (material == null)
                 {

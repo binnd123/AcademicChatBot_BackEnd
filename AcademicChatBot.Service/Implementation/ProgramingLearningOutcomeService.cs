@@ -16,11 +16,13 @@ namespace AcademicChatBot.Service.Implementation
     public class ProgramingLearningOutcomeService : IProgramingLearningOutcomeService
     {
         private readonly IGenericRepository<ProgramingLearningOutcome> _programingLearningOutcomeRepository;
+        private readonly IGenericRepository<Curriculum> _curriculumRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ProgramingLearningOutcomeService(IGenericRepository<ProgramingLearningOutcome> programingLearningOutcomeRepository, IUnitOfWork unitOfWork)
+        public ProgramingLearningOutcomeService(IGenericRepository<ProgramingLearningOutcome> programingLearningOutcomeRepository, IGenericRepository<Curriculum> curriculumRepository, IUnitOfWork unitOfWork)
         {
             _programingLearningOutcomeRepository = programingLearningOutcomeRepository;
+            _curriculumRepository = curriculumRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -29,6 +31,18 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                if (request.CurriculumId != null)
+                {
+                    var curriculum = await _curriculumRepository.GetById(request.CurriculumId.Value);
+                    if (curriculum == null)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Curriculum not found";
+                        return dto;
+                    }
+                }
+
                 var programingLearningOutcome = new ProgramingLearningOutcome
                 {
                     ProgramingLearningOutcomeId = Guid.NewGuid(),
@@ -44,7 +58,7 @@ namespace AcademicChatBot.Service.Implementation
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.INSERT_SUCESSFULLY;
                 dto.Data = programingLearningOutcome;
-                dto.Message = "ProgramingLearningOutcome created successfully";
+                dto.Message = "Programing Learning Outcome created successfully";
             }
             catch (Exception ex)
             {
@@ -65,7 +79,7 @@ namespace AcademicChatBot.Service.Implementation
                 {
                     dto.IsSucess = false;
                     dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                    dto.Message = "ProgramingLearningOutcome not found";
+                    dto.Message = "Programing Learning Outcome not found";
                     return dto;
                 }
                 programingLearningOutcome.IsDeleted = true;
@@ -75,7 +89,7 @@ namespace AcademicChatBot.Service.Implementation
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.DELETE_SUCCESSFULLY;
                 dto.Data = programingLearningOutcome;
-                dto.Message = "ProgramingLearningOutcome deleted successfully";
+                dto.Message = "Programing Learning Outcome deleted successfully";
             }
             catch (Exception ex)
             {
@@ -96,8 +110,9 @@ namespace AcademicChatBot.Service.Implementation
                     && p.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.ProgramingLearningOutcomeName : s.ProgramingLearningOutcomeCode,
-                    isAscending: sortType == SortType.Ascending);
+                    orderBy: p => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? p.ProgramingLearningOutcomeName : p.ProgramingLearningOutcomeCode,
+                    isAscending: sortType == SortType.Ascending,
+                    includes: p => p.Curriculum);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "ProgramingLearningOutcomes retrieved successfully";
@@ -143,6 +158,18 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                if (request.CurriculumId != null)
+                {
+                    var curriculum = await _curriculumRepository.GetById(request.CurriculumId.Value);
+                    if (curriculum == null)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Curriculum not found";
+                        return dto;
+                    }
+                }
+
                 var programingLearningOutcome = await _programingLearningOutcomeRepository.GetById(programingLearningOutcomeId);
                 if (programingLearningOutcome == null)
                 {

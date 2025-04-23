@@ -16,11 +16,13 @@ namespace AcademicChatBot.Service.Implementation
     public class AssessmentService : IAssessmentService
     {
         private readonly IGenericRepository<Assessment> _assessmentRepository;
+        private readonly IGenericRepository<Subject> _subjectRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public AssessmentService(IGenericRepository<Assessment> assessmentRepository, IUnitOfWork unitOfWork)
+        public AssessmentService(IGenericRepository<Assessment> assessmentRepository, IGenericRepository<Subject> subjectRepository, IUnitOfWork unitOfWork)
         {
             _assessmentRepository = assessmentRepository;
+            _subjectRepository = subjectRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -29,6 +31,18 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                if (request.SubjectId != null)
+                {
+                    var subject = await _subjectRepository.GetById(request.SubjectId.Value);
+                    if (subject == null)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Subject not found";
+                        return dto;
+                    }
+                }
+
                 var assessment = new Assessment
                 {
                     AssessmentId = Guid.NewGuid(),
@@ -93,7 +107,6 @@ namespace AcademicChatBot.Service.Implementation
             }
             return dto;
         }
-
         public async Task<Response> GetAllAssessments(int pageNumber, int pageSize, string search, bool isDelete)
         {
             Response dto = new Response();
@@ -103,8 +116,9 @@ namespace AcademicChatBot.Service.Implementation
                     filter: a => a.Category.ToLower().Contains(search.ToLower()) && a.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: a => a.Category,
-                    isAscending: true);
+                    orderBy: a => sortBy == SortBy.Default ? null : a.Category,
+                    isAscending: sortType == SortType.Ascending,
+                    includes: a => a.Subject);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Assessments retrieved successfully";
@@ -150,6 +164,18 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                if (request.SubjectId != null)
+                {
+                    var subject = await _subjectRepository.GetById(request.SubjectId.Value);
+                    if (subject == null)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.Message = "Subject not found";
+                        return dto;
+                    }
+                }
+
                 var assessment = await _assessmentRepository.GetById(assessmentId);
                 if (assessment == null)
                 {
