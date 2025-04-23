@@ -42,6 +42,7 @@ builder.Services.AddScoped<IMajorService, MajorService>();
 builder.Services.AddScoped<ICourseLearningOutcomeService, CourseLearningOutcomeService>();
 builder.Services.AddScoped<IPrerequisiteConstraintService, PrerequisiteConstraintService>();
 builder.Services.AddScoped<IPrerequisiteSubjectService, PrerequisiteSubjectService>();
+builder.Services.AddScoped<IComboService, ComboService>();
 var secretKey = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]);
 
 builder.Services.AddAuthentication(options =>
