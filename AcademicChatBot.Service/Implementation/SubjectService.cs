@@ -137,13 +137,14 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllSubjects(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
+        public async Task<Response> GetAllSubjects(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _subjectRepository.GetAllDataByExpression(
-                    filter: s => s.SubjectCode.ToLower().Contains(search) || s.SubjectName.ToLower().Contains(search), 
+                    filter: s => (s.SubjectCode.ToLower().Contains(search.ToLower()) || s.SubjectName.ToLower().Contains(search.ToLower()))
+                    && s.IsDeleted == isDelete, 
                     pageNumber: pageNumber, 
                     pageSize: pageSize, 
                     orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.SubjectName : s.SubjectCode, 

@@ -15,5 +15,6 @@ namespace AcademicChatBot.Common.BussinessModel.Students
         public DateTime DOB { get; set; }
         public DateTime IntakeYear { get; set; }
         public GenderType Gender { get; set; } = GenderType.Male;
+        public Guid? MajorId { get; set; } = null;
     }
 }

@@ -10,6 +10,7 @@ using AcademicChatBot.Common.BussinessModel;
 
 namespace AcademicChatBot.API.Controllers
 {
+    [Authorize]
     [Route("api/message")]
     [ApiController]
     public class MessageController : ControllerBase
@@ -25,7 +26,6 @@ namespace AcademicChatBot.API.Controllers
 
         [HttpGet]
         [Route("get-message")]
-        [Authorize]
         public async Task<IActionResult> GetMessageByChatId(
              [FromQuery] Guid aIChatLogId,
              [FromQuery] int pageNumber = 1,
@@ -45,31 +45,29 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        //[HttpPost]
-        //[Route("send-message")]
-        //[Authorize]
-        //public async Task<IActionResult> SendMessage(
-        //    [FromQuery] Guid? aIChatLogId,
-        //    [FromQuery] string content)
-        //{
-        //    var senderId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
-        //    if (senderId == null || senderId == Guid.Empty) return Unauthorized(new Response
-        //    {
-        //        IsSucess = false,
-        //        BusinessCode = BusinessCode.AUTH_NOT_FOUND,
-        //        Message = errorMessage
-        //    });
-        //    var response = await _messageService.SendMessage((Guid)senderId, aIChatLogId, content);
-        //    if (!response.IsSucess)
-        //    {
-        //        return response.BusinessCode switch
-        //        {
-        //            BusinessCode.AUTH_NOT_FOUND => Unauthorized(response),
-        //            BusinessCode.EXCEPTION => StatusCode(500, response),
-        //            _ => BadRequest(response)
-        //        };
-        //    }
-        //    return Ok(response);
-        //}
+        [HttpPost]
+        [Route("send-message")]
+        public async Task<IActionResult> SendMessage(
+            [FromQuery] string content)
+        {
+            var senderId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
+            if (senderId == null || senderId == Guid.Empty) return Unauthorized(new Response
+            {
+                IsSucess = false,
+                BusinessCode = BusinessCode.AUTH_NOT_FOUND,
+                Message = errorMessage
+            });
+            var response = await _messageService.SendMessage((Guid)senderId, content);
+            if (!response.IsSucess)
+            {
+                return response.BusinessCode switch
+                {
+                    BusinessCode.AUTH_NOT_FOUND => Unauthorized(response),
+                    BusinessCode.EXCEPTION => StatusCode(500, response),
+                    _ => BadRequest(response)
+                };
+            }
+            return Ok(response);
+        }
     }
 }

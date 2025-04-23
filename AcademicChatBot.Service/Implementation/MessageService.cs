@@ -62,6 +62,7 @@ namespace AcademicChatBot.Service.Implementation
                         UpdatedAt = DateTime.UtcNow
                     };
                     await _aIChatLogRepository.Insert(aIChatLog);
+                    await _unitOfWork.SaveChangeAsync();
                 }
 
                 // Tạo đối tượng tin nhắn của người dùng  

@@ -21,22 +21,25 @@ namespace AcademicChatBot.Service.Implementation
     {
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<Student> _studentRepository;
+        private readonly IGenericRepository<Major> _majorRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public StudentService(IGenericRepository<User> userRepository, IGenericRepository<Student> studentRepository, IUnitOfWork unitOfWork)
+        public StudentService(IGenericRepository<User> userRepository, IGenericRepository<Student> studentRepository, IGenericRepository<Major> majorRepository, IUnitOfWork unitOfWork)
         {
             _userRepository = userRepository;
             _studentRepository = studentRepository;
+            _majorRepository = majorRepository;
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Response> GetAllStudents(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
+        public async Task<Response> GetAllStudents(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _studentRepository.GetAllDataByExpression(
-                    filter: s => s.StudentCode.ToLower().Contains(search) || s.FullName.ToLower().Contains(search),
+                    filter: s => (s.StudentCode.ToLower().Contains(search.ToLower()) || s.FullName.ToLower().Contains(search.ToLower()))
+                    && s.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.FullName : s.StudentCode,
@@ -89,12 +92,23 @@ namespace AcademicChatBot.Service.Implementation
                     IntakeYear = studentDb.IntakeYear,
                     IsDeleted = studentDb.IsDeleted,
                     StudentCode = studentDb.StudentCode,
-                    MajorId = studentDb.MajorId ,
-                    MajorCode = studentDb.MajorId != null ? studentDb.Major.MajorCode : null,
-                    MajorName = studentDb.MajorId != null ? studentDb.Major.MajorName : null,
                 };
+                if (studentDb.MajorId != null)
+                {
+                    var majorDb = await _majorRepository.GetById(studentDb.MajorId);
+                    if (majorDb == null)
+                    {
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.IsSucess = false;
+                        dto.Message = "Major not found";
+                        return dto;
+                    }
+                    studentResponse.MajorCode = majorDb.MajorCode;
+                    studentResponse.MajorId = majorDb.MajorId;
+                    studentResponse.MajorName = majorDb.MajorName;
+                }    
                 var userDb = await _userRepository.GetById(studentDb.UserId);
-                if (userDb == null || !userDb.IsActive)
+                if (userDb == null)
                 {
                     dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
                     dto.IsSucess = false;
@@ -146,12 +160,54 @@ namespace AcademicChatBot.Service.Implementation
                 if (!string.IsNullOrEmpty(request.Address)) studentDb.Address = request.Address;
                 if (!string.IsNullOrEmpty(request.FullName)) studentDb.FullName = request.FullName;
                 if (!string.IsNullOrEmpty(request.PhoneNumber)) studentDb.PhoneNumber = request.PhoneNumber;
+                if (!string.IsNullOrEmpty(request.MajorId.ToString()))
+                {
+                    var majorDb = await _majorRepository.GetById(request.MajorId);
+                    if (majorDb == null)
+                    {
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.IsSucess = false;
+                        dto.Message = "Major not found";
+                        return dto;
+                    }
+                    studentDb.MajorId = majorDb.MajorId;
+                }
                 studentDb.Gender = request.Gender;
                 studentDb.DOB = request.DOB;
                 studentDb.IntakeYear = request.IntakeYear;
                 await _studentRepository.Update(studentDb);
-                await _unitOfWork.SaveChangeAsync();    
-                dto.Data = studentDb;
+                await _unitOfWork.SaveChangeAsync();
+                studentDb = await _studentRepository.GetById(studentId);
+                var studentResponse = new StudentProfileResponse
+                {
+                    StudentId = studentDb.StudentId,
+                    FullName = studentDb.FullName,
+                    Address = studentDb.Address,
+                    CreatedAt = studentDb.CreatedAt,
+                    UpdatedAt = studentDb.UpdatedAt,
+                    DeletedAt = studentDb.DeletedAt,
+                    DOB = studentDb.DOB,
+                    Gender = studentDb.Gender,
+                    PhoneNumber = studentDb.PhoneNumber,
+                    IntakeYear = studentDb.IntakeYear,
+                    IsDeleted = studentDb.IsDeleted,
+                    StudentCode = studentDb.StudentCode,
+                };
+                if (studentDb.MajorId != null)
+                {
+                    var majorDb = await _majorRepository.GetById(studentDb.MajorId);
+                    if (majorDb == null)
+                    {
+                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        dto.IsSucess = false;
+                        dto.Message = "Major not found";
+                        return dto;
+                    }
+                    studentResponse.MajorCode = majorDb.MajorCode;
+                    studentResponse.MajorId = majorDb.MajorId;
+                    studentResponse.MajorName = majorDb.MajorName;
+                }
+                dto.Data = studentResponse;
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.UPDATE_SUCCESSFULLY;
                 dto.Message = "Student profile updated successfully";

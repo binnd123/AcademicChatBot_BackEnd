@@ -9,7 +9,6 @@ namespace AcademicChatBot.Common.BussinessModel.AIChatLogs
 {
     public class AIChatLogRequest
     {
-        public Guid AIChatLogId { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public StatusChat Status { get; set; }

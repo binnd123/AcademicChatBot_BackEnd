@@ -13,7 +13,7 @@ namespace AcademicChatBot.Service.Contract
     {
         Task<Response> CreateMaterial(CreateMaterialRequest request);
         Task<Response> DeleteMaterial(Guid materialId);
-        Task<Response> GetAllMaterials(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType);
+        Task<Response> GetAllMaterials(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete);
         Task<Response> GetMaterialById(Guid materialId);
         Task<Response> UpdateMaterial(Guid materialId, UpdateMaterialRequest request);
     }
