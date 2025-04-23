@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
@@ -96,6 +97,12 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                var includesList = new Expression<Func<CourseLearningOutcome, object>>[]
+                {
+                    c => c.Subject,
+                    c => c.Assessment
+                };
+
                 dto.Data = await _courseLearningOutcomeRepository.GetAllDataByExpression(
                     filter: c => (c.CourseLearningOutcomeName.ToLower().Contains(search.ToLower()) || c.CourseLearningOutcomeCode.ToLower().Contains(search.ToLower()))
                     && c.IsDeleted == isDelete,
@@ -103,7 +110,7 @@ namespace AcademicChatBot.Service.Implementation
                     pageSize: pageSize,
                     orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.CourseLearningOutcomeName : c.CourseLearningOutcomeCode,
                     isAscending: sortType == SortType.Ascending,
-                    includes: c => new { c.Subject, c.Assessment});
+                    includes: includesList);
 
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;

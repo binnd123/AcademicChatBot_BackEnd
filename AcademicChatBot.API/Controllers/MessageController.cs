@@ -29,11 +29,11 @@ namespace AcademicChatBot.API.Controllers
         public async Task<IActionResult> GetMessageByChatId(
              [FromQuery] Guid aIChatLogId,
              [FromQuery] int pageNumber = 1,
-             [FromQuery] int pageSize = 5)
+             [FromQuery] int pageSize = 10)
         {
             // Đảm bảo pageIndex và pageSize hợp lệ
             if (pageNumber < 1) pageNumber = 1;
-            if (pageSize < 1) pageSize = 5;
+            if (pageSize < 1) pageSize = 10;
 
             var response = await _messageService.GetMessageByChatIdAsync(aIChatLogId, pageNumber, pageSize);
             if (response.IsSucess == false)

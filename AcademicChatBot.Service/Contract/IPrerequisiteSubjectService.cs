@@ -12,7 +12,7 @@ namespace AcademicChatBot.Service.Contract
     public interface IPrerequisiteSubjectService
     {
         Task<Response> CreatePrerequisiteSubject(CreatePrerequisiteSubjectRequest request);
-        Task<Response> GetAllPrerequisiteSubjects(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType);
+        Task<Response> GetAllPrerequisiteSubjects(int pageNumber, int pageSize, SortBy sortBy, SortType sortType, bool isDelete);
         Task<Response> GetPrerequisiteSubjectById(Guid id);
         Task<Response> UpdatePrerequisiteSubject(Guid id, UpdatePrerequisiteSubjectRequest request);
         Task<Response> DeletePrerequisiteSubject(Guid id);

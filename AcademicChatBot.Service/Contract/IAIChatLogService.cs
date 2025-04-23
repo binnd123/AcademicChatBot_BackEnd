@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessModel;
-using AcademicChatBot.Common.BussinessModel.AIChatLogs;
 using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.Service.Contract

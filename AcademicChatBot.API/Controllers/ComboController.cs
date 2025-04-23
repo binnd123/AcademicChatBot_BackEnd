@@ -1,43 +1,37 @@
 ﻿using AcademicChatBot.Common.BussinessCode;
-using AcademicChatBot.Common.BussinessModel;
-using AcademicChatBot.Common.BussinessModel.Subjects;
+using AcademicChatBot.Common.BussinessModel.Combo;
 using AcademicChatBot.Common.Enum;
-using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
-using Azure;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/subject")]
+    [Route("api/combo")]
     [ApiController]
-    public class SubjectController : ControllerBase
+    public class ComboController : ControllerBase
     {
-        private readonly ISubjectService _subjectService;
+        private readonly IComboService _comboService;
 
-        public SubjectController(ISubjectService subjectService)
+        public ComboController(IComboService comboService)
         {
-            _subjectService = subjectService;
+            _comboService = comboService;
         }
 
-
         [Authorize]
-        [HttpGet("get-all-subjects")]
-        public async Task<IActionResult> GetAllSubjects(
+        [HttpGet("get-all-combos")]
+        public async Task<IActionResult> GetAllCombos(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 5,
+            [FromQuery] int pageSize = 10,
             [FromQuery] string search = "",
             [FromQuery] SortBy sortBy = SortBy.Default,
             [FromQuery] SortType sortType = SortType.Ascending,
-            [FromQuery] bool isDelete = false
-            )
+            [FromQuery] bool isDelete = false)
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            var response = await _subjectService.GetAllSubjects(pageNumber, pageSize, search, sortBy, sortType, isDelete);
-            if (response.IsSucess == false)
+            var response = await _comboService.GetAllCombos(pageNumber, pageSize, search, sortBy, sortType, isDelete);
+            if (!response.IsSucess)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
                     return StatusCode(500, response);
@@ -47,24 +41,11 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("get-subject-by-id/{subjectId}")]
-        public async Task<IActionResult> GetSubjectById(Guid subjectId)
+        [HttpGet("get-combo-by-id/{id}")]
+        public async Task<IActionResult> GetComboById(Guid id)
         {
-            var response = await _subjectService.GetSubjectById(subjectId);
-            if (response.IsSucess == false)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpPost("create-subject")]
-        public async Task<IActionResult> CreateSubject([FromBody] CreateSubjectRequest request)
-        {
-            var response = await _subjectService.CreateSubject(request);
-            if (response.IsSucess == false)
+            var response = await _comboService.GetComboById(id);
+            if (!response.IsSucess)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
                     return StatusCode(500, response);
@@ -74,11 +55,11 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-subject/{subjectId}")]
-        public async Task<IActionResult> UpdateSubject(Guid subjectId, UpdateSubjectRequest request)
+        [HttpPost("create-combo")]
+        public async Task<IActionResult> CreateCombo([FromBody] CreateComboRequest request)
         {
-            var response = await _subjectService.UpdateSubject(subjectId, request);
-            if (response.IsSucess == false)
+            var response = await _comboService.CreateCombo(request);
+            if (!response.IsSucess)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
                     return StatusCode(500, response);
@@ -88,11 +69,25 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-subject/{subjectId}")]
-        public async Task<IActionResult> DeleteSubject(Guid subjectId)
+        [HttpPut("update-combo/{id}")]
+        public async Task<IActionResult> UpdateCombo(Guid id, UpdateComboRequest request)
         {
-            var response = await _subjectService.DeleteSubject(subjectId);
-            if (response.IsSucess == false)
+            var response = await _comboService.UpdateCombo(id, request);
+            if (!response.IsSucess)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("delete-combo/{id}")]
+        public async Task<IActionResult> DeleteCombo(Guid id)
+        {
+            var response = await _comboService.DeleteCombo(id);
+            if (!response.IsSucess)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
                     return StatusCode(500, response);

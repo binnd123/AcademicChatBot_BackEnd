@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
@@ -103,18 +104,24 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllPrerequisiteSubjects(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
+        public async Task<Response> GetAllPrerequisiteSubjects(int pageNumber, int pageSize, SortBy sortBy, SortType sortType, bool isDelete)
         {
             Response dto = new Response();
             try
             {
+                var includesList = new Expression<Func<PrerequisiteSubject, object>>[]
+                {
+                    p => p.Subject,
+                    p => p.PrerequisiteSubjectInfo,
+                    p => p.PrerequisiteConstraint
+                };
                 dto.Data = await _prerequisiteSubjectRepository.GetAllDataByExpression(
-                    filter: p => !p.IsDeleted,
+                    filter: p => p.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: p => p.RelationGroup,
                     isAscending: sortType == SortType.Ascending,
-                    includes: p => new { p.Subject, p.PrerequisiteSubjectInfo, p.PrerequisiteConstraint}
+                    includes: includesList
                 );
 
                 dto.IsSucess = true;
