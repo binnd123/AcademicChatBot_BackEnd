@@ -73,7 +73,7 @@ namespace AcademicChatBot.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPut("update-material/{materialId}")]
-        public async Task<IActionResult> UpdateMaterial(Guid materialId, [FromBody] UpdateMaterialRequest request)
+        public async Task<IActionResult> UpdateMaterial(Guid materialId, UpdateMaterialRequest request)
         {
             var response = await _materialService.UpdateMaterial(materialId, request);
             if (response.IsSucess == false)

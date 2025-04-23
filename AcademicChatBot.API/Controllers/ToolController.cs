@@ -73,7 +73,7 @@ namespace AcademicChatBot.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPut("update-tool/{toolId}")]
-        public async Task<IActionResult> UpdateTool(Guid toolId, [FromBody] UpdateToolRequest request)
+        public async Task<IActionResult> UpdateTool(Guid toolId, UpdateToolRequest request)
         {
             var response = await _toolService.UpdateTool(toolId, request);
             if (response.IsSucess == false)

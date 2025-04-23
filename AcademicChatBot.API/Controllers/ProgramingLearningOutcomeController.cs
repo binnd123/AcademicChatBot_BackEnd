@@ -73,7 +73,7 @@ namespace AcademicChatBot.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPut("update-programing-learning-outcome/{pLOId}")]
-        public async Task<IActionResult> UpdateProgramingLearningOutcome(Guid pLOId, [FromBody] UpdateProgramingLearningOutcomeRequest request)
+        public async Task<IActionResult> UpdateProgramingLearningOutcome(Guid pLOId, UpdateProgramingLearningOutcomeRequest request)
         {
             var response = await _programingLearningOutcomeService.UpdateProgramingLearningOutcome(pLOId, request);
             if (response.IsSucess == false)
