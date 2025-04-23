@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
@@ -94,13 +95,18 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                var includesList = new Expression<Func<PrerequisiteConstraint, object>>[]
+                {
+                    p => p.Subject,
+                    p => p.Curriculum
+                };
                 dto.Data = await _prerequisiteConstraintRepository.GetAllDataByExpression(
                     filter: p => p.PrerequisiteConstraintCode.ToLower().Contains(search.ToLower()) && p.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: p => p.PrerequisiteConstraintCode,
                     isAscending: sortType == SortType.Ascending,
-                    includes: p => new { p.Subject, p.Curriculum});
+                    includes: includesList);
 
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
