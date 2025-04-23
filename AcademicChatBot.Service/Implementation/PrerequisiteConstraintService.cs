@@ -89,13 +89,14 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllPrerequisiteConstraints(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
+        public async Task<Response> GetAllPrerequisiteConstraints(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _prerequisiteConstraintRepository.GetAllDataByExpression(
-                    filter: p => p.PrerequisiteConstraintCode.ToLower().Contains(search.ToLower()),
+                    filter: p => (p.PrerequisiteConstraintCode.ToLower().Contains(search.ToLower()))
+                    && p.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: p => p.PrerequisiteConstraintCode,

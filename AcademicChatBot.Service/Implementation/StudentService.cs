@@ -108,7 +108,7 @@ namespace AcademicChatBot.Service.Implementation
                     studentResponse.MajorName = majorDb.MajorName;
                 }    
                 var userDb = await _userRepository.GetById(studentDb.UserId);
-                if (userDb == null)
+                if (userDb == null || !userDb.IsActive)
                 {
                     dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
                     dto.IsSucess = false;

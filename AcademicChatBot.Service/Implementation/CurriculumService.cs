@@ -136,7 +136,7 @@ namespace AcademicChatBot.Service.Implementation
                     pageSize: pageSize,
                     orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.CurriculumName : c.CurriculumCode,
                     isAscending: sortType == SortType.Ascending,
-                    includes: c => new { c.Major, c.Program }
+                    includes: null
                 );
 
                 dto.IsSucess = true;
@@ -245,7 +245,7 @@ namespace AcademicChatBot.Service.Implementation
             }
             return dto;
         }
-        public async Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode, bool isDelete)
+        public async Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode, SortBy sortBy, SortType sortType, bool isDelete)
         {
             Response dto = new Response();
             try
