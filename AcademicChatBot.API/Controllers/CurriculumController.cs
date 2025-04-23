@@ -84,7 +84,7 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [HttpPut("update-curriculum/{curriculumId}")]
-        public async Task<IActionResult> UpdateCurriculum(Guid curriculumId, [FromBody] UpdateCurriculumRequest request)
+        public async Task<IActionResult> UpdateCurriculum(Guid curriculumId, UpdateCurriculumRequest request)
         {
             var response = await _curriculumService.UpdateCurriculum(curriculumId, request);
             if (response.IsSucess == false)

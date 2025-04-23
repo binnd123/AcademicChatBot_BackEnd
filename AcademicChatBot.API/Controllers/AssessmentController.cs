@@ -72,7 +72,7 @@ namespace AcademicChatBot.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPut("update-assessment/{assessmentId}")]
-        public async Task<IActionResult> UpdateAssessment(Guid assessmentId, [FromBody] UpdateAssessmentRequest request)
+        public async Task<IActionResult> UpdateAssessment(Guid assessmentId, UpdateAssessmentRequest request)
         {
             var response = await _assessmentService.UpdateAssessment(assessmentId, request);
             if (response.IsSucess == false)

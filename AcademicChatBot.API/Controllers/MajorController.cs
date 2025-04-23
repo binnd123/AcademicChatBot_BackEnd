@@ -73,7 +73,7 @@ namespace AcademicChatBot.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPut("update-major/{majorId}")]
-        public async Task<IActionResult> UpdateMajor(Guid majorId, [FromBody] UpdateMajorRequest request)
+        public async Task<IActionResult> UpdateMajor(Guid majorId, UpdateMajorRequest request)
         {
             var response = await _majorService.UpdateMajor(majorId, request);
             if (response.IsSucess == false)
