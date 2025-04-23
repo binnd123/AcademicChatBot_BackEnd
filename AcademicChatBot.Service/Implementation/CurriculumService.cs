@@ -8,6 +8,7 @@ using AcademicChatBot.Common.BussinessModel.Curriculum;
 using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.Enum;
 using System.Globalization;
+using System.Linq.Expressions;
 
 
 namespace AcademicChatBot.Service.Implementation
@@ -129,6 +130,12 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                var includesList = new Expression<Func<Curriculum, object>>[]
+                {
+                    c => c.Major,
+                    c => c.Program
+                };
+
                 dto.Data = await _curriculumRepository.GetAllDataByExpression(
                     filter: c => (c.CurriculumName.ToLower().Contains(search.ToLower()) || c.CurriculumCode.ToLower().Contains(search.ToLower()))
                     && c.IsDeleted == isDelete,
@@ -136,7 +143,7 @@ namespace AcademicChatBot.Service.Implementation
                     pageSize: pageSize,
                     orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.CurriculumName : c.CurriculumCode,
                     isAscending: sortType == SortType.Ascending,
-                    includes: c => new { c.Major, c.Program }
+                    includes: includesList
                 );
 
                 dto.IsSucess = true;
@@ -245,7 +252,7 @@ namespace AcademicChatBot.Service.Implementation
             }
             return dto;
         }
-        public async Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode, bool isDelete)
+        public async Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode, SortBy sortBy, SortType sortType, bool isDelete)
         {
             Response dto = new Response();
             try

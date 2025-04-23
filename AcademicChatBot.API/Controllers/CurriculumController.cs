@@ -35,6 +35,7 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("get-all-curriculums")]
         public async Task<IActionResult> GetAllCurriculums(
             [FromQuery] int pageNumber = 1,

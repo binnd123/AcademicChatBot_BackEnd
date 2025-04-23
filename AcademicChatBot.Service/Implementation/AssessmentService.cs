@@ -107,7 +107,7 @@ namespace AcademicChatBot.Service.Implementation
             }
             return dto;
         }
-        public async Task<Response> GetAllAssessments(int pageNumber, int pageSize, string search, bool isDelete)
+        public async Task<Response> GetAllAssessments(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
         {
             Response dto = new Response();
             try
