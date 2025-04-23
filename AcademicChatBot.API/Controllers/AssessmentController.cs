@@ -40,12 +40,13 @@ namespace AcademicChatBot.API.Controllers
         public async Task<IActionResult> GetAllAssessments(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
-            [FromQuery] string search = ""
+            [FromQuery] string search = "",
+            [FromQuery] bool isDelete = false
         )
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            var response = await _assessmentService.GetAllAssessments(pageNumber, pageSize, search);
+            var response = await _assessmentService.GetAllAssessments(pageNumber, pageSize, search, isDelete);
             if (response.IsSucess == false)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)

@@ -11,7 +11,7 @@ namespace AcademicChatBot.Service.Contract
 {
     public interface ISubjectService
     {
-        Task<Response> GetAllSubjects(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType);
+        Task<Response> GetAllSubjects(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete);
         Task<Response> GetSubjectById(Guid subjectId);
         public Task<Response> CreateSubject(CreateSubjectRequest request);
         public Task<Response> UpdateSubject(Guid SubjectId, UpdateSubjectRequest request);

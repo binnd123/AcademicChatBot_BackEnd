@@ -107,14 +107,13 @@ namespace AcademicChatBot.Service.Implementation
             }
             return dto;
         }
-
-        public async Task<Response> GetAllAssessments(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
+        public async Task<Response> GetAllAssessments(int pageNumber, int pageSize, string search, bool isDelete)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _assessmentRepository.GetAllDataByExpression(
-                    filter: a => a.Category.ToLower().Contains(search.ToLower()),
+                    filter: a => a.Category.ToLower().Contains(search.ToLower()) && a.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: a => sortBy == SortBy.Default ? null : a.Category,

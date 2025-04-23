@@ -100,13 +100,14 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllProgramingLearningOutcomes(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
+        public async Task<Response> GetAllProgramingLearningOutcomes(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _programingLearningOutcomeRepository.GetAllDataByExpression(
-                    filter: p => p.ProgramingLearningOutcomeName.ToLower().Contains(search.ToLower()) || p.ProgramingLearningOutcomeCode.ToLower().Contains(search.ToLower()),
+                    filter: p => (p.ProgramingLearningOutcomeName.ToLower().Contains(search.ToLower()) || p.ProgramingLearningOutcomeCode.ToLower().Contains(search.ToLower()))
+                    && p.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: p => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? p.ProgramingLearningOutcomeName : p.ProgramingLearningOutcomeCode,

@@ -108,13 +108,14 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllMaterials(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
+        public async Task<Response> GetAllMaterials(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _materialRepository.GetAllDataByExpression(
-                    filter: m => m.MaterialCode.ToLower().Contains(search.ToLower()) || m.MaterialDescription.ToLower().Contains(search.ToLower()),
+                    filter: m => (m.MaterialCode.ToLower().Contains(search.ToLower()) || m.MaterialDescription.ToLower().Contains(search.ToLower()))
+                    && m.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: m => sortBy == SortBy.Default ? null : m.MaterialCode,

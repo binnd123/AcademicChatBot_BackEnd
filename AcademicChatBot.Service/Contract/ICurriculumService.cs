@@ -8,9 +8,9 @@ namespace AcademicChatBot.Service.Contract
     {
         Task<Response> CreateCurriculum(CreateCurriculumRequest request);
         Task<Response> DeleteCurriculum(Guid curriculumId);
-        Task<Response> GetAllCurriculums(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType);
+        Task<Response> GetAllCurriculums(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete);
         Task<Response> GetCurriculumById(Guid curriculumId);
         Task<Response> UpdateCurriculum(Guid curriculumId, UpdateCurriculumRequest request);
-        Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode, SortBy sortBy, SortType sortType);
+        Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode, bool isDelete);
     }
 }

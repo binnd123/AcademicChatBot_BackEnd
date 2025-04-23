@@ -22,7 +22,7 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("get-tool/{toolId}")]
+        [HttpGet("get-tool-by-id/{toolId}")]
         public async Task<IActionResult> GetToolById(Guid toolId)
         {
             var response = await _toolService.GetToolById(toolId);
@@ -42,12 +42,13 @@ namespace AcademicChatBot.API.Controllers
             [FromQuery] int pageSize = 5,
             [FromQuery] string search = "",
             [FromQuery] SortBy sortBy = SortBy.Default,
-            [FromQuery] SortType sortType = SortType.Ascending
+            [FromQuery] SortType sortType = SortType.Ascending,
+            [FromQuery] bool isDelete = false
         )
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            var response = await _toolService.GetAllTools(pageNumber, pageSize, search, sortBy, sortType);
+            var response = await _toolService.GetAllTools(pageNumber, pageSize, search, sortBy, sortType, isDelete);
             if (response.IsSucess == false)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)

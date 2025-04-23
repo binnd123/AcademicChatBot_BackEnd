@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace AcademicChatBot.Service.Implementation
     public class AIChatLogService : IAIChatLogService
     {
         private readonly IGenericRepository<AIChatLog> _aIChatLogRepository;
+        private readonly IGenericRepository<Message> _messageRepository;
         private readonly IGenericRepository<Subject> _subjectRepository;
         private readonly IGenericRepository<Major> _majorRepository;
         private readonly IGenericRepository<Program> _programRepository;
@@ -28,40 +30,44 @@ namespace AcademicChatBot.Service.Implementation
         private readonly IIntentDetectorService intentDetectorService;
         private readonly IGeminiAPIService geminiApiService;
 
-        public AIChatLogService(IGenericRepository<AIChatLog> aIChatLogRepository, IGenericRepository<Subject> subjectRepository, IGenericRepository<Major> majorRepository, IGenericRepository<Program> programRepository, IGenericRepository<Tool> toolRepository, IGenericRepository<Material> materialRepository, IUnitOfWork unitOfWork, IIntentDetectorService intentDetectorService, IGeminiAPIService geminiApiService)
+        public AIChatLogService(IGenericRepository<AIChatLog> aIChatLogRepository, IGenericRepository<Message> messageRepository, IGenericRepository<Subject> subjectRepository, IGenericRepository<Major> majorRepository, IGenericRepository<Program> programRepository, IGenericRepository<Tool> toolRepository, IGenericRepository<Material> materialRepository, IGenericRepository<Combo> comboRepository, IUnitOfWork unitOfWork, IIntentDetectorService intentDetectorService, IGeminiAPIService geminiApiService)
         {
             _aIChatLogRepository = aIChatLogRepository;
+            _messageRepository = messageRepository;
             _subjectRepository = subjectRepository;
             _majorRepository = majorRepository;
             _programRepository = programRepository;
             _toolRepository = toolRepository;
             _materialRepository = materialRepository;
+            _comboRepository = comboRepository;
             _unitOfWork = unitOfWork;
             this.intentDetectorService = intentDetectorService;
             this.geminiApiService = geminiApiService;
         }
 
-        public async Task<Guid> AddChatAsync(Guid userId, AIChatLogRequest chatRequest)
-        {
-                var messageDomain = new AIChatLog
-                {
-                    AIChatLogId = Guid.NewGuid(),
-                    UserId = userId,
-                    IsDeleted = false,
-                    LastMessageTime = chatRequest.LastMessageTime,
-                    StartTime = DateTime.UtcNow,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                };
-                // Use Domain Model to create Author
-                await _aIChatLogRepository.Insert(messageDomain);
-                await _unitOfWork.SaveChangeAsync();
-                return messageDomain.AIChatLogId;
-        }
+
+
+        //public async Task<Guid> AddChatAsync(Guid userId, AIChatLogRequest chatRequest)
+        //{
+        //        var messageDomain = new AIChatLog
+        //        {
+        //            AIChatLogId = Guid.NewGuid(),
+        //            UserId = userId,
+        //            IsDeleted = false,
+        //            LastMessageTime = chatRequest.LastMessageTime,
+        //            StartTime = DateTime.UtcNow,
+        //            CreatedAt = DateTime.UtcNow,
+        //            UpdatedAt = DateTime.UtcNow,
+        //        };
+        //        // Use Domain Model to create Author
+        //        await _aIChatLogRepository.Insert(messageDomain);
+        //        await _unitOfWork.SaveChangeAsync();
+        //        return messageDomain.AIChatLogId;
+        //}
 
         private string BuildPrompt(IntentType intent, string userMessage, string contextData)
-{
-    return $@"
+        {
+            return $@"
 📌 Người dùng vừa hỏi: {userMessage}
 🎯 Ý định đã xác định: {intent}
 📚 Thông tin học tập liên quan:
@@ -80,7 +86,7 @@ Bạn là một chuyên gia tư vấn học thuật giàu kinh nghiệm, hiểu 
 
 Bắt đầu nhé! 🎉
 ";
-}
+        }
 
 
         public async Task<Response> GenerateResponseAsync(Guid? userId, string message)
@@ -206,12 +212,13 @@ Bắt đầu nhé! 🎉
             return dto;
         }
 
-        public async Task<Response> GetChatByIdAsync(Guid chatId)
+        public async Task<Response> GetAIChatLogById(Guid? userId, Guid aIChatLogId)
         {
             Response dto = new Response();
             try
             {
-                var chat = await _aIChatLogRepository.GetById(chatId);
+                var chat = await _aIChatLogRepository.GetFirstByExpression(
+                    filter: a => a.UserId == userId && a.AIChatLogId == aIChatLogId);
 
                 if (chat == null)
                 {
@@ -220,9 +227,20 @@ Bắt đầu nhé! 🎉
                     dto.Message = "Chat log not found.";
                     return dto;
                 }
+                var message = await _messageRepository.GetAllDataByExpression(
+                    filter: m => m.AIChatLogId == chat.AIChatLogId,
+                    pageNumber: 1,
+                    pageSize: 20,
+                    orderBy: m => m.SentTime,
+                    isAscending: false,
+                    includes: null);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
-                dto.Data = chat;
+                dto.Data = new
+                {
+                    AIChatLog = chat,
+                    Messages = message
+                };
                 dto.Message = "Retrieved chat log successfully.";
             }
             catch (Exception ex)
@@ -234,26 +252,35 @@ Bắt đầu nhé! 🎉
             return dto;
         }
 
-        public async Task<Response> GetChatByUserIdAsync(Guid userId)
+        public async Task<Response> GetAIChatLogActivedByUserId(Guid? userId)
         {
             Response dto = new Response();
             try
             {
-                var chat = await _aIChatLogRepository.GetFirstByExpression(
-                    filter: a => a.UserId == userId && a.Status == StatusChat.Actived,
-                    includeProperties: null);
-
-                if (chat == null)
+                var aIChatLog = await _aIChatLogRepository.GetFirstByExpression(
+                    filter: a => a.UserId == userId && a.IsDeleted == false && a.Status == StatusChat.Actived && a.EndTime == null);
+                if (aIChatLog == null)
                 {
-                    dto.IsSucess = false;
+                    dto.IsSucess = true;
                     dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
                     dto.Message = "AI chat log not found";
                     return dto;
                 }
+                var message = await _messageRepository.GetAllDataByExpression(
+                    filter: m => m.AIChatLogId == aIChatLog.AIChatLogId,
+                    pageNumber: 1,
+                    pageSize: 20,
+                    orderBy: m => m.SentTime,
+                    isAscending: false,
+                    includes: null);
+                dto.Data = new
+                {
+                    AIChatLog = aIChatLog,
+                    Messages = message
+                };
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "AI chat log retrieved successfully";
-                dto.Data = chat;
             }
             catch (Exception ex)
             {
@@ -264,35 +291,99 @@ Bắt đầu nhé! 🎉
             return dto;
         }
 
-        public async Task<Response> UpdateChatAsync(Guid userId, Guid chatId, AIChatLogRequest chatRequest)
+        public async Task<Response> GetAllAIChatLogByUserId(Guid? userId, int pageNumber, int pageSize, bool isDelete)
         {
             Response dto = new Response();
             try
             {
-                var existingChat = await _aIChatLogRepository.GetById(chatId);
-                if (existingChat == null || existingChat.UserId != userId)
+                dto.Data = await _aIChatLogRepository.GetAllDataByExpression(
+                    filter: a => a.UserId == userId && a.IsDeleted == isDelete,
+                    pageNumber: pageNumber,
+                    pageSize: pageSize,
+                    orderBy: a => a.CreatedAt,
+                    isAscending: true,
+                    includes: null);
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                dto.Message = "AI chat log retrieved successfully";
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while retrieving the chat log: " + ex.Message;
+            }
+            return dto;
+        }
+
+        public async Task<Response> UpdateAIChatLog(Guid? userId, Guid aIChatLogId, StatusChat status)
+        {
+            Response dto = new Response();
+            try
+            {
+                var chat = await _aIChatLogRepository.GetFirstByExpression(
+                    filter: a => a.UserId == userId && a.AIChatLogId == aIChatLogId);
+
+                if (chat == null)
                 {
                     dto.IsSucess = false;
                     dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                    dto.Message = "AI chat log not found";
+                    dto.Message = "Chat log not found.";
                     return dto;
                 }
 
-                existingChat.LastMessageTime = chatRequest.LastMessageTime;
-                existingChat.UpdatedAt = DateTime.UtcNow;
+                chat.Status = status;
+                chat.UpdatedAt = DateTime.UtcNow;
 
-                await _aIChatLogRepository.Update(existingChat);
+                await _aIChatLogRepository.Update(chat);
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.UPDATE_SUCCESSFULLY;
                 dto.Message = "AI chat log update successfully";
-                dto.Data = existingChat;
+                dto.Data = chat;
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
                 dto.Message = "An error occurred while update the chat log: " + ex.Message;
+            }
+            return dto;
+        }
+
+        public async Task<Response> DeleteAIChatLog(Guid? userId, Guid aIChatLogId)
+        {
+            Response dto = new Response();
+            try
+            {
+                var chat = await _aIChatLogRepository.GetFirstByExpression(
+                    filter: a => a.UserId == userId && a.AIChatLogId == aIChatLogId);
+
+                if (chat == null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Chat log not found.";
+                    return dto;
+                }
+
+                chat.IsDeleted = true;
+                chat.DeletedAt = DateTime.UtcNow;
+                chat.UpdatedAt = DateTime.UtcNow;
+                chat.EndTime = DateTime.UtcNow;
+
+                await _aIChatLogRepository.Update(chat);
+                await _unitOfWork.SaveChangeAsync();
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.DELETE_SUCCESSFULLY;
+                dto.Message = "AI chat log delete successfully";
+                dto.Data = chat;
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while delete the chat log: " + ex.Message;
             }
             return dto;
         }

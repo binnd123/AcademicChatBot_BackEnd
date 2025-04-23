@@ -124,13 +124,14 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllCurriculums(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType)
+        public async Task<Response> GetAllCurriculums(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _curriculumRepository.GetAllDataByExpression(
-                    filter: c => c.CurriculumName.ToLower().Contains(search.ToLower()) || c.CurriculumCode.ToLower().Contains(search.ToLower()),
+                    filter: c => (c.CurriculumName.ToLower().Contains(search.ToLower()) || c.CurriculumCode.ToLower().Contains(search.ToLower()))
+                    && c.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.CurriculumName : c.CurriculumCode,
@@ -244,13 +245,13 @@ namespace AcademicChatBot.Service.Implementation
             }
             return dto;
         }
-        public async Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode, SortBy sortBy, SortType sortType)
+        public async Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode, bool isDelete)
         {
             Response dto = new Response();
             try
             {
                 var curriculum = await _curriculumRepository.GetAllDataByExpression(
-                filter: c => c.CurriculumCode.Contains(curriculumCode) && !c.IsDeleted,
+                filter: c => c.CurriculumCode.Contains(curriculumCode) && c.IsDeleted == isDelete,
                 pageNumber: pageNumber,
                 pageSize: pageSize,
                 orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.CurriculumName : c.CurriculumCode,
