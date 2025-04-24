@@ -73,25 +73,6 @@ namespace AcademicChatBot.Service.Implementation
                     SessionNo = request.SessionNo,
                 };
                 await _subjectRepository.Insert(subject);
-
-                if (request.ToolIds != null && request.ToolIds.Any())
-                {
-                    foreach (var toolId in request.ToolIds)
-                    {
-                        var tool = await _toolRepository.GetById(toolId);
-                        if (tool != null)
-                        {
-                            var toolForSubject = new ToolForSubject
-                            {
-                                ToolForSubjectId = Guid.NewGuid(),
-                                SubjectId = subject.SubjectId,
-                                ToolId = tool.ToolId                                
-                            };
-                            await _toolForSubjectRepository.Insert(toolForSubject);
-                        }
-                    }
-                }
-
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.INSERT_SUCESSFULLY;

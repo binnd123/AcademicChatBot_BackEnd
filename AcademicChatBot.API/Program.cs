@@ -26,6 +26,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProgramService, ProgramService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IComboSubjectService, ComboSubjectService>();
 builder.Services.AddScoped<IToolForSubjectService, ToolForSubjectService>();
 builder.Services.AddScoped<IClassificationService, ClassificationService>();

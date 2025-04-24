@@ -22,8 +22,6 @@ namespace AcademicChatBot.API.Controllers
             _subjectService = subjectService;
         }
 
-
-        [Authorize]
         [HttpGet("get-all-subjects")]
         public async Task<IActionResult> GetAllSubjects(
             [FromQuery] int pageNumber = 1,
