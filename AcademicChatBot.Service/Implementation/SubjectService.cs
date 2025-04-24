@@ -219,27 +219,6 @@ namespace AcademicChatBot.Service.Implementation
 
                 await _subjectRepository.Update(subject);
 
-                await _toolForSubjectRepository.DeleteByExpression(filter: t => t.SubjectId == subject.SubjectId);
-
-                // Tạo lại liên kết với ToolIds mới
-                if (request.ToolIds != null && request.ToolIds.Any())
-                {
-                    foreach (var toolId in request.ToolIds)
-                    {
-                        var tool = await _toolRepository.GetById(toolId);
-                        if (tool != null)
-                        {
-                            var toolForSubject = new ToolForSubject
-                            {
-                                ToolForSubjectId = Guid.NewGuid(),
-                                SubjectId = subject.SubjectId,
-                                ToolId = toolId
-                            };
-                            await _toolForSubjectRepository.Insert(toolForSubject);
-                        }
-                    }
-                }
-
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.UPDATE_SUCCESSFULLY;
