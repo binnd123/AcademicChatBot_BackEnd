@@ -68,26 +68,36 @@ namespace AcademicChatBot.Service.Implementation
 
         private string BuildPrompt(IntentType intent, string userMessage, string contextData)
         {
+            //- 💰 Học phí mỗi kỳ: 28,700,000 VND.
             return $@"
-📌 Người dùng vừa hỏi: {userMessage}
-🎯 Ý định đã xác định: {intent}
-📚 Thông tin học tập liên quan:
-{contextData}
+            📌 Người dùng vừa hỏi: {userMessage}
+            🎯 Ý định đã xác định: {intent}
+            📚 Thông tin học tập liên quan:
+            {contextData}
 
-Bạn là một chuyên gia tư vấn học thuật giàu kinh nghiệm, hiểu rõ về các ngành học, chuyên ngành, lộ trình học đại học, kỹ năng nghề nghiệp và xu hướng thị trường lao động.
+            Bạn là một chuyên gia tư vấn học thuật giàu kinh nghiệm của đại học FPT, hiểu rõ về các ngành học, chuyên ngành, lộ trình học đại học, kỹ năng nghề nghiệp và xu hướng thị trường lao động.
 
-🎓 Hãy đưa ra lời khuyên và định hướng học tập phù hợp dựa trên nội dung trên. Lưu ý:
+            🎓 Dưới đây là một số thông tin quan trọng về trường đại học FPT:
+            - 📅 Một năm học có 3 kỳ: Spring, Summer, Fall (ví dụ: Spring2025).
+            - ⏳ Tổng thời gian học: 4 năm bao gồm 1 năm tiếng Anh dự bị và 3 năm học chuyên ngành. Nếu có chứng chỉ IELTS từ 6.0 trở lên, sinh viên có thể bỏ qua năm học tiếng Anh dự bị và học thẳng chuyên ngành.
+            - 🧭 Trong 4 kỳ đầu, tất cả sinh viên học giống nhau. Từ cuối kỳ 4 (đầu kỳ 5), sinh viên phải chọn combo chuyên ngành (ví dụ: .NET, Java, SAP...), các môn sau đó sẽ thay đổi theo combo.
+            - 📘 Mỗi kỳ có 5 môn học: 4 môn học trực tiếp tại trường và 1 môn Coursera học online (có ký hiệu 'c' ở cuối mã môn, ví dụ: SSL101c).
+            - 🏢 Kỳ 6 đặc biệt: học 1 môn Coursera và đi thực tập OJT tại doanh nghiệp thay cho 4 môn trên lớp.
+            - 🎓 Kỳ 9: thay môn Coursera bằng đồ án tốt nghiệp (Capstone Project).
 
-1. Sử dụng emoji để tạo cảm giác thân thiện và dễ hiểu (ví dụ: 🎯, 💡, 👨‍🎓, ✅…).
-2. Giọng văn gần gũi, rõ ràng nhưng vẫn mang tính chuyên môn. Có thể đan xen một vài câu hài hước nhẹ nhàng để bớt khô khan 😄.
-3. Tránh đưa ra thông tin sai lệch hoặc mơ hồ. Hạn chế sử dụng ngôn ngữ quá trừu tượng.
-4. Ưu tiên ví dụ thực tế hoặc gợi ý cụ thể (ví dụ: nếu chọn chuyên ngành A thì có thể học combo B, phù hợp với sinh viên thích kiểu học như…).
-5. Trình bày mạch lạc, có thể chia theo các đề mục hoặc bước tư vấn rõ ràng.
-6. Giữ độ dài trong khoảng 20 câu để người dùng dễ tiếp thu.
+            🎯 Hãy đưa ra lời khuyên và định hướng học tập phù hợp dựa trên nội dung trên. Lưu ý:
 
-Bắt đầu nhé! 🎉
-";
+            1. Sử dụng emoji để tạo cảm giác thân thiện và dễ hiểu (ví dụ: 🎯, 💡, 👨‍🎓, ✅…).
+            2. Giọng văn gần gũi, rõ ràng nhưng vẫn mang tính chuyên môn. Có thể đan xen một vài câu hài hước nhẹ nhàng để bớt khô khan 😄.
+            3. Tránh đưa ra thông tin sai lệch hoặc mơ hồ. Hạn chế sử dụng ngôn ngữ quá trừu tượng.
+            4. Ưu tiên ví dụ thực tế hoặc gợi ý cụ thể (ví dụ: nếu chọn chuyên ngành A thì có thể học combo B, phù hợp với sinh viên thích kiểu học như…).
+            5. Trình bày mạch lạc, có thể chia theo các đề mục hoặc bước tư vấn rõ ràng.
+            6. Giữ độ dài trong khoảng 20 câu để người dùng dễ tiếp thu.
+
+            Bắt đầu nhé! 🎉
+            ";
         }
+
 
         public async Task<Response> GenerateResponseAsync(Guid? userId, string message)
         {
@@ -111,7 +121,26 @@ Bắt đầu nhé! 🎉
                                 , orderBy: m => m.MajorName
                                 , isAscending: true
                                 , includes: null); // Lấy danh sách ngành
-                            contextData = JsonSerializerHelper.SerializeData(majors.Items);
+                            var combo = await _comboRepository.GetAllDataByExpression(
+                                filter: c => !c.IsDeleted
+                                , pageNumber: 1
+                                , pageSize: int.MaxValue
+                                , orderBy: m => m.ComboName
+                                , isAscending: true
+                                , includes: null); // Lấy danh sách combo chuyên sâu
+                            var curriculum = await _curriculumRepository.GetAllDataByExpression(
+                                filter: c => !c.IsDeleted
+                                , pageNumber: 1
+                                , pageSize: int.MaxValue
+                                , orderBy: m => m.CurriculumName
+                                , isAscending: true
+                                , includes: null); // Lấy danh sách chương trình đào tạo
+                            contextData = JsonSerializerHelper.SerializeData(new
+                            {
+                                majors = majors.Items,
+                                combo = combo.Items,
+                                curriculum = curriculum.Items
+                            });
                             break;
                         }
 
