@@ -24,12 +24,23 @@ namespace AcademicChatBot.Service.Implementation
         private readonly IGenericRepository<Program> _programRepository;
         private readonly IGenericRepository<Tool> _toolRepository;
         private readonly IGenericRepository<Material> _materialRepository;
+        private readonly IGenericRepository<PrerequisiteConstraint> _prerequisiteConstraintRepository;
         private readonly IGenericRepository<Combo> _comboRepository;
+        private readonly IGenericRepository<ComboSubject> _comboSubjectRepository;
+        private readonly IGenericRepository<Notification> _notificationRepository;
+        private readonly IGenericRepository<ProgramingLearningOutcome> _programingLearningOutcomeRepository;
+        private readonly IGenericRepository<ProgramingOutcome> _programingOutcomeRepository;
+        private readonly IGenericRepository<CourseLearningOutcome> _courseLearningOutcomeRepository;
+        private readonly IGenericRepository<Curriculum> _curriculumRepository;
+        private readonly IGenericRepository<SubjectInCurriculum> _subjectInCurriculumRepository;
+        private readonly IGenericRepository<POMappingPLO> _pOMappingPLORepository;
+        private readonly IGenericRepository<Assessment> _assessmentRepository;
+        private readonly IGenericRepository<ToolForSubject> _toolForSubjectRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IIntentDetectorService intentDetectorService;
         private readonly IGeminiAPIService geminiApiService;
 
-        public AIChatLogService(IGenericRepository<AIChatLog> aIChatLogRepository, IGenericRepository<Message> messageRepository, IGenericRepository<Subject> subjectRepository, IGenericRepository<Major> majorRepository, IGenericRepository<Program> programRepository, IGenericRepository<Tool> toolRepository, IGenericRepository<Material> materialRepository, IGenericRepository<Combo> comboRepository, IUnitOfWork unitOfWork, IIntentDetectorService intentDetectorService, IGeminiAPIService geminiApiService)
+        public AIChatLogService(IGenericRepository<AIChatLog> aIChatLogRepository, IGenericRepository<Message> messageRepository, IGenericRepository<Subject> subjectRepository, IGenericRepository<Major> majorRepository, IGenericRepository<Program> programRepository, IGenericRepository<Tool> toolRepository, IGenericRepository<Material> materialRepository, IGenericRepository<PrerequisiteConstraint> prerequisiteConstraintRepository, IGenericRepository<Combo> comboRepository, IGenericRepository<ComboSubject> comboSubjectRepository, IGenericRepository<Notification> notificationRepository, IGenericRepository<ProgramingLearningOutcome> programingLearningOutcomeRepository, IGenericRepository<ProgramingOutcome> programingOutcomeRepository, IGenericRepository<CourseLearningOutcome> courseLearningOutcomeRepository, IGenericRepository<Curriculum> curriculumRepository, IGenericRepository<SubjectInCurriculum> subjectInCurriculumRepository, IGenericRepository<POMappingPLO> pOMappingPLORepository, IGenericRepository<Assessment> assessmentRepository, IGenericRepository<ToolForSubject> toolForSubjectRepository, IUnitOfWork unitOfWork, IIntentDetectorService intentDetectorService, IGeminiAPIService geminiApiService)
         {
             _aIChatLogRepository = aIChatLogRepository;
             _messageRepository = messageRepository;
@@ -38,31 +49,22 @@ namespace AcademicChatBot.Service.Implementation
             _programRepository = programRepository;
             _toolRepository = toolRepository;
             _materialRepository = materialRepository;
+            _prerequisiteConstraintRepository = prerequisiteConstraintRepository;
             _comboRepository = comboRepository;
+            _comboSubjectRepository = comboSubjectRepository;
+            _notificationRepository = notificationRepository;
+            _programingLearningOutcomeRepository = programingLearningOutcomeRepository;
+            _programingOutcomeRepository = programingOutcomeRepository;
+            _courseLearningOutcomeRepository = courseLearningOutcomeRepository;
+            _curriculumRepository = curriculumRepository;
+            _subjectInCurriculumRepository = subjectInCurriculumRepository;
+            _pOMappingPLORepository = pOMappingPLORepository;
+            _assessmentRepository = assessmentRepository;
+            _toolForSubjectRepository = toolForSubjectRepository;
             _unitOfWork = unitOfWork;
             this.intentDetectorService = intentDetectorService;
             this.geminiApiService = geminiApiService;
         }
-
-
-
-        //public async Task<Guid> AddChatAsync(Guid userId, AIChatLogRequest chatRequest)
-        //{
-        //        var messageDomain = new AIChatLog
-        //        {
-        //            AIChatLogId = Guid.NewGuid(),
-        //            UserId = userId,
-        //            IsDeleted = false,
-        //            LastMessageTime = chatRequest.LastMessageTime,
-        //            StartTime = DateTime.UtcNow,
-        //            CreatedAt = DateTime.UtcNow,
-        //            UpdatedAt = DateTime.UtcNow,
-        //        };
-        //        // Use Domain Model to create Author
-        //        await _aIChatLogRepository.Insert(messageDomain);
-        //        await _unitOfWork.SaveChangeAsync();
-        //        return messageDomain.AIChatLogId;
-        //}
 
         private string BuildPrompt(IntentType intent, string userMessage, string contextData)
         {
@@ -87,7 +89,6 @@ Bắt đầu nhé! 🎉
 ";
         }
 
-
         public async Task<Response> GenerateResponseAsync(Guid? userId, string message)
         {
             Response dto = new Response();
@@ -104,80 +105,77 @@ Bắt đầu nhé! 🎉
                     case IntentType.AskMajorAdvice:
                         {
                             var majors = await _majorRepository.GetAllDataByExpression(
-                                filter: null
+                                filter: c => !c.IsDeleted
                                 , pageNumber: 1
-                                , pageSize: 100
+                                , pageSize: int.MaxValue
                                 , orderBy: m => m.MajorName
                                 , isAscending: true
                                 , includes: null); // Lấy danh sách ngành
-                            contextData = JsonSerializerHelper.SerializeData(majors);
+                            contextData = JsonSerializerHelper.SerializeData(majors.Items);
                             break;
                         }
 
                     case IntentType.AskSpecializationCombo:
                         {
-                            var combos = await _comboRepository.GetAllDataByExpression(
-                                filter: null
-                                , pageNumber: 1
-                                , pageSize: 100
-                                , orderBy: c => c.ComboName
-                                , isAscending: true
-                                , includes: c => c.Major); // Lấy danh sách tổ hợp
-                            contextData = JsonSerializerHelper.SerializeData(combos);
+                            var combos = await _comboSubjectRepository.GetAllDataByExpression(
+                                filter: null,
+                                pageNumber: 1,
+                                pageSize: int.MaxValue,
+                                orderBy: null,
+                                isAscending: true,
+                                includes: x => x.Combo); // Lấy danh sách tổ hợp
+                            contextData = JsonSerializerHelper.SerializeData(combos.Items);
+                            break;
+                        }
+
+                    case IntentType.AskCurriculum:
+                        {
+                            var curriculums = await _curriculumRepository.GetAllDataByExpression(
+                                filter: c => !c.IsDeleted,
+                                pageNumber: 1,
+                                pageSize: int.MaxValue,
+                                orderBy: null,
+                                isAscending: true,
+                                includes: null); // Lấy danh sách chương trình học
+                            contextData = JsonSerializerHelper.SerializeData(curriculums.Items);
                             break;
                         }
 
                     //case IntentType.AskStudyPlan:
                     //    {
-                    //        var semesters = await semesterRepository.GetAllByUserAsync(userId); // Lấy dữ liệu học kỳ của sinh viên
-                    //        var dto = mapper.Map<List<SemesterPlanBotRequest>>(semesters);
-                    //        contextData = JsonSerializerHelper.SerializeData(dto);
+                    //        var curriculum = await _curriculumRepository.GetAllDataByExpression(
+                    //            filter: null, pageNumber: 1, pageSize: 50, orderBy: c => c.CurriculumName, isAscending: true, includes: c => c.Major);
+                    //        var subjects = await _subjectInCurriculumRepository.GetAllDataByExpression(
+                    //            filter: null, pageNumber: 1, pageSize: 200, orderBy: s => s.Semester, isAscending: true, includes: s => s.Subject);
+                    //        contextData = JsonSerializerHelper.SerializeData(new { curriculum, subjects });
                     //        break;
                     //    }
 
-                    case IntentType.AskElectiveSubjects:
+                    case IntentType.CompareSemesterProgress:
                         {
-                            var electives = await _subjectRepository.GetAllDataByExpression(
-                                filter: null
-                                , pageNumber: 1
-                                , pageSize: 100
-                                , orderBy: s => s.SubjectName
-                                , isAscending: true
-                                , includes: s => s.Curriculum);
-                            contextData = JsonSerializerHelper.SerializeData(electives);
+                            var subjectInCurriculums = await _subjectInCurriculumRepository.GetAllDataByExpression(
+                                filter: null, pageNumber: 1, pageSize: int.MaxValue, orderBy: s => s.SemesterNo, isAscending: true, includes: s => s.Subject);
+                            contextData = JsonSerializerHelper.SerializeData(subjectInCurriculums.Items);
                             break;
                         }
 
-                    //case IntentType.AskCapstoneAdvice:
-                    //    {
-                    //        var capstoneData = await capstoneRepository.GetByUserAsync(userId);
-                    //        var dto = mapper.Map<CapstoneBotRequest>(capstoneData);
-                    //        contextData = JsonSerializerHelper.SerializeData(dto);
-                    //        break;
-                    //    }
-
-                    //case IntentType.CompareSemesterProgress:
-                    //    {
-                    //        var comparisonData = await semesterRepository.GetProgressComparison(userId);
-                    //        contextData = JsonSerializerHelper.SerializeData(comparisonData);
-                    //        break;
-                    //    }
-
                     //case IntentType.AskInternshipAdvice:
                     //    {
-                    //        var internship = await internshipRepository.GetByUserAsync(userId);
-                    //        var dto = mapper.Map<InternshipBotRequest>(internship);
-                    //        contextData = JsonSerializerHelper.SerializeData(dto);
+                    //        var internshipSubjects = await _subjectRepository.GetAllDataByExpression(
+                    //            s => s.SubjectName.Contains("thực tập") || s.SubjectName.Contains("internship"), pageNumber: 1, pageSize: 50,
+                    //            orderBy: s => s.SubjectName, isAscending: true, includes: null);
+                    //        contextData = JsonSerializerHelper.SerializeData(internshipSubjects);
                     //        break;
                     //    }
 
-                    //case IntentType.AskCourseraStrategy:
-                    //    {
-                    //        var courseraProgress = await courseraRepository.GetByUserAsync(userId);
-                    //        var dto = mapper.Map<List<CourseraBotRequest>>(courseraProgress);
-                    //        contextData = JsonSerializerHelper.SerializeData(dto);
-                    //        break;
-                    //    }
+                    case IntentType.AskCourseraStrategy:
+                        {
+                            var courseraSubjects = await _subjectRepository.GetAllDataByExpression(
+                                s => s.SubjectName.Contains("Coursera"), pageNumber: 1, pageSize: int.MaxValue,
+                                orderBy: s => s.SubjectName, isAscending: true, includes: null);
+                            contextData = JsonSerializerHelper.SerializeData(courseraSubjects);
+                            break;
+                        }
 
                     default:
                         {

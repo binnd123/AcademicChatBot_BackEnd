@@ -12,6 +12,8 @@ namespace AcademicChatBot.DAL.Models
     {
         [Key]
         public Guid NotificationId { get; set; }
+        public string NotificationName { get; set; } = null!;
+        public string NotificationCode { get; set; } = null!;
         public string Message { get; set; } = string.Empty;
         public bool IsRead { get; set; } = false;
         public DateTime CreatedAt { get; set; }
