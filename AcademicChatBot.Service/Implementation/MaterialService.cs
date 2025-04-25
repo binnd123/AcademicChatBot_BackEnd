@@ -58,8 +58,8 @@ namespace AcademicChatBot.Service.Implementation
                     IsOnline = request.IsOnline,
                     Note = request.Note,
                     SubjectId = request.SubjectId,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
                 };
                 await _materialRepository.Insert(material);
                 await _unitOfWork.SaveChangeAsync();
@@ -91,7 +91,7 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
                 material.IsDeleted = true;
-                material.DeletedAt = DateTime.UtcNow;
+                material.DeletedAt = DateTime.Now;
                 await _materialRepository.Update(material);
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
@@ -199,7 +199,7 @@ namespace AcademicChatBot.Service.Implementation
                 material.IsOnline = request.IsOnline ?? material.IsOnline;
                 material.Note = request.Note ?? material.Note;
                 material.SubjectId = request.SubjectId ?? material.SubjectId;
-                material.UpdatedAt = DateTime.UtcNow;
+                material.UpdatedAt = DateTime.Now;
 
                 await _materialRepository.Update(material);
                 await _unitOfWork.SaveChangeAsync();

@@ -10,6 +10,6 @@ namespace AcademicChatBot.Common.BussinessModel.Programs
     {
         public string ProgramCode { get; set; } = null!;
         public string ProgramName { get; set; } = null!;
-        public DateTime StartAt { get; set; } = DateTime.UtcNow;
+        public DateTime StartAt { get; set; } = DateTime.Now;
     }
 }

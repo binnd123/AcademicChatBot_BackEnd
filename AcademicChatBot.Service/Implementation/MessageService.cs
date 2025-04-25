@@ -57,8 +57,8 @@ namespace AcademicChatBot.Service.Implementation
                     aIChatLog = new AIChatLog
                     {
                         UserId = senderId,
-                        LastMessageTime = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
+                        LastMessageTime = DateTime.Now,
+                        UpdatedAt = DateTime.Now
                     };
                     await _aIChatLogRepository.Insert(aIChatLog);
                     await _unitOfWork.SaveChangeAsync();
@@ -73,7 +73,7 @@ namespace AcademicChatBot.Service.Implementation
                     MessageType = MessageType.Text,
                     IsBotResponse = false,
                     AIChatLogId = aIChatLog.AIChatLogId,
-                    SentTime = DateTime.UtcNow,
+                    SentTime = DateTime.Now,
                 };
                 // Lưu tin nhắn người dùng  
                 await _messageRepository.Insert(messageUserRequest);
@@ -90,15 +90,15 @@ namespace AcademicChatBot.Service.Implementation
                     MessageType = MessageType.Text,
                     IsBotResponse = true,
                     AIChatLogId = aIChatLog.AIChatLogId,
-                    SentTime = DateTime.UtcNow,
+                    SentTime = DateTime.Now,
                 };
 
                 // Lưu tin nhắn của bot  
                 await _messageRepository.Insert(messageBotResponse);
                 
                 // Cập nhật lại thông tin cuộc trò chuyện 
-                aIChatLog.LastMessageTime = DateTime.UtcNow;
-                aIChatLog.UpdatedAt = DateTime.UtcNow;
+                aIChatLog.LastMessageTime = DateTime.Now;
+                aIChatLog.UpdatedAt = DateTime.Now;
                 await _aIChatLogRepository.Update(aIChatLog);
 
                 // Gửi câu trả lời của bot về cho client  

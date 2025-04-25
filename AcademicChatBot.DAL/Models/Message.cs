@@ -13,7 +13,7 @@ namespace AcademicChatBot.DAL.Models
         public Message()
         {
             MessageId = Guid.NewGuid();
-            SentTime = DateTime.UtcNow;
+            SentTime = DateTime.Now;
         }
         public Guid MessageId { get; set; }
         public Guid SenderId { get; set; }

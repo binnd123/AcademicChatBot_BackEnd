@@ -21,7 +21,6 @@ namespace AcademicChatBot.API.Controllers
             _curriculumService = curriculumService;
         }
 
-        [Authorize]
         [HttpGet("get-curriculum/{curriculumId}")]
         public async Task<IActionResult> GetCurriculumById(Guid curriculumId)
         {

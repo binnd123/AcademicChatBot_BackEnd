@@ -359,7 +359,7 @@ namespace AcademicChatBot.Service.Implementation
                 }
 
                 chat.Status = status;
-                chat.UpdatedAt = DateTime.UtcNow;
+                chat.UpdatedAt = DateTime.Now;
 
                 await _aIChatLogRepository.Update(chat);
                 await _unitOfWork.SaveChangeAsync();
@@ -394,9 +394,9 @@ namespace AcademicChatBot.Service.Implementation
                 }
 
                 chat.IsDeleted = true;
-                chat.DeletedAt = DateTime.UtcNow;
-                chat.UpdatedAt = DateTime.UtcNow;
-                chat.EndTime = DateTime.UtcNow;
+                chat.DeletedAt = DateTime.Now;
+                chat.UpdatedAt = DateTime.Now;
+                chat.EndTime = DateTime.Now;
 
                 await _aIChatLogRepository.Update(chat);
                 await _unitOfWork.SaveChangeAsync();

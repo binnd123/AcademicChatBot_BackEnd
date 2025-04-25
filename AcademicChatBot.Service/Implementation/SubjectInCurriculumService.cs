@@ -161,7 +161,7 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> AddCurriculumsToSubject(Guid subjectId, List<SubjectInCurriculumRequest> requests)
+        public async Task<Response> AddCurriculumsToSubject(Guid subjectId, List<CurriculumInSubjectRequest> requests)
         {
             Response dto = new Response();
             try
@@ -178,18 +178,18 @@ namespace AcademicChatBot.Service.Implementation
                 var subjectCurriculumList = new List<SubjectInCurriculum>();
                 foreach (var request in requests)
                 {
-                    var curriculum = await _curriculumRepository.GetById(request.SubjectId);
+                    var curriculum = await _curriculumRepository.GetById(request.CurriculumId);
                     if (curriculum == null) continue;
 
                     var existing = await _subjectInCurriculumRepository.GetFirstByExpression(
-                        x => x.SubjectId == subjectId && x.CurriculumId == request.SubjectId);
+                        x => x.SubjectId == subjectId && x.CurriculumId == request.CurriculumId);
                     if (existing != null) continue;
 
                     subjectCurriculumList.Add(new SubjectInCurriculum
                     {
                         SubjectInCurriculumId = Guid.NewGuid(),
                         SubjectId = subjectId,
-                        CurriculumId = request.SubjectId,
+                        CurriculumId = request.CurriculumId,
                         SemesterNo = request.SemesterNo
                     });
                 }

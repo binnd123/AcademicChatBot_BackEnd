@@ -13,9 +13,9 @@ namespace AcademicChatBot.DAL.Models
         public AIChatLog()
         {
             AIChatLogId = Guid.NewGuid();
-            StartTime = DateTime.UtcNow;
+            StartTime = DateTime.Now;
             Status = StatusChat.Actived;
-            CreatedAt = DateTime.UtcNow;
+            CreatedAt = DateTime.Now;
         }
         public Guid AIChatLogId { get; set; }
         public DateTime StartTime { get; set; }

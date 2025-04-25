@@ -56,8 +56,8 @@ namespace AcademicChatBot.Service.Implementation
                     IsActive = request.IsActive,
                     IsApproved = request.IsApproved,
                     MajorId = request.MajorId,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
                     IsDeleted = false
                 };
 
@@ -167,7 +167,7 @@ namespace AcademicChatBot.Service.Implementation
                 combo.IsActive = request.IsActive;
                 combo.IsApproved = request.IsApproved;
                 combo.MajorId = request.MajorId ?? combo.MajorId;
-                combo.UpdatedAt = DateTime.UtcNow;
+                combo.UpdatedAt = DateTime.Now;
 
                 await _comboRepository.Update(combo);
                 await _unitOfWork.SaveChangeAsync();
@@ -201,7 +201,7 @@ namespace AcademicChatBot.Service.Implementation
                 }
 
                 combo.IsDeleted = true;
-                combo.DeletedAt = DateTime.UtcNow;
+                combo.DeletedAt = DateTime.Now;
 
                 await _comboRepository.Update(combo);
                 await _unitOfWork.SaveChangeAsync();

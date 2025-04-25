@@ -20,7 +20,7 @@ namespace AcademicChatBot.API.Controllers
         {
             _programService = programService;
         }
-        [Authorize]
+
         [HttpGet("get-program-by-id/{programId}")]
         public async Task<IActionResult> GetProgramById(Guid programId)
         {
@@ -34,7 +34,6 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [Authorize]
         [HttpGet("get-all-programs")]
         public async Task<IActionResult> GetAllPrograms(
             [FromQuery] int pageNumber = 1,

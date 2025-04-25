@@ -18,7 +18,6 @@ namespace AcademicChatBot.API.Controllers
             _comboService = comboService;
         }
 
-        [Authorize]
         [HttpGet("get-all-combos")]
         public async Task<IActionResult> GetAllCombos(
             [FromQuery] int pageNumber = 1,
@@ -40,7 +39,6 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [Authorize]
         [HttpGet("get-combo-by-id/{id}")]
         public async Task<IActionResult> GetComboById(Guid id)
         {

@@ -70,8 +70,8 @@ namespace AcademicChatBot.Service.Implementation
                     CourseLearningOutcomeDetail = request.CourseLearningOutcomeDetail,
                     SubjectId = request.SubjectId,
                     AssessmentId = request.AssessmentId,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
                     IsDeleted = false
                 };
 
@@ -197,7 +197,7 @@ namespace AcademicChatBot.Service.Implementation
                 clo.CourseLearningOutcomeDetail = request.CourseLearningOutcomeDetail ?? clo.CourseLearningOutcomeDetail;
                 clo.SubjectId = request.SubjectId ?? clo.SubjectId;
                 clo.AssessmentId = request.AssessmentId ?? clo.AssessmentId;
-                clo.UpdatedAt = DateTime.UtcNow;
+                clo.UpdatedAt = DateTime.Now;
 
                 await _courseLearningOutcomeRepository.Update(clo);
                 await _unitOfWork.SaveChangeAsync();
@@ -231,7 +231,7 @@ namespace AcademicChatBot.Service.Implementation
                 }
 
                 clo.IsDeleted = true;
-                clo.DeletedAt = DateTime.UtcNow;
+                clo.DeletedAt = DateTime.Now;
 
                 await _courseLearningOutcomeRepository.Update(clo);
                 await _unitOfWork.SaveChangeAsync();

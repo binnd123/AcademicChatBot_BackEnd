@@ -46,8 +46,8 @@ namespace AcademicChatBot.Service.Implementation
                         NotificationId = Guid.NewGuid(),
                         UserId = userId,
                         NotificationCode = request.NotificationCode,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
                         IsRead = false,
                         IsDeleted = false,
                         Message = request.Message,
@@ -85,8 +85,8 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
                 notification.IsDeleted = true;
-                notification.DeletedAt = DateTime.UtcNow;
-                notification.UpdatedAt = DateTime.UtcNow;
+                notification.DeletedAt = DateTime.Now;
+                notification.UpdatedAt = DateTime.Now;
                 await _notificationRepository.Update(notification);
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
@@ -182,7 +182,7 @@ namespace AcademicChatBot.Service.Implementation
                 if (!string.IsNullOrEmpty(request.NotificationCode)) notification.NotificationCode = request.NotificationCode;
                 if (!string.IsNullOrEmpty(request.NotificationName)) notification.NotificationName = request.NotificationName;
                 if (!string.IsNullOrEmpty(request.Message)) notification.Message = request.Message;
-                notification.UpdatedAt = DateTime.UtcNow;
+                notification.UpdatedAt = DateTime.Now;
 
                 await _notificationRepository.Update(notification);
                 await _unitOfWork.SaveChangeAsync();
@@ -224,7 +224,7 @@ namespace AcademicChatBot.Service.Implementation
                     if (!string.IsNullOrEmpty(request.NotificationCode)) notification.NotificationCode = request.NotificationCode;
                     if (!string.IsNullOrEmpty(request.NotificationName)) notification.NotificationName = request.NotificationName;
                     if (!string.IsNullOrEmpty(request.Message)) notification.Message = request.Message;
-                    notification.UpdatedAt = DateTime.UtcNow;
+                    notification.UpdatedAt = DateTime.Now;
                 };
                 await _notificationRepository.UpdateRange(notifications.Items);
                 await _unitOfWork.SaveChangeAsync();
@@ -270,8 +270,8 @@ namespace AcademicChatBot.Service.Implementation
                 foreach (var notification in notifications.Items)
                 {
                     notification.IsDeleted = true;
-                    notification.DeletedAt = DateTime.UtcNow;
-                    notification.UpdatedAt = DateTime.UtcNow;
+                    notification.DeletedAt = DateTime.Now;
+                    notification.UpdatedAt = DateTime.Now;
                 };
                 await _notificationRepository.UpdateRange(notifications.Items);
                 await _unitOfWork.SaveChangeAsync();

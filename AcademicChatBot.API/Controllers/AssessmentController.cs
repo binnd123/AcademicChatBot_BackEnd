@@ -21,7 +21,6 @@ namespace AcademicChatBot.API.Controllers
             _assessmentService = assessmentService;
         }
 
-        [Authorize]
         [HttpGet("get-assessment-by-id/{assessmentId}")]
         public async Task<IActionResult> GetAssessmentById(Guid assessmentId)
         {
@@ -35,7 +34,6 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [Authorize]
         [HttpGet("get-all-assessments")]
         public async Task<IActionResult> GetAllAssessments(
             [FromQuery] int pageNumber = 1,

@@ -39,8 +39,8 @@ namespace AcademicChatBot.Service.Implementation
                     Publisher = request.Publisher,
                     PublishedDate = request.PublishedDate,
                     Note = request.Note,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
                 };
                 await _toolRepository.Insert(tool);
                 await _unitOfWork.SaveChangeAsync();
@@ -72,7 +72,7 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
                 tool.IsDeleted = true;
-                tool.DeletedAt = DateTime.UtcNow;
+                tool.DeletedAt = DateTime.Now;
                 await _toolRepository.Update(tool);
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
@@ -162,7 +162,7 @@ namespace AcademicChatBot.Service.Implementation
                 tool.Publisher = request.Publisher ?? tool.Publisher;
                 tool.PublishedDate = request.PublishedDate ?? tool.PublishedDate;
                 tool.Note = request.Note ?? tool.Note;
-                tool.UpdatedAt = DateTime.UtcNow;
+                tool.UpdatedAt = DateTime.Now;
 
                 await _toolRepository.Update(tool);
                 await _unitOfWork.SaveChangeAsync();

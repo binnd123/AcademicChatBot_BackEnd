@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.DAL.Models
 {
@@ -17,6 +18,7 @@ namespace AcademicChatBot.DAL.Models
         public DateTime UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public ConditionTypeName GroupCombinationType { get; set; } = ConditionTypeName.OR;
         public Guid? SubjectId { get; set; }
         [ForeignKey(nameof(SubjectId))]
         public Subject? Subject { get; set; }
