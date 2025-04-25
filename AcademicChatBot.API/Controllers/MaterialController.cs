@@ -21,7 +21,6 @@ namespace AcademicChatBot.API.Controllers
             _materialService = materialService;
         }
 
-        [Authorize]
         [HttpGet("get-material-by-id/{materialId}")]
         public async Task<IActionResult> GetMaterialById(Guid materialId)
         {
@@ -35,7 +34,6 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [Authorize]
         [HttpGet("get-all-materials")]
         public async Task<IActionResult> GetAllMaterials(
             [FromQuery] int pageNumber = 1,

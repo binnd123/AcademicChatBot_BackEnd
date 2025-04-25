@@ -14,7 +14,7 @@ namespace AcademicChatBot.Service.Contract
         Task<Response> GetAllSubjectsForCurriculum(Guid curriculumId, int pageNumber, int pageSize);
         Task<Response> GetAllCurriculumsForSubject(Guid subjectId, int pageNumber, int pageSize);
         Task<Response> AddSubjectsToCurriculum(Guid curriculumId, List<SubjectInCurriculumRequest> requests);
-        Task<Response> AddCurriculumsToSubject(Guid subjectId, List<SubjectInCurriculumRequest> requests);
+        Task<Response> AddCurriculumsToSubject(Guid subjectId, List<CurriculumInSubjectRequest> requests);
         Task<Response> DeleteSubjectsFromCurriculum(Guid curriculumId, List<Guid> subjectIds);
         Task<Response> DeleteCurriculumsFromSubject(Guid subjectId, List<Guid> curriculumIds);
         Task<Response> DeleteAllSubjectsFromCurriculum(Guid curriculumId);

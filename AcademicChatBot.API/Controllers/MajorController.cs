@@ -21,7 +21,6 @@ namespace AcademicChatBot.API.Controllers
             _majorService = majorService;
         }
 
-        [Authorize]
         [HttpGet("get-major-by-id/{majorId}")]
         public async Task<IActionResult> GetMajorById(Guid majorId)
         {

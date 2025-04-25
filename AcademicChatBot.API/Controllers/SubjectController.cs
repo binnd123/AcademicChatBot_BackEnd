@@ -44,7 +44,6 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [Authorize]
         [HttpGet("get-subject-by-id/{subjectId}")]
         public async Task<IActionResult> GetSubjectById(Guid subjectId)
         {

@@ -50,8 +50,8 @@ namespace AcademicChatBot.Service.Implementation
                     ProgramingLearningOutcomeName = request.ProgramingLearningOutcomeName,
                     Description = request.Description,
                     CurriculumId = request.CurriculumId,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
                 };
                 await _programingLearningOutcomeRepository.Insert(programingLearningOutcome);
                 await _unitOfWork.SaveChangeAsync();
@@ -83,7 +83,7 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
                 programingLearningOutcome.IsDeleted = true;
-                programingLearningOutcome.DeletedAt = DateTime.UtcNow;
+                programingLearningOutcome.DeletedAt = DateTime.Now;
                 await _programingLearningOutcomeRepository.Update(programingLearningOutcome);
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
@@ -183,7 +183,7 @@ namespace AcademicChatBot.Service.Implementation
                 programingLearningOutcome.ProgramingLearningOutcomeName = request.ProgramingLearningOutcomeName ?? programingLearningOutcome.ProgramingLearningOutcomeName;
                 programingLearningOutcome.Description = request.Description ?? programingLearningOutcome.Description;
                 programingLearningOutcome.CurriculumId = request.CurriculumId ?? programingLearningOutcome.CurriculumId;
-                programingLearningOutcome.UpdatedAt = DateTime.UtcNow;
+                programingLearningOutcome.UpdatedAt = DateTime.Now;
 
                 await _programingLearningOutcomeRepository.Update(programingLearningOutcome);
                 await _unitOfWork.SaveChangeAsync();

@@ -54,13 +54,6 @@ namespace AcademicChatBot.Service.Implementation
                         ToolId = toolId,
                         SubjectId = subjectId,
                     });
-                    //var toolForSubject = new ToolForSubject
-                    //{
-                    //    ToolForSubjectId = Guid.NewGuid(),
-                    //    ToolId = toolId,
-                    //    SubjectId = subjectId,
-                    //};
-                    //await _toolForSubjectRepository.Insert(toolForSubject);
                 }
                 await _toolForSubjectRepository.InsertRange(toolSubjectList);
                 await _unitOfWork.SaveChangeAsync();

@@ -66,10 +66,11 @@ namespace AcademicChatBot.Service.Implementation
                 {
                     PrerequisiteConstraintId = Guid.NewGuid(),
                     PrerequisiteConstraintCode = request.PrerequisiteConstraintCode,
+                    GroupCombinationType = request.GroupCombinationType,
                     SubjectId = request.SubjectId,
                     CurriculumId = request.CurriculumId,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
                     IsDeleted = false
                 };
 
@@ -191,8 +192,9 @@ namespace AcademicChatBot.Service.Implementation
 
                 prerequisite.PrerequisiteConstraintCode = request.PrerequisiteConstraintCode ?? prerequisite.PrerequisiteConstraintCode;
                 prerequisite.SubjectId = request.SubjectId ?? prerequisite.SubjectId;
+                prerequisite.GroupCombinationType = request.GroupCombinationType;
                 prerequisite.CurriculumId = request.CurriculumId ?? prerequisite.CurriculumId;
-                prerequisite.UpdatedAt = DateTime.UtcNow;
+                prerequisite.UpdatedAt = DateTime.Now;
 
                 await _prerequisiteConstraintRepository.Update(prerequisite);
                 await _unitOfWork.SaveChangeAsync();
@@ -226,7 +228,7 @@ namespace AcademicChatBot.Service.Implementation
                 }
 
                 prerequisite.IsDeleted = true;
-                prerequisite.DeletedAt = DateTime.UtcNow;
+                prerequisite.DeletedAt = DateTime.Now;
 
                 await _prerequisiteConstraintRepository.Update(prerequisite);
                 await _unitOfWork.SaveChangeAsync();

@@ -21,7 +21,6 @@ namespace AcademicChatBot.API.Controllers
             _toolService = toolService;
         }
 
-        [Authorize]
         [HttpGet("get-tool-by-id/{toolId}")]
         public async Task<IActionResult> GetToolById(Guid toolId)
         {
@@ -35,7 +34,6 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [Authorize]
         [HttpGet("get-all-tools")]
         public async Task<IActionResult> GetAllTools(
             [FromQuery] int pageNumber = 1,

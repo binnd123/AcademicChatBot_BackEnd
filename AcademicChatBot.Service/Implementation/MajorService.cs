@@ -35,8 +35,8 @@ namespace AcademicChatBot.Service.Implementation
                     MajorCode = request.MajorCode,
                     MajorName = request.MajorName,
                     StartAt = request.StartAt,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
                 };
                 await _majorRepository.Insert(major);
                 await _unitOfWork.SaveChangeAsync();
@@ -68,7 +68,7 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
                 major.IsDeleted = true;
-                major.DeletedAt = DateTime.UtcNow;
+                major.DeletedAt = DateTime.Now;
                 await _majorRepository.Update(major);
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
@@ -154,7 +154,7 @@ namespace AcademicChatBot.Service.Implementation
                 major.MajorCode = request.MajorCode ?? major.MajorCode;
                 major.MajorName = request.MajorName ?? major.MajorName;
                 major.StartAt = request.StartAt ?? major.StartAt;
-                major.UpdatedAt = DateTime.UtcNow;
+                major.UpdatedAt = DateTime.Now;
 
                 await _majorRepository.Update(major);
                 await _unitOfWork.SaveChangeAsync();

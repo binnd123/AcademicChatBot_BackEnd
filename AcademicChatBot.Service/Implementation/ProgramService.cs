@@ -34,8 +34,8 @@ namespace AcademicChatBot.Service.Implementation
                     ProgramId = Guid.NewGuid(),
                     ProgramCode = request.ProgramCode,
                     ProgramName = request.ProgramName,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
                     DeletedAt = null,
                     IsDeleted = false,
                     StartAt = request.StartAt,
@@ -71,7 +71,7 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
                 program.IsDeleted = true;
-                program.DeletedAt = DateTime.UtcNow;
+                program.DeletedAt = DateTime.Now;
                 await _programRepository.Update(program);
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;

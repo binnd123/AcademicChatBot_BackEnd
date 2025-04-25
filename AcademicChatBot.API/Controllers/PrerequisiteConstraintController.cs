@@ -19,7 +19,6 @@ namespace AcademicChatBot.API.Controllers
             _prerequisiteConstraintService = prerequisiteConstraintService;
         }
 
-        [Authorize]
         [HttpGet("get-all-prerequisite-constraints")]
         public async Task<IActionResult> GetAllPrerequisiteConstraints(
             [FromQuery] int pageNumber = 1,
@@ -41,7 +40,6 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [Authorize]
         [HttpGet("get-prerequisite-constraint-by-id/{id}")]
         public async Task<IActionResult> GetPrerequisiteConstraintById(Guid id)
         {

@@ -58,8 +58,8 @@ namespace AcademicChatBot.Service.Implementation
                     GradingGuide = request.GradingGuide,
                     Note = request.Note,
                     SubjectId = request.SubjectId,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
                 };
                 await _assessmentRepository.Insert(assessment);
                 await _unitOfWork.SaveChangeAsync();
@@ -91,7 +91,7 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
                 assessment.IsDeleted = true;
-                assessment.DeletedAt = DateTime.UtcNow;
+                assessment.DeletedAt = DateTime.Now;
                 await _assessmentRepository.Update(assessment);
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
@@ -197,7 +197,7 @@ namespace AcademicChatBot.Service.Implementation
                 assessment.GradingGuide = request.GradingGuide ?? assessment.GradingGuide;
                 assessment.Note = request.Note ?? assessment.Note;
                 assessment.SubjectId = request.SubjectId ?? assessment.SubjectId;
-                assessment.UpdatedAt = DateTime.UtcNow;
+                assessment.UpdatedAt = DateTime.Now;
 
                 await _assessmentRepository.Update(assessment);
                 await _unitOfWork.SaveChangeAsync();

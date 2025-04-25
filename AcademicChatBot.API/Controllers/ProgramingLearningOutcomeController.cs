@@ -21,7 +21,6 @@ namespace AcademicChatBot.API.Controllers
             _programingLearningOutcomeService = programingLearningOutcomeService;
         }
 
-        [Authorize]
         [HttpGet("get-programing-learning-outcome-by-id/{pLOId}")]
         public async Task<IActionResult> GetProgramingLearningOutcomeById(Guid pLOId)
         {
@@ -35,7 +34,6 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [Authorize]
         [HttpGet("get-all-programing-learning-outcomes")]
         public async Task<IActionResult> GetAllProgramingLearningOutcomes(
             [FromQuery] int pageNumber = 1,

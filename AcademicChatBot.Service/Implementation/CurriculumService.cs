@@ -72,8 +72,8 @@ namespace AcademicChatBot.Service.Implementation
                     IsActive = request.IsActive,
                     IsApproved = request.IsApproved,
                     IsDeleted = false,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
                     MajorId = request.MajorId,
                     ProgramId = request.ProgramId
                 };
@@ -232,7 +232,7 @@ namespace AcademicChatBot.Service.Implementation
                 curriculum.PreRequisite = request.PreRequisite ?? curriculum.PreRequisite;
                 curriculum.IsActive = request.IsActive;
                 curriculum.IsApproved = request.IsApproved;
-                curriculum.UpdatedAt = DateTime.UtcNow;
+                curriculum.UpdatedAt = DateTime.Now;
                 curriculum.MajorId = request.MajorId ?? curriculum.MajorId;
                 curriculum.ProgramId = request.ProgramId ?? curriculum.ProgramId;
 

@@ -19,8 +19,7 @@ namespace AcademicChatBot.API.Controllers
             _courseLearningOutcomeService = courseLearningOutcomeService;
         }
 
-        [Authorize]
-        [HttpGet("get-clo/{id}")]
+        [HttpGet("get-clo-by-id/{id}")]
         public async Task<IActionResult> GetCourseLearningOutcomeById(Guid id)
         {
             var response = await _courseLearningOutcomeService.GetCourseLearningOutcomeById(id);
@@ -33,7 +32,6 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [Authorize]
         [HttpGet("get-all-clos")]
         public async Task<IActionResult> GetAllCourseLearningOutcomes(
             [FromQuery] int pageNumber = 1,

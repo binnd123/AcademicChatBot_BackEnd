@@ -86,7 +86,7 @@ namespace AcademicChatBot.API.Controllers
         [HttpPost("add-curriculums-to-subject")]
         public async Task<IActionResult> AddCurriculumsToSubject(
             [FromQuery] Guid subjectId,
-            [FromBody] List<SubjectInCurriculumRequest> requests)
+            [FromBody] List<CurriculumInSubjectRequest> requests)
         {
             var response = await _subjectInCurriculumService.AddCurriculumsToSubject(subjectId, requests);
             if (!response.IsSucess)

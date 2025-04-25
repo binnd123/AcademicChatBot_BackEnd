@@ -176,9 +176,9 @@ namespace AcademicChatBot.Service.Implementation
                     Email = signUpRequest.Email.ToLower(),
                     PasswordHash = passWordHash,
                     Role = signUpRequest.Role,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.Now,
                     IsActive = true,
-                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.Now,
                     DeletedAt = null,
                     IsDeleted = false,
                 };
@@ -190,8 +190,8 @@ namespace AcademicChatBot.Service.Implementation
                         StudentCode = signUpRequest.Email.ToLower().Replace("@fpt.edu.vn", ""),
                         UserId = user.UserId,
                         FullName = signUpRequest.FullName,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
                         IsDeleted = false,
                         DeletedAt = null,
                         Gender = GenderType.Male,
@@ -257,7 +257,7 @@ namespace AcademicChatBot.Service.Implementation
                     PasswordHash = null,
                     IsActive = true,
                     IsDeleted = false,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.Now
                 };
                 string fullName = payload.Name ?? "";
 
@@ -273,8 +273,8 @@ namespace AcademicChatBot.Service.Implementation
                             UserId = user.UserId,
                             FullName = fullName,
                             Gender = GenderType.Male,
-                            CreatedAt = DateTime.UtcNow,
-                            UpdatedAt = DateTime.UtcNow,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
                         };
                         await _studentRepository.Insert(student);
                     }
@@ -301,7 +301,7 @@ namespace AcademicChatBot.Service.Implementation
 
             var accessToken = _jwtService.GenerateAccessToken(user.UserId, user.Role, user.Email, studentId);
             var refreshToken = _jwtService.GenerateRefreshToken();
-            var expiredRefreshToken = DateTime.UtcNow.AddDays(7); // ví dụ 7 ngày
+            var expiredRefreshToken = DateTime.Now.AddDays(7); // ví dụ 7 ngày
 
             user.RefreshToken = refreshToken;
             user.ExpiredRefreshToken = expiredRefreshToken;
@@ -357,8 +357,8 @@ namespace AcademicChatBot.Service.Implementation
                     PasswordHash = passHash,
                     Role = RoleName.Admin,
                     IsActive = true,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
                 };
 
                 await _userRepository.Insert(admin);
@@ -567,17 +567,17 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
                 userDb.IsDeleted = true;
-                userDb.DeletedAt = DateTime.UtcNow;
+                userDb.DeletedAt = DateTime.Now;
                 userDb.IsActive = false;
-                userDb.UpdatedAt = DateTime.UtcNow;
+                userDb.UpdatedAt = DateTime.Now;
                 if (userDb.Role == RoleName.Student)
                 {
                     var studentDb = await _studentRepository.GetByExpression(a => a.UserId == userDb.UserId);
                     if (studentDb != null)
                     {
                         studentDb.IsDeleted = true;
-                        studentDb.DeletedAt = DateTime.UtcNow;
-                        studentDb.UpdatedAt = DateTime.UtcNow;
+                        studentDb.DeletedAt = DateTime.Now;
+                        studentDb.UpdatedAt = DateTime.Now;
                         await _studentRepository.Update(studentDb);
                     }
                 }
