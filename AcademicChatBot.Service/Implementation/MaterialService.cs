@@ -47,6 +47,7 @@ namespace AcademicChatBot.Service.Implementation
                 {
                     MaterialId = Guid.NewGuid(),
                     MaterialCode = request.MaterialCode,
+                    MaterialName = request.MaterialName,
                     MaterialDescription = request.MaterialDescription,
                     Author = request.Author,
                     Publisher = request.Publisher,
@@ -114,11 +115,13 @@ namespace AcademicChatBot.Service.Implementation
             try
             {
                 dto.Data = await _materialRepository.GetAllDataByExpression(
-                    filter: m => (m.MaterialCode.ToLower().Contains(search.ToLower()) || m.MaterialDescription.ToLower().Contains(search.ToLower()))
+                    filter: m => (m.MaterialCode.ToLower().Contains(search.ToLower()) 
+                    || m.MaterialName.ToLower().Contains(search.ToLower()) 
+                    || m.MaterialDescription.ToLower().Contains(search.ToLower()))
                     && m.IsDeleted == isDelete,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: m => sortBy == SortBy.Default ? null : m.MaterialCode,
+                    orderBy: m => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? m.MaterialName : m.MaterialCode,
                     isAscending: sortType == SortType.Ascending,
                     includes: m => m.Subject);
                 dto.IsSucess = true;
@@ -188,6 +191,7 @@ namespace AcademicChatBot.Service.Implementation
                 }
 
                 material.MaterialCode = request.MaterialCode ?? material.MaterialCode;
+                material.MaterialName = request.MaterialName ?? material.MaterialName;
                 material.MaterialDescription = request.MaterialDescription ?? material.MaterialDescription;
                 material.Author = request.Author ?? material.Author;
                 material.Publisher = request.Publisher ?? material.Publisher;

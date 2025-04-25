@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AcademicChatBot.DAL.Migrations
 {
     [DbContext(typeof(AcademicChatBotDBContext))]
-    [Migration("20250425020434_PrerequisiteSubject")]
-    partial class PrerequisiteSubject
+    [Migration("20250425063452_MaterialName")]
+    partial class MaterialName
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -392,6 +392,10 @@ namespace AcademicChatBot.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MaterialDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MaterialName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

@@ -13,6 +13,7 @@ namespace AcademicChatBot.DAL.Models
         [Key]
         public Guid MaterialId { get; set; }
         public string MaterialCode { get; set; } = null!;
+        public string MaterialName { get; set; } = null!;
         public string MaterialDescription { get; set; } = null!;
         public string Author { get; set; } = string.Empty;
         public string Publisher { get; set; } = string.Empty;
