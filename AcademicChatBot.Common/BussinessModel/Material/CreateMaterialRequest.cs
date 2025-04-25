@@ -8,6 +8,7 @@ namespace AcademicChatBot.Common.BussinessModel.Material
 {
     public class CreateMaterialRequest
     {
+        public string MaterialName { get; set; } = null!;
         public string MaterialCode { get; set; } = null!;
         public string MaterialDescription { get; set; } = null!;
         public string Author { get; set; } = string.Empty;

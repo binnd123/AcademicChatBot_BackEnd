@@ -4,6 +4,7 @@ using AcademicChatBot.DAL.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AcademicChatBot.DAL.Migrations
 {
     [DbContext(typeof(AcademicChatBotDBContext))]
-    partial class AcademicChatBotDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250424182154_PrerequisiteSubject")]
+    partial class PrerequisiteSubject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -392,10 +395,6 @@ namespace AcademicChatBot.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MaterialName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Note")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -568,6 +567,12 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<Guid?>("PrerequisiteConstraintId")
                         .HasColumnType("uniqueidentifier");
 
@@ -577,11 +582,19 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<int>("RelationGroup")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PrerequisiteConstraintId");
 
                     b.HasIndex("PrerequisiteSubjectId");
+
+                    b.HasIndex("SubjectId");
 
                     b.ToTable("PrerequisiteSubject");
                 });
@@ -1118,9 +1131,15 @@ namespace AcademicChatBot.DAL.Migrations
                         .WithMany()
                         .HasForeignKey("PrerequisiteSubjectId");
 
+                    b.HasOne("AcademicChatBot.DAL.Models.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId");
+
                     b.Navigation("PrerequisiteConstraint");
 
                     b.Navigation("PrerequisiteSubjectInfo");
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.ProgramingLearningOutcome", b =>
