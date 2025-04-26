@@ -18,17 +18,11 @@ namespace AcademicChatBot.Service.Implementation
     public class SubjectService : ISubjectService
     {
         private readonly IGenericRepository<Subject> _subjectRepository;
-        private readonly IGenericRepository<Curriculum> _curriculumRepository;
-        private readonly IGenericRepository<ToolForSubject> _toolForSubjectRepository;
-        private readonly IGenericRepository<Tool> _toolRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public SubjectService(IGenericRepository<Subject> subjectRepository, IGenericRepository<Curriculum> curriculumRepository, IGenericRepository<ToolForSubject> toolForSubjectRepository, IGenericRepository<Tool> toolRepository, IUnitOfWork unitOfWork)
+        public SubjectService(IGenericRepository<Subject> subjectRepository, IUnitOfWork unitOfWork)
         {
             _subjectRepository = subjectRepository;
-            _curriculumRepository = curriculumRepository;
-            _toolForSubjectRepository = toolForSubjectRepository;
-            _toolRepository = toolRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -37,17 +31,6 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                if (request.CurriculumId != null)
-                {
-                    var curriculum = await _curriculumRepository.GetById(request.CurriculumId);
-                    if (curriculum == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Curriculum not found";
-                        return dto;
-                    }
-                }
                 var subject = new Subject
                 {
                     SubjectId = Guid.NewGuid(),
@@ -59,7 +42,6 @@ namespace AcademicChatBot.Service.Implementation
                     DecisionNo = request.DecisionNo,
                     NoCredit = request.NoCredit,
                     SubjectName = request.SubjectName,
-                    CurriculumId = request.CurriculumId,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     DegreeLevel = request.DegreeLevel,
@@ -130,7 +112,7 @@ namespace AcademicChatBot.Service.Implementation
                     pageSize: pageSize, 
                     orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.SubjectName : s.SubjectCode, 
                     isAscending: sortType == SortType.Ascending,
-                    includes: s => s.Curriculum);
+                    includes: null);
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Subjects retrieved successfully";
@@ -175,17 +157,6 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                if (request.CurriculumId != null)
-                {
-                    var curriculum = await _curriculumRepository.GetById(request.CurriculumId);
-                    if (curriculum == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Curriculum not found";
-                        return dto;
-                    }
-                }
                 var subject = await _subjectRepository.GetById(SubjectId);
                 if (subject == null)
                 {
@@ -213,7 +184,6 @@ namespace AcademicChatBot.Service.Implementation
                 if (request.ScoringScale > 0) subject.ScoringScale = request.ScoringScale;
                 if (request.MinAvgMarkToPass > 0) subject.MinAvgMarkToPass = request.MinAvgMarkToPass;
                 if (!string.IsNullOrEmpty(request.Note)) subject.Note = request.Note;
-                if (request.CurriculumId != null) subject.CurriculumId = request.CurriculumId;
 
                 subject.UpdatedAt = DateTime.Now;
 
