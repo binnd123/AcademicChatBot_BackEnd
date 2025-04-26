@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
@@ -301,7 +302,11 @@ namespace AcademicChatBot.Service.Implementation
                     pageSize: pageSize,
                     orderBy: null,
                     isAscending: true,
-                    includes: t => t.ProgramingLearningOutcome);
+                    includes: new Expression<Func<POMappingPLO, object>>[]
+                {
+                    c => c.ProgramingOutcome,
+                    c => c.ProgramingLearningOutcome
+                });
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "PLOs For PO retrieved successfully";
@@ -326,7 +331,11 @@ namespace AcademicChatBot.Service.Implementation
                     pageSize: pageSize,
                     orderBy: null,
                     isAscending: true,
-                    includes: t => t.ProgramingOutcome);
+                    includes: new Expression<Func<POMappingPLO, object>>[]
+                {
+                    c => c.ProgramingOutcome,
+                    c => c.ProgramingLearningOutcome
+                });
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "POs For PLO retrieved successfully";

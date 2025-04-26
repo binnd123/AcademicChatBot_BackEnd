@@ -34,11 +34,13 @@ namespace AcademicChatBot.API.Controllers
         public async Task<IActionResult> GetAllSubjectsForCurriculum(
             [FromQuery] Guid curriculumId,
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 5)
+            [FromQuery] int pageSize = 5,
+            [FromQuery] int semesterNo = 0)
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            var response = await _subjectInCurriculumService.GetAllSubjectsForCurriculum(curriculumId, pageNumber, pageSize);
+            if(semesterNo < 1 || semesterNo > 9) semesterNo = 0;
+            var response = await _subjectInCurriculumService.GetAllSubjectsForCurriculum(curriculumId, pageNumber, pageSize, semesterNo);
             if (!response.IsSucess)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
@@ -52,11 +54,13 @@ namespace AcademicChatBot.API.Controllers
         public async Task<IActionResult> GetAllCurriculumsForSubject(
             [FromQuery] Guid subjectId,
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 5)
+            [FromQuery] int pageSize = 5,
+            [FromQuery] int semesterNo = 0)
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            var response = await _subjectInCurriculumService.GetAllCurriculumsForSubject(subjectId, pageNumber, pageSize);
+            if (semesterNo < 1 || semesterNo > 9) semesterNo = 0;
+            var response = await _subjectInCurriculumService.GetAllCurriculumsForSubject(subjectId, pageNumber, pageSize, semesterNo);
             if (!response.IsSucess)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
