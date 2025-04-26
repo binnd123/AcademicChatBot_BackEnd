@@ -15,7 +15,6 @@ namespace AcademicChatBot.Common.BussinessModel.Subjects
         public bool IsApproved { get; set; }
         public int NoCredit { get; set; }
         public DateTime ApprovedDate { get; set; }
-        public Guid? CurriculumId { get; set; }
         public int SessionNo { get; set; }
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
         public string SyllabusName { get; set; }

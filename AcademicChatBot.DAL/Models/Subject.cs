@@ -32,8 +32,5 @@ namespace AcademicChatBot.DAL.Models
         public double ScoringScale { get; set; } = 10;
         public double MinAvgMarkToPass { get; set; } = 5;
         public string Note { get; set; } = string.Empty;
-        public Guid? CurriculumId { get; set; }
-        [ForeignKey(nameof(CurriculumId))]
-        public Curriculum? Curriculum { get; set; }
     }
 }
