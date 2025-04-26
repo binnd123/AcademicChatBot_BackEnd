@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
@@ -59,18 +60,22 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllSubjectsForCurriculum(Guid curriculumId, int pageNumber, int pageSize)
+        public async Task<Response> GetAllSubjectsForCurriculum(Guid curriculumId, int pageNumber, int pageSize, int semesterNo)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _subjectInCurriculumRepository.GetAllDataByExpression(
-                    filter: x => x.CurriculumId == curriculumId,
+                    filter: x => x.CurriculumId == curriculumId && semesterNo == 0? true : x.SemesterNo == semesterNo,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: null,
+                    orderBy: x => x.SemesterNo,
                     isAscending: true,
-                    includes: x => x.Subject);
+                    includes: new Expression<Func<SubjectInCurriculum, object>>[]
+                {
+                    c => c.Curriculum,
+                    c => c.Subject
+                });
 
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
@@ -85,18 +90,22 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllCurriculumsForSubject(Guid subjectId, int pageNumber, int pageSize)
+        public async Task<Response> GetAllCurriculumsForSubject(Guid subjectId, int pageNumber, int pageSize, int semesterNo)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _subjectInCurriculumRepository.GetAllDataByExpression(
-                    filter: x => x.SubjectId == subjectId,
+                    filter: x => x.SubjectId == subjectId && semesterNo == 0 ? true : x.SemesterNo == semesterNo,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    orderBy: null,
+                    orderBy: x => x.SemesterNo,
                     isAscending: true,
-                    includes: x => x.Curriculum);
+                    includes: new Expression<Func<SubjectInCurriculum, object>>[]
+                {
+                    c => c.Curriculum,
+                    c => c.Subject
+                });
 
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;

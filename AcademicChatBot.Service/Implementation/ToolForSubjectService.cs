@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
@@ -323,7 +324,11 @@ namespace AcademicChatBot.Service.Implementation
                     pageSize: pageSize,
                     orderBy: null,
                     isAscending: true,
-                    includes: t => t.Subject);
+                    includes: new Expression<Func<ToolForSubject, object>>[]
+                {
+                    c => c.Tool,
+                    c => c.Subject
+                });
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Subjects For Tool retrieved successfully";
@@ -348,7 +353,11 @@ namespace AcademicChatBot.Service.Implementation
                     pageSize: pageSize,
                     orderBy: null,
                     isAscending: true,
-                    includes: x => x.Tool);
+                    includes: new Expression<Func<ToolForSubject, object>>[]
+                {
+                    c => c.Tool,
+                    c => c.Subject
+                });
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Tools for Subject retrieved successfully";

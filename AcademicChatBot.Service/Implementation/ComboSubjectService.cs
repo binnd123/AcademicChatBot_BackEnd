@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
@@ -283,7 +284,11 @@ namespace AcademicChatBot.Service.Implementation
                     pageSize: pageSize,
                     orderBy: null,
                     isAscending: true,
-                    includes: x => x.Combo);
+                    includes: new Expression<Func<ComboSubject, object>>[]
+                {
+                    c => c.Combo,
+                    c => c.Subject
+                });
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Combos for Subject retrieved successfully";
@@ -308,7 +313,11 @@ namespace AcademicChatBot.Service.Implementation
                     pageSize: pageSize,
                     orderBy: null,
                     isAscending: true,
-                    includes: t => t.Subject);
+                    includes: new Expression<Func<ComboSubject, object>>[]
+                {
+                    c => c.Combo,
+                    c => c.Subject
+                });
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Subjects For Combo retrieved successfully";

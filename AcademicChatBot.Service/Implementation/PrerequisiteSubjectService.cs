@@ -285,7 +285,11 @@ namespace AcademicChatBot.Service.Implementation
                     pageSize: pageSize,
                     orderBy: null,
                     isAscending: true,
-                    includes: x => x.PrerequisiteSubjectInfo);
+                    includes: new Expression<Func<PrerequisiteSubject, object>>[]
+                {
+                    c => c.PrerequisiteSubjectInfo,
+                    c => c.PrerequisiteConstraint
+                });
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Prerequisite subject for Prerequisite constrain retrieved successfully";
