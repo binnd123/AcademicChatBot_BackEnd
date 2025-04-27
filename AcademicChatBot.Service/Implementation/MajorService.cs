@@ -151,8 +151,9 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
 
-                major.MajorCode = request.MajorCode ?? major.MajorCode;
-                major.MajorName = request.MajorName ?? major.MajorName;
+
+                if (!string.IsNullOrEmpty(request.MajorCode)) major.MajorCode = request.MajorCode;
+                if (!string.IsNullOrEmpty(request.MajorName)) major.MajorName = request.MajorName;
                 major.StartAt = request.StartAt ?? major.StartAt;
                 major.UpdatedAt = DateTime.Now;
 

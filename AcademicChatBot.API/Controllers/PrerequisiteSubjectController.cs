@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/prerequisite-subject")]
+    [Route("api/prerequisite-subjects")]
     [ApiController]
     public class PrerequisiteSubjectController : ControllerBase
     {
@@ -21,85 +21,8 @@ namespace AcademicChatBot.API.Controllers
             _prerequisiteSubjectService = prerequisiteSubjectService;
         }
 
-        //[HttpGet("get-all-prerequisite-subjects")]
-        //public async Task<IActionResult> GetAllPrerequisiteSubjects(
-        //    [FromQuery] int pageNumber = 1,
-        //    [FromQuery] int pageSize = 5,
-        //    [FromQuery] SortBy sortBy = SortBy.Default,
-        //    [FromQuery] SortType sortType = SortType.Ascending,
-        //    [FromQuery] bool isDelete = false)
-        //{
-        //    pageNumber = pageNumber < 1 ? 1 : pageNumber;
-        //    pageSize = pageSize < 1 ? 5 : pageSize;
-        //    var response = await _prerequisiteSubjectService.GetAllPrerequisiteSubjects(pageNumber, pageSize, sortBy, sortType, isDelete);
-        //    if (!response.IsSucess)
-        //    {
-        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
-        //            return StatusCode(500, response);
-        //        return NotFound(response);
-        //    }
-        //    return Ok(response);
-        //}
-
-        //[Authorize(Roles = "Admin")]
-        //[HttpPost("create-prerequisite-subject")]
-        //public async Task<IActionResult> CreatePrerequisiteSubject([FromBody] CreatePrerequisiteSubjectRequest request)
-        //{
-        //    var response = await _prerequisiteSubjectService.CreatePrerequisiteSubject(request);
-        //    if (!response.IsSucess)
-        //    {
-        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
-        //            return StatusCode(500, response);
-        //        return NotFound(response);
-        //    }
-        //    return Ok(response);
-        //}
-
-        //[Authorize(Roles = "Admin")]
-        //[HttpPut("update-prerequisite-subject/{id}")]
-        //public async Task<IActionResult> UpdatePrerequisiteSubject(
-        //    Guid id,
-        //    UpdatePrerequisiteSubjectRequest request)
-        //{
-        //    var response = await _prerequisiteSubjectService.UpdatePrerequisiteSubject(id, request);
-        //    if (!response.IsSucess)
-        //    {
-        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
-        //            return StatusCode(500, response);
-        //        return NotFound(response);
-        //    }
-        //    return Ok(response);
-        //}
-
-        //[Authorize(Roles = "Admin")]
-        //[HttpDelete("delete-prerequisite-subject/{id}")]
-        //public async Task<IActionResult> DeletePrerequisiteSubject(Guid id)
-        //{
-        //    var response = await _prerequisiteSubjectService.DeletePrerequisiteSubject(id);
-        //    if (!response.IsSucess)
-        //    {
-        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
-        //            return StatusCode(500, response);
-        //        return NotFound(response);
-        //    }
-        //    return Ok(response);
-        //}
-
-
-        //[HttpGet("get-prerequisite-subject-by-id/{id}")]
-        //public async Task<IActionResult> GetPrerequisiteSubjectById(Guid id)
-        //{
-        //    var response = await _prerequisiteSubjectService.GetPrerequisiteSubjectById(id);
-        //    if (!response.IsSucess)
-        //    {
-        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
-        //            return StatusCode(500, response);
-        //        return NotFound(response);
-        //    }
-        //    return Ok(response);
-        //}
-
-        [HttpGet("get-all-prerequisite-expression-for-constrain")]
+        // Lấy thông tin prerequisite expression cho constraint
+        [HttpGet("expressions-for-constrain")]
         public async Task<IActionResult> GetReadablePrerequisiteExpression(
             [FromQuery] Guid prerequisiteConstrainId)
         {
@@ -113,7 +36,8 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-prerequisite-expression-of-subject-in-curriculum")]
+        // Lấy thông tin prerequisite expression của môn học trong chương trình học
+        [HttpGet("expressions-of-subject-in-curriculum")]
         public async Task<IActionResult> GetReadablePrerequisiteExpressionOfSubjectInCurriculum(
             [FromQuery] Guid subjectId,
             [FromQuery] Guid curriculumId)
@@ -128,26 +52,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        //[HttpGet("get-all-prerequisite-subjects-for-prerequisite-constrain")]
-        //public async Task<IActionResult> GetAllPrerequisiteSubjectsForPrerequisiteConstrain(
-        //    [FromQuery] Guid prerequisiteConstrainId,
-        //    [FromQuery] int pageNumber = 1,
-        //    [FromQuery] int pageSize = 5)
-        //{
-        //    pageNumber = pageNumber < 1 ? 1 : pageNumber;
-        //    pageSize = pageSize < 1 ? 5 : pageSize;
-        //    var response = await _prerequisiteSubjectService.GetAllPrerequisiteSubjectsForPrerequisiteConstrain(prerequisiteConstrainId, pageNumber, pageSize);
-        //    if (!response.IsSucess)
-        //    {
-        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
-        //            return StatusCode(500, response);
-        //        return NotFound(response);
-        //    }
-        //    return Ok(response);
-        //}
-
+        // Thêm môn học vào constraint prerequisite
         [Authorize(Roles = "Admin")]
-        [HttpPost("add-prerequisite-subjects-to-prerequisite-constrain")]
+        [HttpPost("subjects-to-constrain")]
         public async Task<IActionResult> AddPrerequisiteSubjectsToPrerequisiteConstrain(
             [FromQuery] Guid prerequisiteConstrainId,
             [FromBody] List<PrerequisiteSubjectsToPrerequisiteConstrainRequest> requests)
@@ -162,24 +69,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        //[Authorize(Roles = "Admin")]
-        //[HttpDelete("delete-prerequisite-subjects-from-prerequisite-constrain")]
-        //public async Task<IActionResult> DeletePrerequisiteSubjectsFromPrerequisiteConstrain(
-        //    [FromQuery] Guid prerequisiteConstrainId,
-        //    [FromBody] List<Guid> prerequisiteSubjectIds)
-        //{
-        //    var response = await _prerequisiteSubjectService.DeletePrerequisiteSubjectsFromPrerequisiteConstrain(prerequisiteConstrainId, prerequisiteSubjectIds);
-        //    if (!response.IsSucess)
-        //    {
-        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
-        //            return StatusCode(500, response);
-        //        return NotFound(response);
-        //    }
-        //    return Ok(response);
-        //}
-
+        // Xóa tất cả môn học khỏi prerequisite constraint
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-all-prerequisite-subjects-from-prerequisite-constrain")]
+        [HttpDelete("subjects-from-constrain")]
         public async Task<IActionResult> DeleteAllPrerequisiteSubjectsFromPrerequisiteConstrain([FromQuery] Guid prerequisiteConstrainId)
         {
             var response = await _prerequisiteSubjectService.DeleteAllPrerequisiteSubjectsFromPrerequisiteConstrain(prerequisiteConstrainId);
@@ -192,4 +84,5 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
     }
+
 }

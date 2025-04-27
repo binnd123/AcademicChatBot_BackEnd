@@ -190,7 +190,7 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
 
-                prerequisite.PrerequisiteConstraintCode = request.PrerequisiteConstraintCode ?? prerequisite.PrerequisiteConstraintCode;
+                if (!string.IsNullOrEmpty(request.PrerequisiteConstraintCode)) prerequisite.PrerequisiteConstraintCode = request.PrerequisiteConstraintCode;
                 prerequisite.SubjectId = request.SubjectId ?? prerequisite.SubjectId;
                 prerequisite.GroupCombinationType = request.GroupCombinationType;
                 prerequisite.CurriculumId = request.CurriculumId ?? prerequisite.CurriculumId;

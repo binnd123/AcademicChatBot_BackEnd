@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/program")]
+    [Route("api/programs")]
     [ApiController]
     public class ProgramController : ControllerBase
     {
@@ -21,7 +21,8 @@ namespace AcademicChatBot.API.Controllers
             _programService = programService;
         }
 
-        [HttpGet("get-program-by-id/{programId}")]
+        // Lấy thông tin chương trình học theo ID
+        [HttpGet("{programId}")]
         public async Task<IActionResult> GetProgramById(Guid programId)
         {
             var response = await _programService.GetProgramById(programId);
@@ -34,7 +35,8 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-programs")]
+        // Lấy tất cả các chương trình học
+        [HttpGet]
         public async Task<IActionResult> GetAllPrograms(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
@@ -56,8 +58,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Tạo chương trình học mới (chỉ dành cho admin)
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-program")]
+        [HttpPost]
         public async Task<IActionResult> CreateProgram([FromBody] CreateProgramRequest request)
         {
             var response = await _programService.CreateProgram(request);
@@ -70,8 +73,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Cập nhật chương trình học (chỉ dành cho admin)
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-program/{programId}")]
+        [HttpPut("{programId}")]
         public async Task<IActionResult> UpdateProgram(Guid programId, [FromBody] UpdateProgramRequest request)
         {
             var response = await _programService.UpdateProgram(programId, request);
@@ -84,8 +88,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa chương trình học (chỉ dành cho admin)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-program/{programId}")]
+        [HttpDelete("{programId}")]
         public async Task<IActionResult> DeleteProgram(Guid programId)
         {
             var response = await _programService.DeleteProgram(programId);
@@ -98,4 +103,5 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
     }
+
 }

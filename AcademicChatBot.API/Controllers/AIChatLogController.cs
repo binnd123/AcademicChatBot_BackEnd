@@ -113,28 +113,28 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpPut("update-ai-chat-log/{aIChatLogId}")]
-        public async Task<IActionResult> UpdateAIChatLog(Guid aIChatLogId, [FromQuery] StatusChat status = StatusChat.Actived)
-        {
-            var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
-            if (userId == null) return Unauthorized(new Response
-            {
-                IsSucess = false,
-                BusinessCode = BusinessCode.AUTH_NOT_FOUND,
-                Message = errorMessage
-            });
-            var response = await _aiChatLogService.UpdateAIChatLog(userId, aIChatLogId, status);
-            if (response.IsSucess == false)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
+        //[HttpPut("update-ai-chat-log/{aIChatLogId}")]
+        //public async Task<IActionResult> UpdateAIChatLog(Guid aIChatLogId, [FromQuery] StatusChat status = StatusChat.Actived)
+        //{
+        //    var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
+        //    if (userId == null) return Unauthorized(new Response
+        //    {
+        //        IsSucess = false,
+        //        BusinessCode = BusinessCode.AUTH_NOT_FOUND,
+        //        Message = errorMessage
+        //    });
+        //    var response = await _aiChatLogService.UpdateAIChatLog(userId, aIChatLogId, status);
+        //    if (response.IsSucess == false)
+        //    {
+        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
+        //            return StatusCode(500, response);
+        //        return NotFound(response);
+        //    }
+        //    return Ok(response);
+        //}
 
-        [HttpDelete("delete-ai-chat-log/{aIChatLogId}")]
-        public async Task<IActionResult> DeleteAIChatLog(Guid aIChatLogId)
+        [HttpDelete("delete-ai-chat-log-active")]
+        public async Task<IActionResult> DeleteAIChatLogActive()
         {
             var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
             if (userId == null) return Unauthorized(new Response
@@ -143,7 +143,7 @@ namespace AcademicChatBot.API.Controllers
                 BusinessCode = BusinessCode.AUTH_NOT_FOUND,
                 Message = errorMessage
             });
-            var response = await _aiChatLogService.DeleteAIChatLog(userId, aIChatLogId);
+            var response = await _aiChatLogService.DeleteAIChatLogActive(userId);
             if (response.IsSucess == false)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)

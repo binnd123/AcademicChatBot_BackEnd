@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/material")]
+    [Route("api/materials")]
     [ApiController]
     public class MaterialController : ControllerBase
     {
@@ -21,8 +21,9 @@ namespace AcademicChatBot.API.Controllers
             _materialService = materialService;
         }
 
-        [HttpGet("get-material-by-id/{materialId}")]
-        public async Task<IActionResult> GetMaterialById(Guid materialId)
+        // GET api/material/{materialId}
+        [HttpGet("{materialId}")]
+        public async Task<IActionResult> GetById(Guid materialId)
         {
             var response = await _materialService.GetMaterialById(materialId);
             if (response.IsSucess == false)
@@ -34,8 +35,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-materials")]
-        public async Task<IActionResult> GetAllMaterials(
+        // GET api/material
+        [HttpGet]
+        public async Task<IActionResult> GetAll(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string search = "",
@@ -56,9 +58,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // POST api/material
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-material")]
-        public async Task<IActionResult> CreateMaterial([FromBody] CreateMaterialRequest request)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateMaterialRequest request)
         {
             var response = await _materialService.CreateMaterial(request);
             if (response.IsSucess == false)
@@ -70,9 +73,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // PUT api/material/{materialId}
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-material/{materialId}")]
-        public async Task<IActionResult> UpdateMaterial(Guid materialId, UpdateMaterialRequest request)
+        [HttpPut("{materialId}")]
+        public async Task<IActionResult> Update(Guid materialId, UpdateMaterialRequest request)
         {
             var response = await _materialService.UpdateMaterial(materialId, request);
             if (response.IsSucess == false)
@@ -84,9 +88,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // DELETE api/material/{materialId}
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-material/{materialId}")]
-        public async Task<IActionResult> DeleteMaterial(Guid materialId)
+        [HttpDelete("{materialId}")]
+        public async Task<IActionResult> Delete(Guid materialId)
         {
             var response = await _materialService.DeleteMaterial(materialId);
             if (response.IsSucess == false)
@@ -98,4 +103,5 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
     }
+
 }

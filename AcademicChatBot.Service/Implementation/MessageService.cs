@@ -168,5 +168,41 @@ namespace AcademicChatBot.Service.Implementation
             }
             return dto;
         }
+
+        public async Task<Response> GetMessageActive(Guid? userId, int pageNumber, int pageSize)
+        {
+            Response dto = new Response();
+            try
+            {
+                var aIChatLogActive = await _aIChatLogRepository.GetFirstByExpression(
+                filter: a => a.UserId == userId && a.IsDeleted == false && a.Status == StatusChat.Actived && a.EndTime == null); 
+                if (aIChatLogActive == null)
+                {
+                    dto.IsSucess = true;
+                    dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                    dto.Message = "No Message found";
+                    return dto;
+                }
+
+                dto.Data = await _messageRepository.GetAllDataByExpression(
+                filter: x => (x.AIChatLogId == aIChatLogActive.AIChatLogId),
+                pageNumber: pageNumber,
+                pageSize: pageSize,
+                orderBy: x => x.SentTime,
+                isAscending: false,
+                includes: null
+                );
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                dto.Message = "Messages retrieved successfully";
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred while retrieving Messages: " + ex.Message;
+            }
+            return dto;
+        }
     }
 }

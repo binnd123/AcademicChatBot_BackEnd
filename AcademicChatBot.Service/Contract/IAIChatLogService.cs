@@ -15,6 +15,6 @@ namespace AcademicChatBot.Service.Contract
         Task<Response> GetAIChatLogActivedByUserId(Guid? userId);
         Task<Response> UpdateAIChatLog(Guid? userId, Guid aIChatLogId, StatusChat status);
         Task<Response> GenerateResponseAsync(Guid? userId, string message);
-        Task<Response> DeleteAIChatLog(Guid? userId, Guid aIChatLogId);
+        Task<Response> DeleteAIChatLogActive(Guid? userId);
     }
 }

@@ -37,28 +37,22 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                if (request.MajorId != null)
+                var major = await _majorRepository.GetById(request.MajorId);
+                if (major == null)
                 {
-                    var major = await _majorRepository.GetById(request.MajorId.Value);
-                    if (major == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Major not found";
-                        return dto;
-                    }
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Major not found";
+                    return dto;
                 }
 
-                if (request.ProgramId != null)
+                var program = await _programRepository.GetById(request.ProgramId);
+                if (program == null)
                 {
-                    var program = await _programRepository.GetById(request.ProgramId.Value);
-                    if (program == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Program not found";
-                        return dto;
-                    }
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Program not found";
+                    return dto;
                 }
 
                 var curriculum = new Curriculum
@@ -225,11 +219,12 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
 
-                curriculum.CurriculumCode = request.CurriculumCode ?? curriculum.CurriculumCode;
-                curriculum.CurriculumName = request.CurriculumName ?? curriculum.CurriculumName;
-                curriculum.Description = request.Description ?? curriculum.Description;
-                curriculum.DecisionNo = request.DecisionNo ?? curriculum.DecisionNo;
-                curriculum.PreRequisite = request.PreRequisite ?? curriculum.PreRequisite;
+
+                if (!string.IsNullOrEmpty(request.CurriculumCode)) curriculum.CurriculumCode = request.CurriculumCode;
+                if (!string.IsNullOrEmpty(request.CurriculumName)) curriculum.CurriculumName = request.CurriculumName;
+                if (!string.IsNullOrEmpty(request.Description)) curriculum.Description = request.Description;
+                if (!string.IsNullOrEmpty(request.DecisionNo)) curriculum.DecisionNo = request.DecisionNo;
+                if (!string.IsNullOrEmpty(request.PreRequisite)) curriculum.PreRequisite = request.PreRequisite;
                 curriculum.IsActive = request.IsActive;
                 curriculum.IsApproved = request.IsApproved;
                 curriculum.UpdatedAt = DateTime.Now;

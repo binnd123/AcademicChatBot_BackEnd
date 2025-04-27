@@ -31,16 +31,13 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                if (request.SubjectId != null)
+                var subject = await _subjectRepository.GetById(request.SubjectId);
+                if (subject == null)
                 {
-                    var subject = await _subjectRepository.GetById(request.SubjectId.Value);
-                    if (subject == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Subject not found";
-                        return dto;
-                    }
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Subject not found";
+                    return dto;
                 }
 
                 var assessment = new Assessment
@@ -185,17 +182,17 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
 
-                assessment.Category = request.Category ?? assessment.Category;
-                assessment.Type = request.Type ?? assessment.Type;
+                if (!string.IsNullOrEmpty(request.Category)) assessment.Category = request.Category;
+                if (!string.IsNullOrEmpty(request.Type)) assessment.Type = request.Type;
+                if (!string.IsNullOrEmpty(request.CompletionCriteria)) assessment.CompletionCriteria = request.CompletionCriteria;
+                if (!string.IsNullOrEmpty(request.Duration)) assessment.Duration = request.Duration;
+                if (!string.IsNullOrEmpty(request.QuestionType)) assessment.QuestionType = request.QuestionType;
+                if (!string.IsNullOrEmpty(request.NoQuestion)) assessment.NoQuestion = request.NoQuestion;
+                if (!string.IsNullOrEmpty(request.KnowledgeAndSkill)) assessment.KnowledgeAndSkill = request.KnowledgeAndSkill;
+                if (!string.IsNullOrEmpty(request.GradingGuide)) assessment.GradingGuide = request.GradingGuide;
+                if (!string.IsNullOrEmpty(request.Note)) assessment.Note = request.Note;
                 assessment.Part = request.Part ?? assessment.Part;
                 assessment.Weight = request.Weight ?? assessment.Weight;
-                assessment.CompletionCriteria = request.CompletionCriteria ?? assessment.CompletionCriteria;
-                assessment.Duration = request.Duration ?? assessment.Duration;
-                assessment.QuestionType = request.QuestionType ?? assessment.QuestionType;
-                assessment.NoQuestion = request.NoQuestion ?? assessment.NoQuestion;
-                assessment.KnowledgeAndSkill = request.KnowledgeAndSkill ?? assessment.KnowledgeAndSkill;
-                assessment.GradingGuide = request.GradingGuide ?? assessment.GradingGuide;
-                assessment.Note = request.Note ?? assessment.Note;
                 assessment.SubjectId = request.SubjectId ?? assessment.SubjectId;
                 assessment.UpdatedAt = DateTime.Now;
 

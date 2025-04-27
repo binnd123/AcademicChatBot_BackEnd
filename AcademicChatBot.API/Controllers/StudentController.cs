@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    
     [Route("api/student")]
     [ApiController]
     public class StudentController : ControllerBase
@@ -46,7 +45,7 @@ namespace AcademicChatBot.API.Controllers
         //    return Ok(response);
         //}
         [Authorize(Roles = "Student")]
-        [HttpPut("update-student-profile")]
+        [HttpPut("myself")]
         public async Task<IActionResult> UpdateStudentProfile([FromBody] StudentProfileRequest request)
         {
             var studentId = _jwtService.GetStudentIdFromToken(HttpContext.Request, out var errorMessage);

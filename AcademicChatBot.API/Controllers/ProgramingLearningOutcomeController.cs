@@ -10,7 +10,7 @@ using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/programing-learning-outcome")]
+    [Route("api/programing-learning-outcomes")]
     [ApiController]
     public class ProgramingLearningOutcomeController : ControllerBase
     {
@@ -21,7 +21,8 @@ namespace AcademicChatBot.API.Controllers
             _programingLearningOutcomeService = programingLearningOutcomeService;
         }
 
-        [HttpGet("get-programing-learning-outcome-by-id/{pLOId}")]
+        // Lấy thông tin outcome học tập theo ID
+        [HttpGet("{pLOId}")]
         public async Task<IActionResult> GetProgramingLearningOutcomeById(Guid pLOId)
         {
             var response = await _programingLearningOutcomeService.GetProgramingLearningOutcomeById(pLOId);
@@ -34,7 +35,8 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-programing-learning-outcomes")]
+        // Lấy tất cả các outcome học tập
+        [HttpGet]
         public async Task<IActionResult> GetAllProgramingLearningOutcomes(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
@@ -42,7 +44,7 @@ namespace AcademicChatBot.API.Controllers
             [FromQuery] SortBy sortBy = SortBy.Default,
             [FromQuery] SortType sortType = SortType.Ascending,
             [FromQuery] bool isDelete = false
-    )
+        )
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
@@ -56,8 +58,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Tạo outcome học tập mới (chỉ dành cho admin)
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-programing-learning-outcome")]
+        [HttpPost]
         public async Task<IActionResult> CreateProgramingLearningOutcome([FromBody] CreateProgramingLearningOutcomeRequest request)
         {
             var response = await _programingLearningOutcomeService.CreateProgramingLearningOutcome(request);
@@ -70,8 +73,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Cập nhật outcome học tập (chỉ dành cho admin)
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-programing-learning-outcome/{pLOId}")]
+        [HttpPut("{pLOId}")]
         public async Task<IActionResult> UpdateProgramingLearningOutcome(Guid pLOId, UpdateProgramingLearningOutcomeRequest request)
         {
             var response = await _programingLearningOutcomeService.UpdateProgramingLearningOutcome(pLOId, request);
@@ -84,8 +88,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa outcome học tập (chỉ dành cho admin)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-programing-learning-outcome/{pLOId}")]
+        [HttpDelete("{pLOId}")]
         public async Task<IActionResult> DeleteProgramingLearningOutcome(Guid pLOId)
         {
             var response = await _programingLearningOutcomeService.DeleteProgramingLearningOutcome(pLOId);
@@ -98,4 +103,5 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
     }
+
 }

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/combo")]
+    [Route("api/combos")]
     [ApiController]
     public class ComboController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace AcademicChatBot.API.Controllers
             _comboService = comboService;
         }
 
-        [HttpGet("get-all-combos")]
+        [HttpGet]
         public async Task<IActionResult> GetAllCombos(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
@@ -39,7 +39,7 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-combo-by-id/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetComboById(Guid id)
         {
             var response = await _comboService.GetComboById(id);
@@ -53,7 +53,7 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-combo")]
+        [HttpPost]
         public async Task<IActionResult> CreateCombo([FromBody] CreateComboRequest request)
         {
             var response = await _comboService.CreateCombo(request);
@@ -67,7 +67,7 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-combo/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCombo(Guid id, UpdateComboRequest request)
         {
             var response = await _comboService.UpdateCombo(id, request);
@@ -81,7 +81,7 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-combo/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCombo(Guid id)
         {
             var response = await _comboService.DeleteCombo(id);

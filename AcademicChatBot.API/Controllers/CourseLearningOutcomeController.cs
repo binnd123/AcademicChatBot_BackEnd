@@ -19,8 +19,8 @@ namespace AcademicChatBot.API.Controllers
             _courseLearningOutcomeService = courseLearningOutcomeService;
         }
 
-        [HttpGet("get-clo-by-id/{id}")]
-        public async Task<IActionResult> GetCourseLearningOutcomeById(Guid id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
         {
             var response = await _courseLearningOutcomeService.GetCourseLearningOutcomeById(id);
             if (response.IsSucess == false)
@@ -32,8 +32,8 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-clos")]
-        public async Task<IActionResult> GetAllCourseLearningOutcomes(
+        [HttpGet]
+        public async Task<IActionResult> GetAll(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string search = "",
@@ -55,8 +55,8 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-clo")]
-        public async Task<IActionResult> CreateCourseLearningOutcome([FromBody] CreateCourseLearningOutcomeRequest request)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateCourseLearningOutcomeRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -71,15 +71,14 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpPut("update-curriculum/{cloId}")]
-        public async Task<IActionResult> UpdateCourseLearningOutcome(
-            Guid cloId,
-            UpdateCourseLearningOutcomeRequest request)
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, UpdateCourseLearningOutcomeRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var response = await _courseLearningOutcomeService.UpdateCourseLearningOutcome(cloId, request);
+            var response = await _courseLearningOutcomeService.UpdateCourseLearningOutcome(id, request);
 
             if (response.IsSucess == false)
             {
@@ -91,10 +90,10 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-curriculum/{cloId}")]
-        public async Task<IActionResult> DeleteCourseLearningOutcome(Guid cloId)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var response = await _courseLearningOutcomeService.DeleteCourseLearningOutcome(cloId);
+            var response = await _courseLearningOutcomeService.DeleteCourseLearningOutcome(id);
 
             if (response.IsSucess == false)
             {

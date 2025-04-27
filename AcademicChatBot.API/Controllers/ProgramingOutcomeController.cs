@@ -10,7 +10,7 @@ using AcademicChatBot.Common.Enum;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/programing-outcome")]
+    [Route("api/programing-outcomes")]
     [ApiController]
     public class ProgramingOutcomeController : ControllerBase
     {
@@ -21,7 +21,8 @@ namespace AcademicChatBot.API.Controllers
             _programingOutcomeService = programingOutcomeService;
         }
 
-        [HttpGet("get-programing-outcome-by-id/{pOId}")]
+        // Lấy thông tin outcome theo ID
+        [HttpGet("{pOId}")]
         public async Task<IActionResult> GetProgramingOutcomeById(Guid pOId)
         {
             var response = await _programingOutcomeService.GetProgramingOutcomeById(pOId);
@@ -34,7 +35,8 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-programing-outcomes")]
+        // Lấy tất cả outcomes
+        [HttpGet]
         public async Task<IActionResult> GetAllProgramingOutcomes(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
@@ -56,8 +58,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Tạo outcome mới (chỉ dành cho admin)
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-programing-outcome")]
+        [HttpPost]
         public async Task<IActionResult> CreateProgramingOutcome([FromBody] CreateProgramingOutcomeRequest request)
         {
             var response = await _programingOutcomeService.CreateProgramingOutcome(request);
@@ -70,8 +73,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Cập nhật outcome (chỉ dành cho admin)
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-programing-outcome/{pOId}")]
+        [HttpPut("{pOId}")]
         public async Task<IActionResult> UpdateProgramingOutcome(Guid pOId, UpdateProgramingOutcomeRequest request)
         {
             var response = await _programingOutcomeService.UpdateProgramingOutcome(pOId, request);
@@ -84,8 +88,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa outcome (chỉ dành cho admin)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-programing-outcome/{pOId}")]
+        [HttpDelete("{pOId}")]
         public async Task<IActionResult> DeleteProgramingOutcome(Guid pOId)
         {
             var response = await _programingOutcomeService.DeleteProgramingOutcome(pOId);
@@ -98,4 +103,5 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
     }
+
 }

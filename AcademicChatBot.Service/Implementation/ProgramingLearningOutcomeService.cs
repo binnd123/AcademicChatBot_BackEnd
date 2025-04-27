@@ -31,16 +31,13 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                if (request.CurriculumId != null)
+                var curriculum = await _curriculumRepository.GetById(request.CurriculumId);
+                if (curriculum == null)
                 {
-                    var curriculum = await _curriculumRepository.GetById(request.CurriculumId.Value);
-                    if (curriculum == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Curriculum not found";
-                        return dto;
-                    }
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Curriculum not found";
+                    return dto;
                 }
 
                 var programingLearningOutcome = new ProgramingLearningOutcome
@@ -179,9 +176,9 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
 
-                programingLearningOutcome.ProgramingLearningOutcomeCode = request.ProgramingLearningOutcomeCode ?? programingLearningOutcome.ProgramingLearningOutcomeCode;
-                programingLearningOutcome.ProgramingLearningOutcomeName = request.ProgramingLearningOutcomeName ?? programingLearningOutcome.ProgramingLearningOutcomeName;
-                programingLearningOutcome.Description = request.Description ?? programingLearningOutcome.Description;
+                if (!string.IsNullOrEmpty(request.ProgramingLearningOutcomeCode)) programingLearningOutcome.ProgramingLearningOutcomeCode = request.ProgramingLearningOutcomeCode;
+                if (!string.IsNullOrEmpty(request.ProgramingLearningOutcomeName)) programingLearningOutcome.ProgramingLearningOutcomeName = request.ProgramingLearningOutcomeName;
+                if (!string.IsNullOrEmpty(request.Description)) programingLearningOutcome.Description = request.Description;
                 programingLearningOutcome.CurriculumId = request.CurriculumId ?? programingLearningOutcome.CurriculumId;
                 programingLearningOutcome.UpdatedAt = DateTime.Now;
 

@@ -25,8 +25,8 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [HttpGet]
-        [Route("get-message")]
-        public async Task<IActionResult> GetMessageByChatId(
+        [Route("get-message-by-chat-id")]
+        public async Task<IActionResult> GetMessageByChatIdAsync(
              [FromQuery] Guid aIChatLogId,
              [FromQuery] int pageNumber = 1,
              [FromQuery] int pageSize = 10)
@@ -36,6 +36,33 @@ namespace AcademicChatBot.API.Controllers
             if (pageSize < 1) pageSize = 10;
 
             var response = await _messageService.GetMessageByChatIdAsync(aIChatLogId, pageNumber, pageSize);
+            if (response.IsSucess == false)
+            {
+                if (response.BusinessCode == BusinessCode.EXCEPTION)
+                    return StatusCode(500, response);
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("get-message-active")]
+        public async Task<IActionResult> GetMessageActive(
+             [FromQuery] int pageNumber = 1,
+             [FromQuery] int pageSize = 10)
+        {
+            var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
+            if (userId == null) return Unauthorized(new Response
+            {
+                IsSucess = false,
+                BusinessCode = BusinessCode.AUTH_NOT_FOUND,
+                Message = errorMessage
+            });
+            // Đảm bảo pageIndex và pageSize hợp lệ
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            var response = await _messageService.GetMessageActive(userId, pageNumber, pageSize);
             if (response.IsSucess == false)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)

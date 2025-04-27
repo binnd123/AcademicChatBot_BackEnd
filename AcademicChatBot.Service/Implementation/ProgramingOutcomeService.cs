@@ -34,16 +34,13 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                if (request.ProgramId != null)
+                var program = await _programRepository.GetById(request.ProgramId);
+                if (program == null)
                 {
-                    var program = await _programRepository.GetById(request.ProgramId.Value);
-                    if (program == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Program not found";
-                        return dto;
-                    }
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Program not found";
+                    return dto;
                 }
 
                 var programingOutcome = new ProgramingOutcome
@@ -183,9 +180,9 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
 
-                programingOutcome.ProgramingOutcomeCode = request.ProgramingOutcomeCode ?? programingOutcome.ProgramingOutcomeCode;
-                programingOutcome.ProgramingOutcomeName = request.ProgramingOutcomeName ?? programingOutcome.ProgramingOutcomeName;
-                programingOutcome.Description = request.Description ?? programingOutcome.Description;
+                if (!string.IsNullOrEmpty(request.ProgramingOutcomeCode)) programingOutcome.ProgramingOutcomeCode = request.ProgramingOutcomeCode;
+                if (!string.IsNullOrEmpty(request.ProgramingOutcomeName)) programingOutcome.ProgramingOutcomeName = request.ProgramingOutcomeName;
+                if (!string.IsNullOrEmpty(request.Description)) programingOutcome.Description = request.Description;
                 programingOutcome.ProgramId = request.ProgramId ?? programingOutcome.ProgramId;
                 programingOutcome.UpdatedAt = DateTime.Now;
 

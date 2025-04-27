@@ -38,28 +38,22 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                if (request.SubjectId != null)
+                var subject = await _subjectRepository.GetById(request.SubjectId);
+                if (subject == null)
                 {
-                    var subject = await _subjectRepository.GetById(request.SubjectId.Value);
-                    if (subject == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Subject not found";
-                        return dto;
-                    }
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Subject not found";
+                    return dto;
                 }
 
-                if (request.AssessmentId != null)
+                var assessment = await _assessmentRepository.GetById(request.AssessmentId);
+                if (assessment == null)
                 {
-                    var assessment = await _assessmentRepository.GetById(request.AssessmentId.Value);
-                    if (assessment == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Assessment not found";
-                        return dto;
-                    }
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Assessment not found";
+                    return dto;
                 }
 
                 var clo = new CourseLearningOutcome
@@ -192,9 +186,9 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
 
-                clo.CourseLearningOutcomeCode = request.CourseLearningOutcomeCode ?? clo.CourseLearningOutcomeCode;
-                clo.CourseLearningOutcomeName = request.CourseLearningOutcomeName ?? clo.CourseLearningOutcomeName;
-                clo.CourseLearningOutcomeDetail = request.CourseLearningOutcomeDetail ?? clo.CourseLearningOutcomeDetail;
+                if (!string.IsNullOrEmpty(request.CourseLearningOutcomeCode)) clo.CourseLearningOutcomeCode = request.CourseLearningOutcomeCode;
+                if (!string.IsNullOrEmpty(request.CourseLearningOutcomeName)) clo.CourseLearningOutcomeName = request.CourseLearningOutcomeName;
+                if (!string.IsNullOrEmpty(request.CourseLearningOutcomeDetail)) clo.CourseLearningOutcomeDetail = request.CourseLearningOutcomeDetail;
                 clo.SubjectId = request.SubjectId ?? clo.SubjectId;
                 clo.AssessmentId = request.AssessmentId ?? clo.AssessmentId;
                 clo.UpdatedAt = DateTime.Now;

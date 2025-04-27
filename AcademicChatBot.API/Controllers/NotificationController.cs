@@ -24,9 +24,10 @@ namespace AcademicChatBot.API.Controllers
             _jwtService = jwtService;
         }
 
+        // GET api/notification/{notificationId}
         [Authorize]
-        [HttpGet("get-notification-by-id/{notificationId}")]
-        public async Task<IActionResult> GetNotificationById(Guid notificationId)
+        [HttpGet("{notificationId}")]
+        public async Task<IActionResult> GetById(Guid notificationId)
         {
             var response = await _notificationService.GetNotificationById(notificationId);
             if (response.IsSucess == false)
@@ -38,9 +39,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // GET api/notification
         [Authorize]
-        [HttpGet("get-all-notifications")]
-        public async Task<IActionResult> GetAllNotificationsOfUser(
+        [HttpGet]
+        public async Task<IActionResult> GetAll(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string search = "",
@@ -68,9 +70,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // POST api/notification
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-notifications")]
-        public async Task<IActionResult> CreateNotification([FromBody] CreateNotification createRequest)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateNotification createRequest)
         {
             var response = await _notificationService.CreateNotification(createRequest);
             if (response.IsSucess == false)
@@ -82,9 +85,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // PUT api/notification/{notificationId}
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-notification/{notificationId}")]
-        public async Task<IActionResult> UpdateNotification(Guid notificationId, UpdateNotificationRequest request)
+        [HttpPut("{notificationId}")]
+        public async Task<IActionResult> Update(Guid notificationId, UpdateNotificationRequest request)
         {
             var response = await _notificationService.UpdateNotification(notificationId, request);
             if (response.IsSucess == false)
@@ -96,9 +100,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // PUT api/notification/by-code/{notificationCode}
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-notification-by-code/{notificationCode}")]
-        public async Task<IActionResult> UpdateNotificationByCode(string notificationCode, UpdateNotificationRequest request)
+        [HttpPut("by-code/{notificationCode}")]
+        public async Task<IActionResult> UpdateByCode(string notificationCode, UpdateNotificationRequest request)
         {
             var response = await _notificationService.UpdateNotificationByCode(notificationCode, request);
             if (response.IsSucess == false)
@@ -110,9 +115,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // DELETE api/notification/{notificationId}
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-notification/{notificationId}")]
-        public async Task<IActionResult> DeleteNotification(Guid notificationId)
+        [HttpDelete("{notificationId}")]
+        public async Task<IActionResult> Delete(Guid notificationId)
         {
             var response = await _notificationService.DeleteNotification(notificationId);
             if (response.IsSucess == false)
@@ -124,9 +130,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // DELETE api/notification/by-code/{notificationCode}
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-notifications-by-code/{notificationCode}")]
-        public async Task<IActionResult> DeleteNotificationByCode(string notificationCode)
+        [HttpDelete("by-code/{notificationCode}")]
+        public async Task<IActionResult> DeleteByCode(string notificationCode)
         {
             var response = await _notificationService.DeleteNotificationByCode(notificationCode);
             if (response.IsSucess == false)
@@ -138,4 +145,5 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
     }
+
 }
