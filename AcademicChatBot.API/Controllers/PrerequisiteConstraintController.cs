@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/prerequisite-constraints")]
     [ApiController]
     public class PrerequisiteConstraintController : ControllerBase
     {
@@ -19,7 +19,8 @@ namespace AcademicChatBot.API.Controllers
             _prerequisiteConstraintService = prerequisiteConstraintService;
         }
 
-        [HttpGet("get-all-prerequisite-constraints")]
+        // Lấy tất cả prerequisite constraints với phân trang và tìm kiếm
+        [HttpGet]
         public async Task<IActionResult> GetAllPrerequisiteConstraints(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
@@ -40,7 +41,8 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-prerequisite-constraint-by-id/{id}")]
+        // Lấy thông tin prerequisite constraint theo ID
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetPrerequisiteConstraintById(Guid id)
         {
             var response = await _prerequisiteConstraintService.GetPrerequisiteConstraintById(id);
@@ -53,8 +55,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Tạo mới prerequisite constraint
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-prerequisite-constraint")]
+        [HttpPost]
         public async Task<IActionResult> CreatePrerequisiteConstraint([FromBody] CreatePrerequisiteConstraintRequest request)
         {
             var response = await _prerequisiteConstraintService.CreatePrerequisiteConstraint(request);
@@ -67,11 +70,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Cập nhật prerequisite constraint
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-prerequisite-constraint/{id}")]
-        public async Task<IActionResult> UpdatePrerequisiteConstraint(
-            Guid id,
-            UpdatePrerequisiteConstraintRequest request)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdatePrerequisiteConstraint(Guid id, [FromBody] UpdatePrerequisiteConstraintRequest request)
         {
             var response = await _prerequisiteConstraintService.UpdatePrerequisiteConstraint(id, request);
             if (!response.IsSucess)
@@ -83,8 +85,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa prerequisite constraint
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-prerequisite-constraint/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePrerequisiteConstraint(Guid id)
         {
             var response = await _prerequisiteConstraintService.DeletePrerequisiteConstraint(id);
@@ -97,4 +100,5 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
     }
+
 }

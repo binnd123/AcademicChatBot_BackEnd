@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/subject-in-curriculum")]
+    [Route("api/subject-in-curriculums")]
     [ApiController]
     public class SubjectInCurriculumController : ControllerBase
     {
@@ -17,7 +17,8 @@ namespace AcademicChatBot.API.Controllers
             _subjectInCurriculumService = subjectInCurriculumService;
         }
 
-        [HttpGet("get-subject-in-curriculum-by-id/{subjectInCurriculumId}")]
+        // Lấy thông tin môn học trong chương trình giảng dạy theo ID
+        [HttpGet("{subjectInCurriculumId}")]
         public async Task<IActionResult> GetSubjectInCurriculumById(Guid subjectInCurriculumId)
         {
             var response = await _subjectInCurriculumService.GetSubjectInCurriculumById(subjectInCurriculumId);
@@ -30,7 +31,8 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-subjects-for-curriculum")]
+        // Lấy tất cả môn học trong chương trình giảng dạy
+        [HttpGet]
         public async Task<IActionResult> GetAllSubjectsForCurriculum(
             [FromQuery] Guid curriculumId,
             [FromQuery] int pageNumber = 1,
@@ -39,7 +41,7 @@ namespace AcademicChatBot.API.Controllers
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            if(semesterNo < 1 || semesterNo > 9) semesterNo = 0;
+            if (semesterNo < 1 || semesterNo > 9) semesterNo = 0;
             var response = await _subjectInCurriculumService.GetAllSubjectsForCurriculum(curriculumId, pageNumber, pageSize, semesterNo);
             if (!response.IsSucess)
             {
@@ -50,8 +52,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-curriculums-for-subject")]
-        public async Task<IActionResult> GetAllCurriculumsForSubject(
+        // Lấy tất cả chương trình giảng dạy cho môn học
+        [HttpGet("curriculums-for-subject")]
+        public async Task<IActionResult> GetCurriculumsForSubject(
             [FromQuery] Guid subjectId,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
@@ -70,8 +73,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Thêm môn học vào chương trình giảng dạy (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpPost("add-subjects-to-curriculum")]
+        [HttpPost]
         public async Task<IActionResult> AddSubjectsToCurriculum(
             [FromQuery] Guid curriculumId,
             [FromBody] List<SubjectInCurriculumRequest> requests)
@@ -86,8 +90,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Thêm chương trình giảng dạy vào môn học (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpPost("add-curriculums-to-subject")]
+        [HttpPost("curriculums")]
         public async Task<IActionResult> AddCurriculumsToSubject(
             [FromQuery] Guid subjectId,
             [FromBody] List<CurriculumInSubjectRequest> requests)
@@ -102,8 +107,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa các môn học khỏi chương trình giảng dạy (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-subjects-from-curriculum")]
+        [HttpDelete("subjects-from-curriculum")]
         public async Task<IActionResult> DeleteSubjectsFromCurriculum(
             [FromQuery] Guid curriculumId,
             [FromBody] List<Guid> subjectIds)
@@ -118,8 +124,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa chương trình giảng dạy khỏi môn học (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-curriculums-from-subject")]
+        [HttpDelete("curriculums-from-subject")]
         public async Task<IActionResult> DeleteCurriculumsFromSubject(
             [FromQuery] Guid subjectId,
             [FromBody] List<Guid> curriculumIds)
@@ -134,8 +141,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa tất cả môn học khỏi chương trình giảng dạy (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-all-subjects-from-curriculum")]
+        [HttpDelete("all-subjects")]
         public async Task<IActionResult> DeleteAllSubjectsFromCurriculum([FromQuery] Guid curriculumId)
         {
             var response = await _subjectInCurriculumService.DeleteAllSubjectsFromCurriculum(curriculumId);
@@ -148,8 +156,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa tất cả chương trình giảng dạy khỏi môn học (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-all-curriculums-from-subject")]
+        [HttpDelete("all-curriculums")]
         public async Task<IActionResult> DeleteAllCurriculumsFromSubject([FromQuery] Guid subjectId)
         {
             var response = await _subjectInCurriculumService.DeleteAllCurriculumsFromSubject(subjectId);

@@ -21,8 +21,9 @@ namespace AcademicChatBot.API.Controllers
             _curriculumService = curriculumService;
         }
 
-        [HttpGet("get-curriculum/{curriculumId}")]
-        public async Task<IActionResult> GetCurriculumById(Guid curriculumId)
+        // GET api/curriculum/{curriculumId}
+        [HttpGet("{curriculumId}")]
+        public async Task<IActionResult> GetById(Guid curriculumId)
         {
             var response = await _curriculumService.GetCurriculumById(curriculumId);
             if (response.IsSucess == false)
@@ -34,8 +35,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-curriculums")]
-        public async Task<IActionResult> GetAllCurriculums(
+        // GET api/curriculum
+        [HttpGet]
+        public async Task<IActionResult> GetAll(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string search = "",
@@ -56,21 +58,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        //[HttpGet("get-curriculum-by-code")]
-        //public async Task<Response> GetCurriculumByCode(
-        //    [FromQuery] int pageNumber = 1,
-        //    [FromQuery] int pageSize = 5,
-        //    [FromQuery] string curriculumCode = ""
-        //)
-        //{
-        //    pageNumber = pageNumber < 1 ? 1 : pageNumber;
-        //    pageSize = pageSize < 1 ? 5 : pageSize;
-        //    return await _curriculumService.GetCurriculumByCode(pageNumber, pageSize, curriculumCode);
-        //}
-
+        // POST api/curriculum
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-curriculum")]
-        public async Task<IActionResult> CreateCurriculum([FromBody] CreateCurriculumRequest request)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateCurriculumRequest request)
         {
             var response = await _curriculumService.CreateCurriculum(request);
             if (response.IsSucess == false)
@@ -82,8 +73,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpPut("update-curriculum/{curriculumId}")]
-        public async Task<IActionResult> UpdateCurriculum(Guid curriculumId, UpdateCurriculumRequest request)
+        // PUT api/curriculum/{curriculumId}
+        [HttpPut("{curriculumId}")]
+        public async Task<IActionResult> Update(Guid curriculumId, UpdateCurriculumRequest request)
         {
             var response = await _curriculumService.UpdateCurriculum(curriculumId, request);
             if (response.IsSucess == false)
@@ -95,9 +87,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // DELETE api/curriculum/{curriculumId}
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-curriculum/{curriculumId}")]
-        public async Task<IActionResult> DeleteCurriculum(Guid curriculumId)
+        [HttpDelete("{curriculumId}")]
+        public async Task<IActionResult> Delete(Guid curriculumId)
         {
             var response = await _curriculumService.DeleteCurriculum(curriculumId);
             if (response.IsSucess == false)

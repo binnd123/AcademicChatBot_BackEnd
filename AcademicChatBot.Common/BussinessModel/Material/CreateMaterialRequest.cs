@@ -20,6 +20,6 @@ namespace AcademicChatBot.Common.BussinessModel.Material
         public bool IsHardCopy { get; set; } = false;
         public bool IsOnline { get; set; } = false;
         public string Note { get; set; } = string.Empty;
-        public Guid? SubjectId { get; set; }
+        public Guid SubjectId { get; set; }
     }
 }

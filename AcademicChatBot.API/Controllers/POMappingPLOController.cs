@@ -19,10 +19,11 @@ namespace AcademicChatBot.API.Controllers
             _poMappingPLOService = poMappingPLOService;
         }
 
-        [HttpGet("get-po-mapping-plo-by-id/{pOMappingPLOId}")]
-        public async Task<IActionResult> GetPOMappingPLOById(Guid pOMappingPLOId)
+        // GET api/po-mapping-plo/{pOMappingPLOId}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
         {
-            var response = await _poMappingPLOService.GetPOMappingPLOById(pOMappingPLOId);
+            var response = await _poMappingPLOService.GetPOMappingPLOById(id);
             if (response.IsSucess == false)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
@@ -32,7 +33,8 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-plo-for-po")]
+        // GET api/po-mapping-plo/plo-for-po
+        [HttpGet("plo-for-po")]
         public async Task<IActionResult> GetAllPLOsForPO(
             [FromQuery] Guid pOId,
             [FromQuery] int pageNumber = 1,
@@ -51,7 +53,8 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-po-for-plo")]
+        // GET api/po-mapping-plo/po-for-plo
+        [HttpGet("po-for-plo")]
         public async Task<IActionResult> GetAllPOsForPLO(
             [FromQuery] Guid pLOId,
             [FromQuery] int pageNumber = 1,
@@ -70,8 +73,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // POST api/po-mapping-plo/plo-to-po
         [Authorize(Roles = "Admin")]
-        [HttpPost("add-plo-to-po")]
+        [HttpPost("plo-to-po")]
         public async Task<IActionResult> AddPLOsToPO(
             [FromQuery] Guid pOId,
             [FromBody] List<Guid> pLOIds)
@@ -86,10 +90,11 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // POST api/po-mapping-plo/po-to-plo
         [Authorize(Roles = "Admin")]
-        [HttpPost("add-po-to-plo")]
+        [HttpPost("po-to-plo")]
         public async Task<IActionResult> AddPOsToPLO(
-        [FromQuery] Guid pLOId,
+            [FromQuery] Guid pLOId,
             [FromBody] List<Guid> pOIds)
         {
             var response = await _poMappingPLOService.AddPOsToPLO(pLOId, pOIds);
@@ -102,8 +107,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // DELETE api/po-mapping-plo/plo-from-po
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-plo-from-po")]
+        [HttpDelete("plo-from-po")]
         public async Task<IActionResult> DeletePLOsFromPO(
             [FromQuery] Guid pOId,
             [FromBody] List<Guid> pLOIds)
@@ -118,10 +124,11 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // DELETE api/po-mapping-plo/po-from-plo
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-po-from-plo")]
+        [HttpDelete("po-from-plo")]
         public async Task<IActionResult> DeletePOsFromPLO(
-        [FromQuery] Guid pLOId,
+            [FromQuery] Guid pLOId,
             [FromBody] List<Guid> pOIds)
         {
             var response = await _poMappingPLOService.DeletePOsFromPLO(pLOId, pOIds);
@@ -134,8 +141,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // DELETE api/po-mapping-plo/all-plo-from-po
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-all-plo-from-po")]
+        [HttpDelete("all-plo-from-po")]
         public async Task<IActionResult> DeleteAllPLOsFromPO(
             [FromQuery] Guid pOId)
         {
@@ -149,8 +157,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // DELETE api/po-mapping-plo/all-po-from-plo
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-all-po-from-plo")]
+        [HttpDelete("all-po-from-plo")]
         public async Task<IActionResult> DeleteAllPOsFromPLO(
             [FromQuery] Guid pLOId)
         {
@@ -164,4 +173,5 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
     }
+
 }

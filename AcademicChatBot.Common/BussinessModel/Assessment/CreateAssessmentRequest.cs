@@ -19,6 +19,6 @@ namespace AcademicChatBot.Common.BussinessModel.Assessment
         public string KnowledgeAndSkill { get; set; } = string.Empty;
         public string GradingGuide { get; set; } = string.Empty;
         public string Note { get; set; } = null!;
-        public Guid? SubjectId { get; set; }
+        public Guid SubjectId { get; set; }
     }
 }

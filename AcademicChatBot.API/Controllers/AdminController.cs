@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/admin")]
+    [Route("api/admins")]
     [ApiController]
     public class AdminController : ControllerBase
     {
@@ -22,17 +22,20 @@ namespace AcademicChatBot.API.Controllers
             _userService = userService;
         }
 
-        [HttpPost("init-admin")]
-        public async Task<IActionResult> InitAdmin()
+        // POST /api/admins
+        [HttpPost]
+        public async Task<IActionResult> CreateAdmin()
         {
             var result = await _userService.CreateAdminIfNotExistsAsync();
-            if (result.IsSucess) return Ok(result);
+            if (result.IsSucess)
+                return Ok(result);
             return BadRequest(result);
         }
 
+        // GET /api/students
         [Authorize(Roles = "Admin")]
-        [HttpGet("get-students")]
-        public async Task<IActionResult> GetAllSubjects(
+        [HttpGet("/api/students")]
+        public async Task<IActionResult> GetStudents(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string search = "",
@@ -43,8 +46,9 @@ namespace AcademicChatBot.API.Controllers
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
+
             var response = await _studentService.GetAllStudents(pageNumber, pageSize, search, sortBy, sortType, isDelete);
-            if (response.IsSucess == false)
+            if (!response.IsSucess)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
                     return StatusCode(500, response);
@@ -53,12 +57,13 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // GET /api/students/{studentId}
         [Authorize(Roles = "Admin")]
-        [HttpGet("get-student-by-id/{studentId}")]
-        public async Task<IActionResult> GetSubjectById(Guid studentId)
+        [HttpGet("/api/students/{studentId}")]
+        public async Task<IActionResult> GetStudentById(Guid studentId)
         {
             var response = await _studentService.GetStudentProfile(studentId);
-            if (response.IsSucess == false)
+            if (!response.IsSucess)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
                     return StatusCode(500, response);
@@ -67,12 +72,13 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // PUT /api/students/{studentId}
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-student-profile/{studentId}")]
-        public async Task<IActionResult> UpdateStudentProfile(Guid studentId, [FromBody] StudentProfileRequest request)
+        [HttpPut("/api/students/{studentId}")]
+        public async Task<IActionResult> UpdateStudent(Guid studentId, [FromBody] StudentProfileRequest request)
         {
             var response = await _studentService.UpdateStudentProfile(studentId, request);
-            if (response.IsSucess == false)
+            if (!response.IsSucess)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
                     return StatusCode(500, response);

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/subject")]
+    [Route("api/subjects")]
     [ApiController]
     public class SubjectController : ControllerBase
     {
@@ -22,7 +22,8 @@ namespace AcademicChatBot.API.Controllers
             _subjectService = subjectService;
         }
 
-        [HttpGet("get-all-subjects")]
+        // Lấy danh sách môn học
+        [HttpGet]
         public async Task<IActionResult> GetAllSubjects(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
@@ -30,7 +31,7 @@ namespace AcademicChatBot.API.Controllers
             [FromQuery] SortBy sortBy = SortBy.Default,
             [FromQuery] SortType sortType = SortType.Ascending,
             [FromQuery] bool isDelete = false
-            )
+        )
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
@@ -44,7 +45,8 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-subject-by-id/{subjectId}")]
+        // Lấy môn học theo ID
+        [HttpGet("{subjectId}")]
         public async Task<IActionResult> GetSubjectById(Guid subjectId)
         {
             var response = await _subjectService.GetSubjectById(subjectId);
@@ -56,8 +58,10 @@ namespace AcademicChatBot.API.Controllers
             }
             return Ok(response);
         }
+
+        // Tạo môn học mới (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-subject")]
+        [HttpPost]
         public async Task<IActionResult> CreateSubject([FromBody] CreateSubjectRequest request)
         {
             var response = await _subjectService.CreateSubject(request);
@@ -70,8 +74,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Cập nhật môn học (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-subject/{subjectId}")]
+        [HttpPut("{subjectId}")]
         public async Task<IActionResult> UpdateSubject(Guid subjectId, UpdateSubjectRequest request)
         {
             var response = await _subjectService.UpdateSubject(subjectId, request);
@@ -84,8 +89,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa môn học (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-subject/{subjectId}")]
+        [HttpDelete("{subjectId}")]
         public async Task<IActionResult> DeleteSubject(Guid subjectId)
         {
             var response = await _subjectService.DeleteSubject(subjectId);
@@ -98,4 +104,5 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
     }
+
 }

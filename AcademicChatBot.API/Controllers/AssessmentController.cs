@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/assessment")]
+    [Route("api/assessments")]
     [ApiController]
     public class AssessmentController : ControllerBase
     {
@@ -21,7 +21,7 @@ namespace AcademicChatBot.API.Controllers
             _assessmentService = assessmentService;
         }
 
-        [HttpGet("get-assessment-by-id/{assessmentId}")]
+        [HttpGet("{assessmentId}")]
         public async Task<IActionResult> GetAssessmentById(Guid assessmentId)
         {
             var response = await _assessmentService.GetAssessmentById(assessmentId);
@@ -34,7 +34,7 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-assessments")]
+        [HttpGet]
         public async Task<IActionResult> GetAllAssessments(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
@@ -57,7 +57,7 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-assessment")]
+        [HttpPost]
         public async Task<IActionResult> CreateAssessment([FromBody] CreateAssessmentRequest request)
         {
             var response = await _assessmentService.CreateAssessment(request);
@@ -71,7 +71,7 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-assessment/{assessmentId}")]
+        [HttpPut("{assessmentId}")]
         public async Task<IActionResult> UpdateAssessment(Guid assessmentId, UpdateAssessmentRequest request)
         {
             var response = await _assessmentService.UpdateAssessment(assessmentId, request);
@@ -85,7 +85,7 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-assessment/{assessmentId}")]
+        [HttpDelete("{assessmentId}")]
         public async Task<IActionResult> DeleteAssessment(Guid assessmentId)
         {
             var response = await _assessmentService.DeleteAssessment(assessmentId);

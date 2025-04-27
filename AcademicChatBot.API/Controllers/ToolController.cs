@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/tool")]
+    [Route("api/tools")]
     [ApiController]
     public class ToolController : ControllerBase
     {
@@ -21,7 +21,8 @@ namespace AcademicChatBot.API.Controllers
             _toolService = toolService;
         }
 
-        [HttpGet("get-tool-by-id/{toolId}")]
+        // Lấy thông tin công cụ theo ID
+        [HttpGet("{toolId}")]
         public async Task<IActionResult> GetToolById(Guid toolId)
         {
             var response = await _toolService.GetToolById(toolId);
@@ -34,7 +35,8 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-tools")]
+        // Lấy tất cả công cụ
+        [HttpGet]
         public async Task<IActionResult> GetAllTools(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
@@ -56,8 +58,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Tạo mới công cụ (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-tool")]
+        [HttpPost]
         public async Task<IActionResult> CreateTool([FromBody] CreateToolRequest request)
         {
             var response = await _toolService.CreateTool(request);
@@ -70,8 +73,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Cập nhật công cụ (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-tool/{toolId}")]
+        [HttpPut("{toolId}")]
         public async Task<IActionResult> UpdateTool(Guid toolId, UpdateToolRequest request)
         {
             var response = await _toolService.UpdateTool(toolId, request);
@@ -84,8 +88,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa công cụ (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-tool/{toolId}")]
+        [HttpDelete("{toolId}")]
         public async Task<IActionResult> DeleteTool(Guid toolId)
         {
             var response = await _toolService.DeleteTool(toolId);
@@ -98,4 +103,5 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
     }
+
 }

@@ -22,8 +22,8 @@ namespace AcademicChatBot.DAL.Models
         public DateTime UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
         public bool IsDeleted { get; set; } = false;
-        public Guid? MajorId { get; set; }
-        [ForeignKey(nameof(MajorId))]
-        public Major? Major { get; set; }
+        public Guid? ProgramId { get; set; }
+        [ForeignKey(nameof(ProgramId))]
+        public Program? Program { get; set; }
     }
 }

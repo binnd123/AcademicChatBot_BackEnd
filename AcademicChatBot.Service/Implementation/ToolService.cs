@@ -155,13 +155,13 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
 
-                tool.ToolCode = request.ToolCode ?? tool.ToolCode;
-                tool.ToolName = request.ToolName ?? tool.ToolName;
-                tool.Description = request.Description ?? tool.Description;
-                tool.Author = request.Author ?? tool.Author;
-                tool.Publisher = request.Publisher ?? tool.Publisher;
+                if (!string.IsNullOrEmpty(request.ToolCode)) tool.ToolCode = request.ToolCode;
+                if (!string.IsNullOrEmpty(request.ToolName)) tool.ToolName = request.ToolName;
+                if (!string.IsNullOrEmpty(request.Description)) tool.Description = request.Description;
+                if (!string.IsNullOrEmpty(request.Author)) tool.Author = request.Author;
+                if (!string.IsNullOrEmpty(request.Publisher)) tool.Publisher = request.Publisher;
+                if (!string.IsNullOrEmpty(request.Note)) tool.Note = request.Note;
                 tool.PublishedDate = request.PublishedDate ?? tool.PublishedDate;
-                tool.Note = request.Note ?? tool.Note;
                 tool.UpdatedAt = DateTime.Now;
 
                 await _toolRepository.Update(tool);

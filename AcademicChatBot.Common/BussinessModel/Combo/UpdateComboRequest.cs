@@ -14,6 +14,6 @@ namespace AcademicChatBot.Common.BussinessModel.Combo
         public string? Description { get; set; }
         public bool IsActive { get; set; }
         public bool IsApproved { get; set; }
-        public Guid? MajorId { get; set; }
+        public Guid? ProgramId { get; set; }
     }
 }

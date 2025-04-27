@@ -15,7 +15,7 @@ namespace AcademicChatBot.DAL.Models
         [Key]
         public Guid UserId { get; set; }
         public string Email { get; set; } = null!;
-        public string PasswordHash { get; set; } = null!;
+        public string? PasswordHash { get; set; } = null!;
         public bool IsActive { get; set; } = true;
         public RoleName Role { get; set; } = RoleName.Student;
         public string? RefreshToken { get; set; }

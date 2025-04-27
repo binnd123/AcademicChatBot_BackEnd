@@ -377,13 +377,13 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> DeleteAIChatLog(Guid? userId, Guid aIChatLogId)
+        public async Task<Response> DeleteAIChatLogActive(Guid? userId)
         {
             Response dto = new Response();
             try
             {
                 var chat = await _aIChatLogRepository.GetFirstByExpression(
-                    filter: a => a.UserId == userId && a.AIChatLogId == aIChatLogId);
+                    filter: a => a.UserId == userId && a.IsDeleted == false && a.Status == StatusChat.Actived && a.EndTime == null);
 
                 if (chat == null)
                 {
@@ -397,6 +397,7 @@ namespace AcademicChatBot.Service.Implementation
                 chat.DeletedAt = DateTime.Now;
                 chat.UpdatedAt = DateTime.Now;
                 chat.EndTime = DateTime.Now;
+                chat.Status = StatusChat.Inactived;
 
                 await _aIChatLogRepository.Update(chat);
                 await _unitOfWork.SaveChangeAsync();

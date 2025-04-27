@@ -103,7 +103,7 @@ namespace AcademicChatBot.API.Controllers
             return Ok(result);
         }
         [Authorize]
-        [HttpGet("current-user")]
+        [HttpGet("current")]
         public async Task<IActionResult> GetCurrentUser()
         {
             var response = await _userService.GetUserProfile(HttpContext.Request);
@@ -115,7 +115,7 @@ namespace AcademicChatBot.API.Controllers
             }
             return Ok(response);
         }
-        [HttpPut("update-user")]
+        [HttpPut("myself")]
         public async Task<IActionResult> UpdateStudentProfile([FromBody] UpdateAccountRequest request)
         {
             var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
@@ -153,7 +153,7 @@ namespace AcademicChatBot.API.Controllers
             }
             return Ok(response);
         }
-        [HttpDelete("delete-user")]
+        [HttpDelete("myself")]
         public async Task<IActionResult> DeleteUser()
         {
             var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);

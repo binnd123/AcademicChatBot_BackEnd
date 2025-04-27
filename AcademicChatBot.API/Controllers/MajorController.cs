@@ -21,8 +21,9 @@ namespace AcademicChatBot.API.Controllers
             _majorService = majorService;
         }
 
-        [HttpGet("get-major-by-id/{majorId}")]
-        public async Task<IActionResult> GetMajorById(Guid majorId)
+        // GET api/major/{majorId}
+        [HttpGet("{majorId}")]
+        public async Task<IActionResult> GetById(Guid majorId)
         {
             var response = await _majorService.GetMajorById(majorId);
             if (response.IsSucess == false)
@@ -34,8 +35,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-majors")]
-        public async Task<IActionResult> GetAllMajors(
+        // GET api/major
+        [HttpGet]
+        public async Task<IActionResult> GetAll(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string search = "",
@@ -56,9 +58,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // POST api/major
         [Authorize(Roles = "Admin")]
-        [HttpPost("create-major")]
-        public async Task<IActionResult> CreateMajor([FromBody] CreateMajorRequest request)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateMajorRequest request)
         {
             var response = await _majorService.CreateMajor(request);
             if (response.IsSucess == false)
@@ -70,9 +73,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // PUT api/major/{majorId}
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-major/{majorId}")]
-        public async Task<IActionResult> UpdateMajor(Guid majorId, UpdateMajorRequest request)
+        [HttpPut("{majorId}")]
+        public async Task<IActionResult> Update(Guid majorId, UpdateMajorRequest request)
         {
             var response = await _majorService.UpdateMajor(majorId, request);
             if (response.IsSucess == false)
@@ -84,9 +88,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // DELETE api/major/{majorId}
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-major/{majorId}")]
-        public async Task<IActionResult> DeleteMajor(Guid majorId)
+        [HttpDelete("{majorId}")]
+        public async Task<IActionResult> Delete(Guid majorId)
         {
             var response = await _majorService.DeleteMajor(majorId);
             if (response.IsSucess == false)

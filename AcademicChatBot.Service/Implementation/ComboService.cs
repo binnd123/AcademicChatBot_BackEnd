@@ -16,16 +16,13 @@ namespace AcademicChatBot.Service.Implementation
     public class ComboService : IComboService
     {
         private readonly IGenericRepository<Combo> _comboRepository;
-        private readonly IGenericRepository<Major> _majorRepository;
+        private readonly IGenericRepository<Program> _programRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ComboService(
-            IGenericRepository<Combo> comboRepository,
-            IGenericRepository<Major> majorRepository,
-            IUnitOfWork unitOfWork)
+        public ComboService(IGenericRepository<Combo> comboRepository, IGenericRepository<Program> programRepository, IUnitOfWork unitOfWork)
         {
             _comboRepository = comboRepository;
-            _majorRepository = majorRepository;
+            _programRepository = programRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -34,16 +31,13 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                if (request.MajorId != null)
+                var program = await _programRepository.GetById(request.ProgramId);
+                if (program == null)
                 {
-                    var major = await _majorRepository.GetById(request.MajorId.Value);
-                    if (major == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Major not found";
-                        return dto;
-                    }
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Program not found";
+                    return dto;
                 }
 
                 var combo = new Combo
@@ -55,7 +49,7 @@ namespace AcademicChatBot.Service.Implementation
                     Description = request.Description,
                     IsActive = request.IsActive,
                     IsApproved = request.IsApproved,
-                    MajorId = request.MajorId,
+                    ProgramId = request.ProgramId,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     IsDeleted = false
@@ -89,7 +83,7 @@ namespace AcademicChatBot.Service.Implementation
                     pageSize: pageSize,
                     orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.ComboName : c.ComboCode,
                     isAscending: sortType == SortType.Ascending,
-                    includes: c => c.Major
+                    includes: c => c.Program
                 );
 
                 dto.IsSucess = true;
@@ -139,14 +133,14 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                if (request.MajorId != null)
+                if (request.ProgramId != null)
                 {
-                    var major = await _majorRepository.GetById(request.MajorId.Value);
-                    if (major == null)
+                    var program = await _programRepository.GetById(request.ProgramId);
+                    if (program == null)
                     {
                         dto.IsSucess = false;
                         dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Major not found";
+                        dto.Message = "Program not found";
                         return dto;
                     }
                 }
@@ -160,13 +154,13 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
 
-                combo.ComboCode = request.ComboCode ?? combo.ComboCode;
-                combo.ComboName = request.ComboName ?? combo.ComboName;
-                combo.Note = request.Note ?? combo.Note;
-                combo.Description = request.Description ?? combo.Description;
+                if (!string.IsNullOrEmpty(request.ComboCode)) combo.ComboCode = request.ComboCode;
+                if (!string.IsNullOrEmpty(request.ComboName)) combo.ComboName = request.ComboName;
+                if (!string.IsNullOrEmpty(request.Note)) combo.Note = request.Note;
+                if (!string.IsNullOrEmpty(request.Description)) combo.Description = request.Description;
                 combo.IsActive = request.IsActive;
                 combo.IsApproved = request.IsApproved;
-                combo.MajorId = request.MajorId ?? combo.MajorId;
+                combo.ProgramId = request.ProgramId ?? combo.ProgramId;
                 combo.UpdatedAt = DateTime.Now;
 
                 await _comboRepository.Update(combo);

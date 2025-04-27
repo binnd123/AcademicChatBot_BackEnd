@@ -11,7 +11,7 @@ namespace AcademicChatBot.Common.BussinessModel.CourseLearningOutcome
         public string CourseLearningOutcomeCode { get; set; } = null!;
         public string CourseLearningOutcomeName { get; set; } = null!;
         public string CourseLearningOutcomeDetail { get; set; } = null!;
-        public Guid? SubjectId { get; set; }
-        public Guid? AssessmentId { get; set; }
+        public Guid SubjectId { get; set; }
+        public Guid AssessmentId { get; set; }
     }
 }

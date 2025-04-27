@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/combo-subject")]
+    [Route("api/combo-subjects")]
     [ApiController]
     public class ComboSubjectController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace AcademicChatBot.API.Controllers
             _comboSubjectService = comboSubjectService;
         }
 
-        [HttpGet("get-combo-subject-by-id/{comboSubjectId}")]
+        [HttpGet("{comboSubjectId}")]
         public async Task<IActionResult> GetComboSubjectById(Guid comboSubjectId)
         {
             var response = await _comboSubjectService.GetComboSubjectById(comboSubjectId);
@@ -31,9 +31,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-combos-for-subject")]
+        [HttpGet("subject/{subjectId}/combos")]
         public async Task<IActionResult> GetAllCombosForSubject(
-            [FromQuery] Guid subjectId,
+            Guid subjectId,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5
         )
@@ -50,9 +50,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-subjects-for-combo")]
+        [HttpGet("combo/{comboId}/subjects")]
         public async Task<IActionResult> GetAllSubjectsForCombo(
-            [FromQuery] Guid comboId,
+            Guid comboId,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5
         )
@@ -70,12 +70,12 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("add-combo-subject")]
+        [HttpPost]
         public async Task<IActionResult> AddSubjectsToTool(
-        [FromQuery] Guid comboId,
-        [FromQuery] Guid subjectIds,
-        [FromQuery] int semesterNo,
-        [FromQuery] string? note)
+            [FromQuery] Guid comboId,
+            [FromQuery] Guid subjectIds,
+            [FromQuery] int semesterNo,
+            [FromQuery] string? note)
         {
             var response = await _comboSubjectService.AddComboSubject(comboId, subjectIds, semesterNo, note);
             if (response.IsSucess == false)
@@ -88,10 +88,10 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-combos-from-subject")]
+        [HttpDelete("subject/{subjectId}/combos")]
         public async Task<IActionResult> DeleteCombosFromSubject(
-        [FromQuery] Guid subjectId,
-        [FromBody] List<Guid> comboIds)
+            Guid subjectId,
+            [FromBody] List<Guid> comboIds)
         {
             var response = await _comboSubjectService.DeleteCombosFromSubject(subjectId, comboIds);
             if (response.IsSucess == false)
@@ -104,10 +104,10 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-subjects-from-combo")]
+        [HttpDelete("combo/{comboId}/subjects")]
         public async Task<IActionResult> DeleteSubjectsFromCombo(
-        [FromQuery] Guid comboId,
-        [FromBody] List<Guid> subjectIds)
+            Guid comboId,
+            [FromBody] List<Guid> subjectIds)
         {
             var response = await _comboSubjectService.DeleteSubjectsFromCombo(comboId, subjectIds);
             if (response.IsSucess == false)
@@ -120,9 +120,9 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-all-combos-from-subject")]
+        [HttpDelete("subject/{subjectId}/combos/all")]
         public async Task<IActionResult> DeleteAllCombosFromSubject(
-            [FromQuery] Guid subjectId)
+            Guid subjectId)
         {
             var response = await _comboSubjectService.DeleteAllCombosFromSubject(subjectId);
             if (response.IsSucess == false)
@@ -135,9 +135,9 @@ namespace AcademicChatBot.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-all-subjects-from-combo")]
+        [HttpDelete("combo/{comboId}/subjects/all")]
         public async Task<IActionResult> DeleteAllSubjectsFromCombo(
-            [FromQuery] Guid comboId)
+            Guid comboId)
         {
             var response = await _comboSubjectService.DeleteAllSubjectsFromCombo(comboId);
             if (response.IsSucess == false)

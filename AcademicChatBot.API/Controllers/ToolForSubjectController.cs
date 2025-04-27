@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/tool-for-subject")]
+    [Route("api/tools-for-subject")]
     [ApiController]
     public class ToolForSubjectController : ControllerBase
     {
@@ -19,7 +19,8 @@ namespace AcademicChatBot.API.Controllers
             _toolForSubjectService = toolForSubjectService;
         }
 
-        [HttpGet("get-tool-for-subject-by-id/{toolForSubjectId}")]
+        // Lấy công cụ cho môn học theo ID
+        [HttpGet("{toolForSubjectId}")]
         public async Task<IActionResult> GetToolForSubjectById(Guid toolForSubjectId)
         {
             var response = await _toolForSubjectService.GetToolForSubjectById(toolForSubjectId);
@@ -32,9 +33,10 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-tools-for-subject")]
+        // Lấy tất cả công cụ cho môn học
+        [HttpGet]
         public async Task<IActionResult> GetAllToolsForSubject(
-            [FromQuery] Guid subjectId, 
+            [FromQuery] Guid subjectId,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5
         )
@@ -51,7 +53,8 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-all-subjects-for-tool")]
+        // Lấy tất cả môn học cho công cụ
+        [HttpGet("subjects")]
         public async Task<IActionResult> GetAllSubjectsForTool(
             [FromQuery] Guid toolId,
             [FromQuery] int pageNumber = 1,
@@ -70,10 +73,11 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Thêm môn học vào công cụ (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpPost("add-subjects-to-tool")]
+        [HttpPost("subjects")]
         public async Task<IActionResult> AddSubjectsToTool(
-            [FromQuery] Guid toolId, 
+            [FromQuery] Guid toolId,
             [FromBody] List<Guid> subjectIds)
         {
             var response = await _toolForSubjectService.AddSubjectsToTool(toolId, subjectIds);
@@ -86,8 +90,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Thêm công cụ vào môn học (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpPost("add-tools-to-subject")]
+        [HttpPost("tools")]
         public async Task<IActionResult> AddToolsToSubject(
             [FromQuery] Guid subjectId,
             [FromBody] List<Guid> toolIds)
@@ -102,8 +107,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa công cụ khỏi môn học (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-tools-from-subject")]
+        [HttpDelete("tools")]
         public async Task<IActionResult> DeleteToolsFromSubject(
             [FromQuery] Guid subjectId,
             [FromBody] List<Guid> toolIds)
@@ -118,8 +124,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa môn học khỏi công cụ (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-subjects-from-tool")]
+        [HttpDelete("subjects")]
         public async Task<IActionResult> DeleteSubjectsFromTool(
             [FromQuery] Guid toolId,
             [FromBody] List<Guid> subjectIds)
@@ -134,8 +141,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa tất cả công cụ khỏi môn học (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-all-tools-from-subject")]
+        [HttpDelete("tools/all")]
         public async Task<IActionResult> DeleteAllToolsFromSubject(
             [FromQuery] Guid subjectId)
         {
@@ -149,8 +157,9 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        // Xóa tất cả môn học khỏi công cụ (Admin only)
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete-all-subjects-from-tool")]
+        [HttpDelete("subjects/all")]
         public async Task<IActionResult> DeleteAllSubjectsFromTool(
             [FromQuery] Guid toolId)
         {
@@ -164,4 +173,5 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
     }
+
 }

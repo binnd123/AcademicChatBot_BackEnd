@@ -11,6 +11,6 @@ namespace AcademicChatBot.Common.BussinessModel.ProgramingLearningOutcome
         public string ProgramingLearningOutcomeCode { get; set; } = null!;
         public string ProgramingLearningOutcomeName { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public Guid? CurriculumId { get; set; }
+        public Guid CurriculumId { get; set; }
     }
 }

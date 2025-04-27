@@ -31,16 +31,13 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                if (request.SubjectId != null)
+                var subject = await _subjectRepository.GetById(request.SubjectId);
+                if (subject == null)
                 {
-                    var subject = await _subjectRepository.GetById(request.SubjectId.Value);
-                    if (subject == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Subject not found";
-                        return dto;
-                    }
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Subject not found";
+                    return dto;
                 }
 
                 var material = new Material
@@ -115,8 +112,8 @@ namespace AcademicChatBot.Service.Implementation
             try
             {
                 dto.Data = await _materialRepository.GetAllDataByExpression(
-                    filter: m => (m.MaterialCode.ToLower().Contains(search.ToLower()) 
-                    || m.MaterialName.ToLower().Contains(search.ToLower()) 
+                    filter: m => (m.MaterialCode.ToLower().Contains(search.ToLower())
+                    || m.MaterialName.ToLower().Contains(search.ToLower())
                     || m.MaterialDescription.ToLower().Contains(search.ToLower()))
                     && m.IsDeleted == isDelete,
                     pageNumber: pageNumber,
@@ -190,18 +187,18 @@ namespace AcademicChatBot.Service.Implementation
                     return dto;
                 }
 
-                material.MaterialCode = request.MaterialCode ?? material.MaterialCode;
-                material.MaterialName = request.MaterialName ?? material.MaterialName;
-                material.MaterialDescription = request.MaterialDescription ?? material.MaterialDescription;
-                material.Author = request.Author ?? material.Author;
-                material.Publisher = request.Publisher ?? material.Publisher;
+                if (!string.IsNullOrEmpty(request.MaterialCode)) material.MaterialCode = request.MaterialCode;
+                if (!string.IsNullOrEmpty(request.MaterialName)) material.MaterialName = request.MaterialName;
+                if (!string.IsNullOrEmpty(request.MaterialDescription)) material.MaterialDescription = request.MaterialDescription;
+                if (!string.IsNullOrEmpty(request.Author)) material.Author = request.Author;
+                if (!string.IsNullOrEmpty(request.Publisher)) material.Publisher = request.Publisher;
+                if (!string.IsNullOrEmpty(request.Edition)) material.Edition = request.Edition;
+                if (!string.IsNullOrEmpty(request.ISBN)) material.ISBN = request.ISBN;
+                if (!string.IsNullOrEmpty(request.Note)) material.Note = request.Note;
                 material.PublishedDate = request.PublishedDate ?? material.PublishedDate;
-                material.Edition = request.Edition ?? material.Edition;
-                material.ISBN = request.ISBN ?? material.ISBN;
                 material.IsMainMaterial = request.IsMainMaterial ?? material.IsMainMaterial;
                 material.IsHardCopy = request.IsHardCopy ?? material.IsHardCopy;
                 material.IsOnline = request.IsOnline ?? material.IsOnline;
-                material.Note = request.Note ?? material.Note;
                 material.SubjectId = request.SubjectId ?? material.SubjectId;
                 material.UpdatedAt = DateTime.Now;
 
