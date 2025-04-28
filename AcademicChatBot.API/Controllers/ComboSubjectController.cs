@@ -1,4 +1,6 @@
 ﻿using AcademicChatBot.Common.BussinessCode;
+using AcademicChatBot.Common.BussinessModel.ComboSubject;
+using AcademicChatBot.Common.BussinessModel.SubjectInCurriculum;
 using AcademicChatBot.Service.Contract;
 using AcademicChatBot.Service.Implementation;
 using Microsoft.AspNetCore.Authorization;
@@ -69,20 +71,36 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost]
+        //public async Task<IActionResult> AddComboSubject(
+        //    [FromQuery] Guid comboId,
+        //    [FromQuery] Guid subjectIds,
+        //    [FromQuery] int semesterNo,
+        //    [FromQuery] string? note)
+        //{
+        //    var response = await _comboSubjectService.AddComboSubject(comboId, subjectIds, semesterNo, note);
+        //    if (response.IsSucess == false)
+        //    {
+        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
+        //            return StatusCode(500, response);
+        //        return NotFound(response);
+        //    }
+        //    return Ok(response);
+        //}
+
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> AddSubjectsToTool(
+        public async Task<IActionResult> AddSubjectsToCombo(
             [FromQuery] Guid comboId,
-            [FromQuery] Guid subjectIds,
-            [FromQuery] int semesterNo,
-            [FromQuery] string? note)
+            [FromBody] List<SubjectInComboRequest> requests)
         {
-            var response = await _comboSubjectService.AddComboSubject(comboId, subjectIds, semesterNo, note);
-            if (response.IsSucess == false)
+            var response = await _comboSubjectService.AddSubjectsToCombo(comboId, requests);
+            if (!response.IsSucess)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
                     return StatusCode(500, response);
-                return NotFound(response);
+                return BadRequest(response);
             }
             return Ok(response);
         }

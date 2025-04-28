@@ -12,8 +12,8 @@ namespace AcademicChatBot.Service.Contract
 {
     public interface IMessageService
     {
-        Task<Response> SendMessage(Guid senderId, string content);
-        Task<Response> GetMessageByChatIdAsync(Guid aIChatLogId, int pageNumber, int pageSize);
-        Task<Response> GetMessageActive(Guid? userId, int pageNumber, int pageSize);
+        Task<Response> SendMessage(Guid senderId, Guid aIChatLogId, string content);
+        Task<Response> GetMessageByChatIdAsync(Guid userId, Guid aIChatLogId, int pageNumber, int pageSize);
+        //Task<Response> GetMessageActive(Guid? userId, int pageNumber, int pageSize);
     }
 }

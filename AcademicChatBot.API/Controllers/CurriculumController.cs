@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/curriculum")]
+    [Route("api/curriculums")]
     [ApiController]
     public class CurriculumController : ControllerBase
     {

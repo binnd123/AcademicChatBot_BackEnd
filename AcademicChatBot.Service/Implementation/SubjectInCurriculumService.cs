@@ -137,6 +137,13 @@ namespace AcademicChatBot.Service.Implementation
                 var subjectCurriculumList = new List<SubjectInCurriculum>();
                 foreach (var request in requests)
                 {
+                    if (request.SemesterNo < 1 || request.SemesterNo > 9)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.EXCEPTION;
+                        dto.Message = "SemesterNo is Invalid. SemesterNo must be from 1 to 9.";
+                        return dto;
+                    }
                     var subject = await _subjectRepository.GetById(request.SubjectId);
                     if (subject == null) continue;
 
@@ -187,6 +194,13 @@ namespace AcademicChatBot.Service.Implementation
                 var subjectCurriculumList = new List<SubjectInCurriculum>();
                 foreach (var request in requests)
                 {
+                    if (request.SemesterNo < 1 || request.SemesterNo > 9)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.EXCEPTION;
+                        dto.Message = "SemesterNo is Invalid. SemesterNo must be from 1 to 9.";
+                        return dto;
+                    }
                     var curriculum = await _curriculumRepository.GetById(request.CurriculumId);
                     if (curriculum == null) continue;
 

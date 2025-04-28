@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.BussinessModel.ComboSubject;
 
 namespace AcademicChatBot.Service.Contract
 {
@@ -17,5 +18,6 @@ namespace AcademicChatBot.Service.Contract
         public Task<Response> DeleteSubjectsFromCombo(Guid comboId, List<Guid> subjectIds);
         public Task<Response> DeleteAllCombosFromSubject(Guid subjectId);
         public Task<Response> DeleteAllSubjectsFromCombo(Guid comboId);
+        public Task<Response> AddSubjectsToCombo(Guid comboId, List<SubjectInComboRequest> requests);
     }
 }

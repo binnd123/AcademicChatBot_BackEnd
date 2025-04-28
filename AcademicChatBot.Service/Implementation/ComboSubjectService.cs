@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.BussinessModel.ComboSubject;
+using AcademicChatBot.Common.BussinessModel.SubjectInCurriculum;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
@@ -25,6 +27,64 @@ namespace AcademicChatBot.Service.Implementation
             _comboRepository = comboRepository;
             _comboSubjectRepository = comboSubjectRepository;
             _unitOfWork = unitOfWork;
+        }
+
+        public async Task<Response> AddSubjectsToCombo(Guid comboId, List<SubjectInComboRequest> requests)
+        {
+            Response dto = new Response();
+            try
+            {
+                var combo = await _comboRepository.GetById(comboId);
+                if (combo == null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Combo not found";
+                    return dto;
+                }
+
+                var subjectList = new List<ComboSubject>();
+                foreach (var request in requests)
+                {
+                    if (request.SemesterNo < 5 || request.SemesterNo > 9)
+                    {
+                        dto.IsSucess = false;
+                        dto.BusinessCode = BusinessCode.EXCEPTION;
+                        dto.Message = "SemesterNo is Invalid. SemesterNo must be from 5 to 9.";
+                        return dto;
+                    }
+                    var subject = await _subjectRepository.GetById(request.SubjectId);
+                    if (subject == null) continue;
+
+                    var existing = await _comboSubjectRepository.GetFirstByExpression(
+                        x => x.ComboId == comboId && x.SubjectId == request.SubjectId);
+                    if (existing != null) continue;
+
+                    subjectList.Add(new ComboSubject
+                    {
+                        ComboSubjectId = Guid.NewGuid(),
+                        ComboId = comboId,
+                        SubjectId = request.SubjectId,
+                        SemesterNo = request.SemesterNo,
+                        Note = request.Note,
+                    });
+                }
+
+                await _comboSubjectRepository.InsertRange(subjectList);
+                await _unitOfWork.SaveChangeAsync();
+
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.INSERT_SUCESSFULLY;
+                dto.Data = subjectList;
+                dto.Message = "Subjects added to combo successfully";
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Message = "An error occurred: " + ex.Message;
+            }
+            return dto;
         }
 
         public async Task<Response> AddComboSubject(Guid comboId, Guid subjectId, int semesterNo, string? note)

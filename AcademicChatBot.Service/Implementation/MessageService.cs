@@ -33,12 +33,12 @@ namespace AcademicChatBot.Service.Implementation
             _hubService = hubService;
         }
 
-        public async Task<Response> SendMessage(Guid senderId, string content)
+        public async Task<Response> SendMessage(Guid senderId, Guid aIChatLogId, string content)
         {
             var response = new Response();
             try
             {
-                var sender = await _userRepository.GetFirstByExpression(u => u.UserId.Equals(senderId));
+                var sender = await _userRepository.GetById(senderId);
                 if (sender == null)
                 {
                     response.IsSucess = false;
@@ -46,22 +46,20 @@ namespace AcademicChatBot.Service.Implementation
                     response.Message = "Sender not found";
                     return response;
                 }
+
                 var aIChatLog = await _aIChatLogRepository.GetFirstByExpression
-                    (filter: x => x.UserId == senderId &&
-                    x.Status == StatusChat.Actived &&
-                    x.IsDeleted == false &&
-                    x.EndTime == null
+                    (filter: x => x.UserId == senderId 
+                    && x.Status == StatusChat.Actived
+                    && x.IsDeleted == false
+                    && x.EndTime == null
+                    && x.AIChatLogId == aIChatLogId
                     );
                 if (aIChatLog == null)
                 {
-                    aIChatLog = new AIChatLog
-                    {
-                        UserId = senderId,
-                        LastMessageTime = DateTime.Now,
-                        UpdatedAt = DateTime.Now
-                    };
-                    await _aIChatLogRepository.Insert(aIChatLog);
-                    await _unitOfWork.SaveChangeAsync();
+                    response.IsSucess = false;
+                    response.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    response.Message = "AI Chat Log not found";
+                    return response;
                 }
 
                 // Tạo đối tượng tin nhắn của người dùng  
@@ -79,7 +77,7 @@ namespace AcademicChatBot.Service.Implementation
                 await _messageRepository.Insert(messageUserRequest);
 
                 // Gọi IChatService để generate câu trả lời từ AI  
-                var botResponse = await aIChatLogService.GenerateResponseAsync(senderId, content);
+                var botResponse = await aIChatLogService.GenerateResponseAsync(senderId, content, aIChatLog.Topic);
 
                 // Tạo đối tượng tin nhắn của bot với nội dung trả lời từ AI  
                 var messageBotResponse = new Message
@@ -143,11 +141,32 @@ namespace AcademicChatBot.Service.Implementation
             return response;
         }
 
-        public async Task<Response> GetMessageByChatIdAsync(Guid aIChatLogId, int pageNumber, int pageSize)
+        public async Task<Response> GetMessageByChatIdAsync(Guid userId, Guid aIChatLogId, int pageNumber, int pageSize)
         {
             Response dto = new Response();
             try
             {
+                var user = await _userRepository.GetById(userId);
+                if (user == null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+                    dto.Message = "User not found";
+                    return dto;
+                }
+
+                var aIChatLog = await _aIChatLogRepository.GetFirstByExpression(
+                    filter: x => x.UserId == userId
+                    && x.AIChatLogId == aIChatLogId
+                    );
+                if (aIChatLog == null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "AI Chat Log not found";
+                    return dto;
+                }    
+
                 dto.Data = await _messageRepository.GetAllDataByExpression(
                 filter: x => (x.AIChatLogId == aIChatLogId),
                 pageNumber: pageNumber,
@@ -169,40 +188,40 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetMessageActive(Guid? userId, int pageNumber, int pageSize)
-        {
-            Response dto = new Response();
-            try
-            {
-                var aIChatLogActive = await _aIChatLogRepository.GetFirstByExpression(
-                filter: a => a.UserId == userId && a.IsDeleted == false && a.Status == StatusChat.Actived && a.EndTime == null); 
-                if (aIChatLogActive == null)
-                {
-                    dto.IsSucess = true;
-                    dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
-                    dto.Message = "No Message found";
-                    return dto;
-                }
+        //public async Task<Response> GetMessageActive(Guid? userId, int pageNumber, int pageSize)
+        //{
+        //    Response dto = new Response();
+        //    try
+        //    {
+        //        var aIChatLogActive = await _aIChatLogRepository.GetFirstByExpression(
+        //        filter: a => a.UserId == userId && a.IsDeleted == false && a.Status == StatusChat.Actived && a.EndTime == null); 
+        //        if (aIChatLogActive == null)
+        //        {
+        //            dto.IsSucess = true;
+        //            dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+        //            dto.Message = "No Message found";
+        //            return dto;
+        //        }
 
-                dto.Data = await _messageRepository.GetAllDataByExpression(
-                filter: x => (x.AIChatLogId == aIChatLogActive.AIChatLogId),
-                pageNumber: pageNumber,
-                pageSize: pageSize,
-                orderBy: x => x.SentTime,
-                isAscending: false,
-                includes: null
-                );
-                dto.IsSucess = true;
-                dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
-                dto.Message = "Messages retrieved successfully";
-            }
-            catch (Exception ex)
-            {
-                dto.IsSucess = false;
-                dto.BusinessCode = BusinessCode.EXCEPTION;
-                dto.Message = "An error occurred while retrieving Messages: " + ex.Message;
-            }
-            return dto;
-        }
+        //        dto.Data = await _messageRepository.GetAllDataByExpression(
+        //        filter: x => (x.AIChatLogId == aIChatLogActive.AIChatLogId),
+        //        pageNumber: pageNumber,
+        //        pageSize: pageSize,
+        //        orderBy: x => x.SentTime,
+        //        isAscending: false,
+        //        includes: null
+        //        );
+        //        dto.IsSucess = true;
+        //        dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+        //        dto.Message = "Messages retrieved successfully";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        dto.IsSucess = false;
+        //        dto.BusinessCode = BusinessCode.EXCEPTION;
+        //        dto.Message = "An error occurred while retrieving Messages: " + ex.Message;
+        //    }
+        //    return dto;
+        //}
     }
 }
