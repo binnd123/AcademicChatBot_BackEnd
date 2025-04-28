@@ -115,6 +115,7 @@ namespace AcademicChatBot.API.Controllers
             }
             return Ok(response);
         }
+        [Authorize(Roles = "Student")]
         [HttpPut("myself")]
         public async Task<IActionResult> UpdateStudentProfile([FromBody] UpdateAccountRequest request)
         {

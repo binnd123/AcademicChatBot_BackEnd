@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicChatBot.API.Controllers
 {
-    [Route("api/notification")]
+    [Route("api/notifications")]
     [ApiController]
     public class NotificationController : ControllerBase
     {

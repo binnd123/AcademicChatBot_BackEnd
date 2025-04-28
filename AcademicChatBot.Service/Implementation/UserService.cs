@@ -472,6 +472,13 @@ namespace AcademicChatBot.Service.Implementation
                     dto.Message = "User not found";
                     return dto;
                 }
+                if (userDb.PasswordHash == null)
+                {
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+                    dto.IsSucess = false;
+                    dto.Message = "User login with google account can not change email";
+                    return dto;
+                }
                 if (!request.Email.ToLower().EndsWith("@fpt.edu.vn", StringComparison.OrdinalIgnoreCase))
                 {
                     dto.IsSucess = false;
@@ -487,7 +494,18 @@ namespace AcademicChatBot.Service.Implementation
                     dto.Message = "Email is existed";
                     return dto;
                 }
+
+                var studentDb = await _studentRepository.GetFirstByExpression(a => a.UserId == userDb.UserId);
+                if (studentDb == null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Student not found";
+                    return dto;
+                }
+
                 if (!string.IsNullOrEmpty(request.Email)) userDb.Email = request.Email;
+                if (!string.IsNullOrEmpty(request.Email)) studentDb.StudentCode = request.Email.ToLower().Replace("@fpt.edu.vn", "");
                 userDb.IsActive = request.IsActive;
                 var userResponse = new UserAccountResponse()
                 {

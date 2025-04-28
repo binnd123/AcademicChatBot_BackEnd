@@ -11,9 +11,8 @@ namespace AcademicChatBot.Common.Enum
         Unknown = 0,
         AskMajorAdvice = 1,
         AskSpecializationCombo = 2,
-        AskCurriculum = 3,
-        CompareSemesterProgress = 4,
-        AskCourseraStrategy = 5
+        AskProgram = 3,
+        AskSubject = 4
 
         //// --- Tư vấn môn học ---
         //AskSubjectDetails,          // Hỏi chi tiết về môn học cụ thể
