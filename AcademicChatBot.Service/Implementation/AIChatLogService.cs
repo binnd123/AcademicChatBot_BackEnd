@@ -181,6 +181,33 @@ namespace AcademicChatBot.Service.Implementation
             return prompt;
         }
 
+        private string BuildPromptGenerateTitle(string userMessage)
+        {
+            return $@"
+Bạn sẽ nhận được một nội dung tin nhắn, nhiệm vụ của bạn:
+
+- Tạo DUY NHẤT 1 tiêu đề ngắn gọn, súc tích, tóm tắt ý chính của tin nhắn đó.
+- Tiêu đề phải có độ dài từ 3 đến 5 từ.
+- Chỉ trả về nội dung tiêu đề, KHÔNG giải thích, KHÔNG đưa nhiều lựa chọn.
+- Tiêu đề cần tự nhiên, dễ hiểu, không chứa ký tự lạ.
+
+Tin nhắn: ""{userMessage}""
+
+Chỉ trả về đúng 1 tiêu đề khoảng 3-5 từ.
+";
+        }
+
+
+        public async Task<string> GenerateTiltleAsync(string message)
+        {
+            var finalPrompt = BuildPromptGenerateTitle(message);
+
+            // Bước 4: Gọi API Gemini (hoặc dịch vụ AI khác)
+            var geminiResponse = await geminiApiService.GenerateResponseAsync(finalPrompt);
+
+            // Bước 5: Trả kết quả về cho client
+            return geminiResponse;
+        }
 
         public async Task<Response> GenerateResponseAsync(Guid? userId, string message, TopicChat topicChat)
         {
@@ -611,7 +638,7 @@ namespace AcademicChatBot.Service.Implementation
                     Status = StatusChat.Actived,
                     StartTime = DateTime.Now,
                     EndTime = null,
-                    AIChatLogName = "New Chat " + DateTime.Now.ToString("yyyyMMddHHmmss"),
+                    AIChatLogName = "#New Chat " + DateTime.Now.ToString("MMM dd, yyyy HH:mm"),
                     DeletedAt = null,
                     LastMessageTime = DateTime.Now,
                 };

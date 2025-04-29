@@ -62,6 +62,16 @@ namespace AcademicChatBot.Service.Implementation
                     return response;
                 }
 
+
+                if (aIChatLog.AIChatLogName != null && aIChatLog.AIChatLogName.Contains("#New Chat "))
+                {
+                    var generatedTitle = await aIChatLogService.GenerateTiltleAsync(content);
+                    if (generatedTitle != null)
+                    {
+                        aIChatLog.AIChatLogName = generatedTitle.Trim();
+                    }
+                }
+
                 // Tạo đối tượng tin nhắn của người dùng  
                 var messageUserRequest = new Message
                 {

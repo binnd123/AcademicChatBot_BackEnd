@@ -17,5 +17,6 @@ namespace AcademicChatBot.Service.Contract
         Task<Response> CreateAIChatLog(Guid? userId, TopicChat topic);
         Task<Response> GenerateResponseAsync(Guid? userId, string message, TopicChat topicChat);
         Task<Response> DeleteAIChatLog(Guid? userId, Guid aIChatLogId);
+        Task<string> GenerateTiltleAsync(string message);
     }
 }
