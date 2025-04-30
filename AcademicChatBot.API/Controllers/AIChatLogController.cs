@@ -155,24 +155,24 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateAIChatLog([FromQuery] TopicChat topic = TopicChat.Default)
-        {
-            var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
-            if (userId == null) return Unauthorized(new Response
-            {
-                IsSucess = false,
-                BusinessCode = BusinessCode.AUTH_NOT_FOUND,
-                Message = errorMessage
-            });
-            var response = await _aiChatLogService.CreateAIChatLog(userId, topic);
-            if (!response.IsSucess)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> CreateAIChatLog([FromQuery] TopicChat topic = TopicChat.Default)
+        //{
+        //    var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
+        //    if (userId == null) return Unauthorized(new Response
+        //    {
+        //        IsSucess = false,
+        //        BusinessCode = BusinessCode.AUTH_NOT_FOUND,
+        //        Message = errorMessage
+        //    });
+        //    var response = await _aiChatLogService.CreateAIChatLog(userId, topic);
+        //    if (!response.IsSucess)
+        //    {
+        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
+        //            return StatusCode(500, response);
+        //        return NotFound(response);
+        //    }
+        //    return Ok(response);
+        //}
     }
 }
