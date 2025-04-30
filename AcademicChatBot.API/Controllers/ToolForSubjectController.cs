@@ -20,18 +20,18 @@ namespace AcademicChatBot.API.Controllers
         }
 
         // Lấy công cụ cho môn học theo ID
-        [HttpGet("{toolForSubjectId}")]
-        public async Task<IActionResult> GetToolForSubjectById(Guid toolForSubjectId)
-        {
-            var response = await _toolForSubjectService.GetToolForSubjectById(toolForSubjectId);
-            if (response.IsSucess == false)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
+        //[HttpGet("{toolForSubjectId}")]
+        //public async Task<IActionResult> GetToolForSubjectById(Guid toolForSubjectId)
+        //{
+        //    var response = await _toolForSubjectService.GetToolForSubjectById(toolForSubjectId);
+        //    if (response.IsSucess == false)
+        //    {
+        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
+        //            return StatusCode(500, response);
+        //        return NotFound(response);
+        //    }
+        //    return Ok(response);
+        //}
 
         // Lấy tất cả công cụ cho môn học
         [HttpGet]
@@ -53,42 +53,42 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        // Lấy tất cả môn học cho công cụ
-        [HttpGet("subjects")]
-        public async Task<IActionResult> GetAllSubjectsForTool(
-            [FromQuery] Guid toolId,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 5
-        )
-        {
-            pageNumber = pageNumber < 1 ? 1 : pageNumber;
-            pageSize = pageSize < 1 ? 5 : pageSize;
-            var response = await _toolForSubjectService.GetAllSubjectsForTool(toolId, pageNumber, pageSize);
-            if (response.IsSucess == false)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
+        //// Lấy tất cả môn học cho công cụ
+        //[HttpGet("subjects")]
+        //public async Task<IActionResult> GetAllSubjectsForTool(
+        //    [FromQuery] Guid toolId,
+        //    [FromQuery] int pageNumber = 1,
+        //    [FromQuery] int pageSize = 5
+        //)
+        //{
+        //    pageNumber = pageNumber < 1 ? 1 : pageNumber;
+        //    pageSize = pageSize < 1 ? 5 : pageSize;
+        //    var response = await _toolForSubjectService.GetAllSubjectsForTool(toolId, pageNumber, pageSize);
+        //    if (response.IsSucess == false)
+        //    {
+        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
+        //            return StatusCode(500, response);
+        //        return NotFound(response);
+        //    }
+        //    return Ok(response);
+        //}
 
         // Thêm môn học vào công cụ (Admin only)
-        [Authorize(Roles = "Admin")]
-        [HttpPost("subjects")]
-        public async Task<IActionResult> AddSubjectsToTool(
-            [FromQuery] Guid toolId,
-            [FromBody] List<Guid> subjectIds)
-        {
-            var response = await _toolForSubjectService.AddSubjectsToTool(toolId, subjectIds);
-            if (response.IsSucess == false)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost("subjects")]
+        //public async Task<IActionResult> AddSubjectsToTool(
+        //    [FromQuery] Guid toolId,
+        //    [FromBody] List<Guid> subjectIds)
+        //{
+        //    var response = await _toolForSubjectService.AddSubjectsToTool(toolId, subjectIds);
+        //    if (response.IsSucess == false)
+        //    {
+        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
+        //            return StatusCode(500, response);
+        //        return NotFound(response);
+        //    }
+        //    return Ok(response);
+        //}
 
         // Thêm công cụ vào môn học (Admin only)
         [Authorize(Roles = "Admin")]
@@ -125,21 +125,21 @@ namespace AcademicChatBot.API.Controllers
         }
 
         // Xóa môn học khỏi công cụ (Admin only)
-        [Authorize(Roles = "Admin")]
-        [HttpDelete("subjects")]
-        public async Task<IActionResult> DeleteSubjectsFromTool(
-            [FromQuery] Guid toolId,
-            [FromBody] List<Guid> subjectIds)
-        {
-            var response = await _toolForSubjectService.DeleteSubjectsFromTool(toolId, subjectIds);
-            if (response.IsSucess == false)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
+        //[Authorize(Roles = "Admin")]
+        //[HttpDelete("subjects")]
+        //public async Task<IActionResult> DeleteSubjectsFromTool(
+        //    [FromQuery] Guid toolId,
+        //    [FromBody] List<Guid> subjectIds)
+        //{
+        //    var response = await _toolForSubjectService.DeleteSubjectsFromTool(toolId, subjectIds);
+        //    if (response.IsSucess == false)
+        //    {
+        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
+        //            return StatusCode(500, response);
+        //        return NotFound(response);
+        //    }
+        //    return Ok(response);
+        //}
 
         // Xóa tất cả công cụ khỏi môn học (Admin only)
         [Authorize(Roles = "Admin")]
@@ -157,21 +157,21 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        // Xóa tất cả môn học khỏi công cụ (Admin only)
-        [Authorize(Roles = "Admin")]
-        [HttpDelete("subjects/all")]
-        public async Task<IActionResult> DeleteAllSubjectsFromTool(
-            [FromQuery] Guid toolId)
-        {
-            var response = await _toolForSubjectService.DeleteAllSubjectsFromTool(toolId);
-            if (response.IsSucess == false)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
+        //// Xóa tất cả môn học khỏi công cụ (Admin only)
+        //[Authorize(Roles = "Admin")]
+        //[HttpDelete("subjects/all")]
+        //public async Task<IActionResult> DeleteAllSubjectsFromTool(
+        //    [FromQuery] Guid toolId)
+        //{
+        //    var response = await _toolForSubjectService.DeleteAllSubjectsFromTool(toolId);
+        //    if (response.IsSucess == false)
+        //    {
+        //        if (response.BusinessCode == BusinessCode.EXCEPTION)
+        //            return StatusCode(500, response);
+        //        return NotFound(response);
+        //    }
+        //    return Ok(response);
+        //}
     }
 
 }

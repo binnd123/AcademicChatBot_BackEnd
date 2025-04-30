@@ -33,7 +33,7 @@ namespace AcademicChatBot.Service.Implementation
             _hubService = hubService;
         }
 
-        public async Task<Response> SendMessage(Guid senderId, Guid aIChatLogId, string content)
+        public async Task<Response> SendMessage(Guid senderId, Guid? aIChatLogId, TopicChat topic, string content)
         {
             var response = new Response();
             try
@@ -46,30 +46,53 @@ namespace AcademicChatBot.Service.Implementation
                     response.Message = "Sender not found";
                     return response;
                 }
-
-                var aIChatLog = await _aIChatLogRepository.GetFirstByExpression
-                    (filter: x => x.UserId == senderId 
+                AIChatLog? aIChatLog = null;
+                if (aIChatLogId == null)
+                {
+                    var generatedTitle = await aIChatLogService.GenerateTiltleAsync(content);
+                    aIChatLog = new AIChatLog
+                    {
+                        AIChatLogId = Guid.NewGuid(),
+                        UserId = senderId,
+                        Topic = topic,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        IsDeleted = false,
+                        Status = StatusChat.Actived,
+                        StartTime = DateTime.Now,
+                        EndTime = null,
+                        AIChatLogName = generatedTitle != null ? generatedTitle.Trim() : "#New Chat " + DateTime.Now.ToString("MMM dd, yyyy HH:mm"),
+                        DeletedAt = null,
+                        LastMessageTime = DateTime.Now,
+                    };
+                    await _aIChatLogRepository.Insert(aIChatLog);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+                else
+                {
+                    aIChatLog = await _aIChatLogRepository.GetFirstByExpression
+                    (filter: x => x.UserId == senderId
                     && x.Status == StatusChat.Actived
                     && x.IsDeleted == false
                     && x.EndTime == null
                     && x.AIChatLogId == aIChatLogId
+                    && x.Topic == topic
                     );
-                if (aIChatLog == null)
-                {
-                    response.IsSucess = false;
-                    response.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                    response.Message = "AI Chat Log not found";
-                    return response;
-                }
-
-
-                if (aIChatLog.AIChatLogName != null && aIChatLog.AIChatLogName.Contains("#New Chat "))
-                {
-                    var generatedTitle = await aIChatLogService.GenerateTiltleAsync(content);
-                    if (generatedTitle != null)
+                    if (aIChatLog == null)
                     {
-                        aIChatLog.AIChatLogName = generatedTitle.Trim();
+                        response.IsSucess = false;
+                        response.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                        response.Message = "AI Chat Log not found";
+                        return response;
                     }
+                    //if (aIChatLog.AIChatLogName != null && aIChatLog.AIChatLogName.Contains("#New Chat "))
+                    //{
+                    //    var generatedTitle = await aIChatLogService.GenerateTiltleAsync(content);
+                    //    if (generatedTitle != null)
+                    //    {
+                    //        aIChatLog.AIChatLogName = generatedTitle.Trim();
+                    //    }
+                    //}
                 }
 
                 // Tạo đối tượng tin nhắn của người dùng  
@@ -132,11 +155,12 @@ namespace AcademicChatBot.Service.Implementation
                     AIChatLogId = messageBotResponse.AIChatLogId,
                     SentTime = messageBotResponse.SentTime,
                 };
-
+                aIChatLog.User = null;
                 response.IsSucess = true;
                 response.BusinessCode = BusinessCode.INSERT_SUCESSFULLY;
                 response.Data = new
                 {
+                    AIChatLog = aIChatLog,
                     MessageUser = messageUserResponse,
                     MessageAI = messageAIResponse
                 };
