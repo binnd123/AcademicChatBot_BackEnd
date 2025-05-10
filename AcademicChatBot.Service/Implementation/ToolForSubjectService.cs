@@ -127,7 +127,6 @@ namespace AcademicChatBot.Service.Implementation
             }
         }
 
-
         public async Task<Response> DeleteAllSubjectsFromTool(Guid toolId)
         {
             var dto = new Response();

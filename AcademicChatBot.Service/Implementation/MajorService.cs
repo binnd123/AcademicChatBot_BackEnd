@@ -10,17 +10,20 @@ using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
 using AcademicChatBot.Common.Enum;
+using AcademicChatBot.DAL.BussinessModel.Majors;
 
 namespace AcademicChatBot.Service.Implementation
 {
     public class MajorService : IMajorService
     {
         private readonly IGenericRepository<Major> _majorRepository;
+        private readonly IGenericRepository<Curriculum> _curriculumRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public MajorService(IGenericRepository<Major> majorRepository, IUnitOfWork unitOfWork)
+        public MajorService(IGenericRepository<Major> majorRepository, IGenericRepository<Curriculum> curriculumRepository, IUnitOfWork unitOfWork)
         {
             _majorRepository = majorRepository;
+            _curriculumRepository = curriculumRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -29,6 +32,15 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                var majorE = await _majorRepository.GetFirstByExpression(x => x.MajorCode == request.MajorCode);
+                if (majorE != null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+                    dto.Message = "Major is Existed!";
+                    return dto;
+                }
+
                 var major = new Major
                 {
                     MajorId = Guid.NewGuid(),
@@ -85,14 +97,14 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllMajors(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
+        public async Task<Response> GetAllMajors(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _majorRepository.GetAllDataByExpression(
                     filter: m => (m.MajorName.ToLower().Contains(search.ToLower()) || m.MajorCode.ToLower().Contains(search.ToLower()))
-                    && m.IsDeleted == isDelete,
+                    && m.IsDeleted == isDeleted,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: m => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? m.MajorName : m.MajorCode,
@@ -123,7 +135,25 @@ namespace AcademicChatBot.Service.Implementation
                     dto.Message = "Major not found";
                     return dto;
                 }
-                dto.Data = major;
+                var curriculums = await _curriculumRepository.GetAllDataByExpression(
+                    filter: s => s.MajorId == majorId && !s.IsDeleted,
+                    pageNumber: 1,
+                    pageSize: 1000,
+                    orderBy: null,
+                    isAscending: true,
+                    includes: null);
+                dto.Data = new DetailMajorResponse
+                {
+                    MajorId = major.MajorId,
+                    MajorCode = major.MajorCode,
+                    MajorName = major.MajorName,
+                    StartAt = major.StartAt,
+                    CreatedAt = major.CreatedAt,
+                    UpdatedAt = major.UpdatedAt,
+                    DeletedAt = major.DeletedAt,
+                    IsDeleted = major.IsDeleted,
+                    Curriculums = curriculums.Items
+                };
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Major retrieved successfully";

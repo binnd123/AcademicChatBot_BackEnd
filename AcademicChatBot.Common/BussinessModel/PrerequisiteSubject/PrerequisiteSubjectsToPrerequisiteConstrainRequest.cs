@@ -12,6 +12,6 @@ namespace AcademicChatBot.Common.BussinessModel.PrerequisiteSubject
     {
         public int RelationGroup { get; set; }
         public ConditionTypeName ConditionType { get; set; } = ConditionTypeName.AND;
-        public Guid? PrerequisiteSubjectId { get; set; }
+        public Guid? SubjectId { get; set; }
     }
 }

@@ -13,7 +13,7 @@ namespace AcademicChatBot.Service.Contract
     {
         Task<Response> CreateAssessment(CreateAssessmentRequest request);
         Task<Response> DeleteAssessment(Guid assessmentId);
-        Task<Response> GetAllAssessments(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete);
+        Task<Response> GetAllAssessments(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted);
         Task<Response> GetAssessmentById(Guid assessmentId);
         Task<Response> UpdateAssessment(Guid assessmentId, UpdateAssessmentRequest request);
     }

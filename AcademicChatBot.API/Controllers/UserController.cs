@@ -76,24 +76,5 @@ namespace AcademicChatBot.API.Controllers
             }
             return Ok(response);
         }
-        [HttpDelete("myself")]
-        public async Task<IActionResult> DeleteUser()
-        {
-            var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
-            if (userId == null) return Unauthorized(new Response
-            {
-                IsSucess = false,
-                BusinessCode = BusinessCode.AUTH_NOT_FOUND,
-                Message = errorMessage
-            });
-            var response = await _userService.DeleteUser(userId);
-            if (response.IsSucess == false)
-            {
-                if (response.BusinessCode == BusinessCode.EXCEPTION)
-                    return StatusCode(500, response);
-                return NotFound(response);
-            }
-            return Ok(response);
-        }
     }
 }

@@ -13,6 +13,6 @@ namespace AcademicChatBot.Service.Contract
     {
         public Task<Response> GetStudentProfile(Guid? studentId);
         public Task<Response> UpdateStudentProfile(Guid? studentId, StudentProfileRequest request);
-        public Task<Response> GetAllStudents(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete);
+        public Task<Response> GetAllStudents(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted);
     }
 }

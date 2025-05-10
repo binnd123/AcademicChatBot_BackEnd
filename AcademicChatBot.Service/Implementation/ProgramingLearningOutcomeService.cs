@@ -31,6 +31,15 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                var ploE = await _programingLearningOutcomeRepository.GetFirstByExpression(x => x.ProgramingLearningOutcomeCode == request.ProgramingLearningOutcomeCode);
+                if (ploE != null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+                    dto.Message = "Programing Learning Outcome is Existed!";
+                    return dto;
+                }
+
                 var curriculum = await _curriculumRepository.GetById(request.CurriculumId);
                 if (curriculum == null)
                 {
@@ -97,14 +106,14 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllProgramingLearningOutcomes(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
+        public async Task<Response> GetAllProgramingLearningOutcomes(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _programingLearningOutcomeRepository.GetAllDataByExpression(
                     filter: p => (p.ProgramingLearningOutcomeName.ToLower().Contains(search.ToLower()) || p.ProgramingLearningOutcomeCode.ToLower().Contains(search.ToLower()))
-                    && p.IsDeleted == isDelete,
+                    && p.IsDeleted == isDeleted,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: p => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? p.ProgramingLearningOutcomeName : p.ProgramingLearningOutcomeCode,

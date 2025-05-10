@@ -13,41 +13,28 @@ namespace AcademicChatBot.API.Controllers
     [ApiController]
     public class AdminController : ControllerBase
     {
-        private readonly IStudentService _studentService;
-        private readonly IUserService _userService;
+        private readonly IAdminService _adminService;
 
-        public AdminController(IStudentService studentService, IUserService userService)
+        public AdminController(IAdminService adminService)
         {
-            _studentService = studentService;
-            _userService = userService;
+            _adminService = adminService;
         }
 
         // POST /api/admins
-        [HttpPost]
+        [HttpPost("init")]
         public async Task<IActionResult> CreateAdmin()
         {
-            var result = await _userService.CreateAdminIfNotExistsAsync();
+            var result = await _adminService.CreateAdminIfNotExistsAsync();
             if (result.IsSucess)
                 return Ok(result);
             return BadRequest(result);
         }
 
-        // GET /api/students
         [Authorize(Roles = "Admin")]
-        [HttpGet("/api/students")]
-        public async Task<IActionResult> GetStudents(
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 5,
-            [FromQuery] string search = "",
-            [FromQuery] SortBy sortBy = SortBy.Default,
-            [FromQuery] SortType sortType = SortType.Ascending,
-            [FromQuery] bool isDelete = false
-            )
+        [HttpGet("report")]
+        public async Task<IActionResult> GetReports()
         {
-            pageNumber = pageNumber < 1 ? 1 : pageNumber;
-            pageSize = pageSize < 1 ? 5 : pageSize;
-
-            var response = await _studentService.GetAllStudents(pageNumber, pageSize, search, sortBy, sortType, isDelete);
+            var response = await _adminService.GetReportsAsync();
             if (!response.IsSucess)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
@@ -57,13 +44,12 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        // GET /api/students/{studentId}
         [Authorize(Roles = "Admin")]
-        [HttpGet("/api/students/{studentId}")]
-        public async Task<IActionResult> GetStudentById(Guid studentId)
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> DeleteUser(Guid userId)
         {
-            var response = await _studentService.GetStudentProfile(studentId);
-            if (!response.IsSucess)
+            var response = await _adminService.DeleteUser(userId);
+            if (response.IsSucess == false)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
                     return StatusCode(500, response);
@@ -72,13 +58,12 @@ namespace AcademicChatBot.API.Controllers
             return Ok(response);
         }
 
-        // PUT /api/students/{studentId}
         [Authorize(Roles = "Admin")]
-        [HttpPut("/api/students/{studentId}")]
-        public async Task<IActionResult> UpdateStudent(Guid studentId, [FromBody] StudentProfileRequest request)
+        [HttpPut("{userId}/status")]
+        public async Task<IActionResult> SetUserActiveStatus(Guid userId, [FromQuery] bool isActive = true)
         {
-            var response = await _studentService.UpdateStudentProfile(studentId, request);
-            if (!response.IsSucess)
+            var response = await _adminService.SetUserActiveStatusAsync(userId, isActive);
+            if (response.IsSucess == false)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)
                     return StatusCode(500, response);

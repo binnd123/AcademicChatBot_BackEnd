@@ -18,18 +18,15 @@ namespace AcademicChatBot.Service.Implementation
     {
         private readonly IGenericRepository<CourseLearningOutcome> _courseLearningOutcomeRepository;
         private readonly IGenericRepository<Subject> _subjectRepository;
-        private readonly IGenericRepository<Assessment> _assessmentRepository;
         private readonly IUnitOfWork _unitOfWork;
 
         public CourseLearningOutcomeService(
             IGenericRepository<CourseLearningOutcome> courseLearningOutcomeRepository,
             IGenericRepository<Subject> subjectRepository,
-            IGenericRepository<Assessment> assessmentRepository,
             IUnitOfWork unitOfWork)
         {
             _courseLearningOutcomeRepository = courseLearningOutcomeRepository;
             _subjectRepository = subjectRepository;
-            _assessmentRepository = assessmentRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -38,21 +35,21 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                var cloE = await _courseLearningOutcomeRepository.GetFirstByExpression(x => x.CourseLearningOutcomeCode == request.CourseLearningOutcomeCode);
+                if (cloE != null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+                    dto.Message = "Course Learning Outcome is Existed!";
+                    return dto;
+                }
+
                 var subject = await _subjectRepository.GetById(request.SubjectId);
                 if (subject == null)
                 {
                     dto.IsSucess = false;
                     dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
                     dto.Message = "Subject not found";
-                    return dto;
-                }
-
-                var assessment = await _assessmentRepository.GetById(request.AssessmentId);
-                if (assessment == null)
-                {
-                    dto.IsSucess = false;
-                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                    dto.Message = "Assessment not found";
                     return dto;
                 }
 
@@ -63,7 +60,6 @@ namespace AcademicChatBot.Service.Implementation
                     CourseLearningOutcomeName = request.CourseLearningOutcomeName,
                     CourseLearningOutcomeDetail = request.CourseLearningOutcomeDetail,
                     SubjectId = request.SubjectId,
-                    AssessmentId = request.AssessmentId,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     IsDeleted = false
@@ -86,25 +82,19 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllCourseLearningOutcomes(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
+        public async Task<Response> GetAllCourseLearningOutcomes(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted)
         {
             Response dto = new Response();
             try
             {
-                var includesList = new Expression<Func<CourseLearningOutcome, object>>[]
-                {
-                    c => c.Subject,
-                    c => c.Assessment
-                };
-
                 dto.Data = await _courseLearningOutcomeRepository.GetAllDataByExpression(
                     filter: c => (c.CourseLearningOutcomeName.ToLower().Contains(search.ToLower()) || c.CourseLearningOutcomeCode.ToLower().Contains(search.ToLower()))
-                    && c.IsDeleted == isDelete,
+                    && c.IsDeleted == isDeleted,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.CourseLearningOutcomeName : c.CourseLearningOutcomeCode,
                     isAscending: sortType == SortType.Ascending,
-                    includes: includesList);
+                    includes: c => c.Subject);
 
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
@@ -165,18 +155,6 @@ namespace AcademicChatBot.Service.Implementation
                     }
                 }
 
-                if (request.AssessmentId != null)
-                {
-                    var assessment = await _assessmentRepository.GetById(request.AssessmentId.Value);
-                    if (assessment == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Assessment not found";
-                        return dto;
-                    }
-                }
-
                 var clo = await _courseLearningOutcomeRepository.GetById(cloId);
                 if (clo == null)
                 {
@@ -190,7 +168,6 @@ namespace AcademicChatBot.Service.Implementation
                 if (!string.IsNullOrEmpty(request.CourseLearningOutcomeName)) clo.CourseLearningOutcomeName = request.CourseLearningOutcomeName;
                 if (!string.IsNullOrEmpty(request.CourseLearningOutcomeDetail)) clo.CourseLearningOutcomeDetail = request.CourseLearningOutcomeDetail;
                 clo.SubjectId = request.SubjectId ?? clo.SubjectId;
-                clo.AssessmentId = request.AssessmentId ?? clo.AssessmentId;
                 clo.UpdatedAt = DateTime.Now;
 
                 await _courseLearningOutcomeRepository.Update(clo);

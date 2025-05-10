@@ -13,7 +13,7 @@ namespace AcademicChatBot.Service.Contract
     {
         Task<Response> CreateMajor(CreateMajorRequest request);
         Task<Response> DeleteMajor(Guid majorId);
-        Task<Response> GetAllMajors(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete);
+        Task<Response> GetAllMajors(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted);
         Task<Response> GetMajorById(Guid majorId);
         Task<Response> UpdateMajor(Guid majorId, UpdateMajorRequest request);
     }

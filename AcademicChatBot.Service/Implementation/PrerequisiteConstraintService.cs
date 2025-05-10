@@ -38,28 +38,22 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                if (request.SubjectId != null)
+                var prerequisiteConstraintE = await _prerequisiteConstraintRepository.GetFirstByExpression(x => x.PrerequisiteConstraintCode == request.PrerequisiteConstraintCode || x.SubjectId == request.SubjectId);
+                if (prerequisiteConstraintE != null)
                 {
-                    var subject = await _subjectRepository.GetById(request.SubjectId.Value);
-                    if (subject == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Subject not found";
-                        return dto;
-                    }
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+                    dto.Message = "Prerequisite Constraint is Existed!";
+                    return dto;
                 }
 
-                if (request.CurriculumId != null)
+                var subject = await _subjectRepository.GetById(request.SubjectId);
+                if (subject == null)
                 {
-                    var curriculum = await _curriculumRepository.GetById(request.CurriculumId.Value);
-                    if (curriculum == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Curriculum not found";
-                        return dto;
-                    }
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
+                    dto.Message = "Subject not found";
+                    return dto;
                 }
 
                 var prerequisite = new PrerequisiteConstraint
@@ -68,7 +62,6 @@ namespace AcademicChatBot.Service.Implementation
                     PrerequisiteConstraintCode = request.PrerequisiteConstraintCode,
                     GroupCombinationType = request.GroupCombinationType,
                     SubjectId = request.SubjectId,
-                    CurriculumId = request.CurriculumId,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     IsDeleted = false
@@ -91,24 +84,19 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllPrerequisiteConstraints(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
+        public async Task<Response> GetAllPrerequisiteConstraints(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted)
         {
             Response dto = new Response();
             try
             {
-                var includesList = new Expression<Func<PrerequisiteConstraint, object>>[]
-                {
-                    p => p.Subject,
-                    p => p.Curriculum
-                };
                 dto.Data = await _prerequisiteConstraintRepository.GetAllDataByExpression(
                     filter: p => (p.PrerequisiteConstraintCode.ToLower().Contains(search.ToLower()))
-                    && p.IsDeleted == isDelete,
+                    && p.IsDeleted == isDeleted,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: p => p.PrerequisiteConstraintCode,
                     isAscending: sortType == SortType.Ascending,
-                    includes: includesList);
+                    includes: p => p.Subject);
 
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
@@ -169,18 +157,6 @@ namespace AcademicChatBot.Service.Implementation
                     }
                 }
 
-                if (request.CurriculumId != null)
-                {
-                    var curriculum = await _curriculumRepository.GetById(request.CurriculumId.Value);
-                    if (curriculum == null)
-                    {
-                        dto.IsSucess = false;
-                        dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                        dto.Message = "Curriculum not found";
-                        return dto;
-                    }
-                }
-
                 var prerequisite = await _prerequisiteConstraintRepository.GetById(id);
                 if (prerequisite == null)
                 {
@@ -193,7 +169,6 @@ namespace AcademicChatBot.Service.Implementation
                 if (!string.IsNullOrEmpty(request.PrerequisiteConstraintCode)) prerequisite.PrerequisiteConstraintCode = request.PrerequisiteConstraintCode;
                 prerequisite.SubjectId = request.SubjectId ?? prerequisite.SubjectId;
                 prerequisite.GroupCombinationType = request.GroupCombinationType;
-                prerequisite.CurriculumId = request.CurriculumId ?? prerequisite.CurriculumId;
                 prerequisite.UpdatedAt = DateTime.Now;
 
                 await _prerequisiteConstraintRepository.Update(prerequisite);
@@ -246,5 +221,6 @@ namespace AcademicChatBot.Service.Implementation
             }
             return dto;
         }
+
     }
 }

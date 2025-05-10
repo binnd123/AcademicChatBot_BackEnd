@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -104,7 +105,7 @@ namespace AcademicChatBot.Service.Implementation
         //    return dto;
         //}
 
-        //public async Task<Response> GetAllPrerequisiteSubjects(int pageNumber, int pageSize, SortBy sortBy, SortType sortType, bool isDelete)
+        //public async Task<Response> GetAllPrerequisiteSubjects(int pageNumber, int pageSize, SortBy sortBy, SortType sortType, bool isDeleted)
         //{
         //    Response dto = new Response();
         //    try
@@ -116,7 +117,7 @@ namespace AcademicChatBot.Service.Implementation
         //            p => p.PrerequisiteConstraint
         //        };
         //        dto.Data = await _prerequisiteSubjectRepository.GetAllDataByExpression(
-        //            filter: p => p.IsDeleted == isDelete,
+        //            filter: p => p.IsDeleted == isDeleted,
         //            pageNumber: pageNumber,
         //            pageSize: pageSize,
         //            orderBy: p => p.RelationGroup,
@@ -308,7 +309,10 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                var prerequisiteConstraint = await _prerequisiteConstraintRepository.GetById(prerequisiteConstrainId);
+                var prerequisiteConstraint = await _prerequisiteConstraintRepository.GetFirstByExpression(
+                    filter: x => x.PrerequisiteConstraintId == prerequisiteConstrainId
+                    && !x.IsDeleted,
+                    includeProperties: x => x.Subject);
                 if (prerequisiteConstraint == null)
                 {
                     dto.IsSucess = false;
@@ -320,18 +324,18 @@ namespace AcademicChatBot.Service.Implementation
                 var prerequisiteSubjectList = new List<PrerequisiteSubject>();
                 foreach (var request in requests)
                 {
-                    var prerequisiteSubject = await _subjectRepository.GetById(request.PrerequisiteSubjectId);
-                    if (prerequisiteSubject == null) continue;
+                    var prerequisiteSubject = await _subjectRepository.GetById(request.SubjectId);
+                    if (prerequisiteSubject == null || prerequisiteConstraint.SubjectId == prerequisiteSubject.SubjectId) continue;
 
                     var existing = await _prerequisiteSubjectRepository.GetFirstByExpression(
-                        x => x.PrerequisiteConstraintId == prerequisiteConstrainId && x.PrerequisiteSubjectId == request.PrerequisiteSubjectId);
+                        x => x.PrerequisiteConstraintId == prerequisiteConstrainId && x.PrerequisiteSubjectId == request.SubjectId);
                     if (existing != null) continue;
 
                     prerequisiteSubjectList.Add(new PrerequisiteSubject
                     {
                         Id = Guid.NewGuid(),
                         PrerequisiteConstraintId = prerequisiteConstrainId,
-                        PrerequisiteSubjectId = request.PrerequisiteSubjectId,
+                        PrerequisiteSubjectId = request.SubjectId,
                         RelationGroup = request.RelationGroup,
                         CreatedAt = DateTime.Now,
                         ConditionType = request.ConditionType,
@@ -340,10 +344,51 @@ namespace AcademicChatBot.Service.Implementation
 
                 await _prerequisiteSubjectRepository.InsertRange(prerequisiteSubjectList);
                 await _unitOfWork.SaveChangeAsync();
+                var prerequisiteSubjects = await _prerequisiteSubjectRepository.GetAllDataByExpression(
+                    filter: x => x.PrerequisiteConstraintId == prerequisiteConstrainId,
+                    pageNumber: 1,
+                    pageSize: int.MaxValue,
+                    orderBy: null,
+                    isAscending: true,
+                    includes: x => x.PrerequisiteSubjectInfo);
+                var grouped = prerequisiteSubjects.Items
+                    .GroupBy(x => x.RelationGroup)
+                    .OrderBy(g => g.Key)
+                    .ToList();
 
+                List<string> groupExpressions = new();
+
+                foreach (var group in grouped)
+                {
+                    var groupItems = group
+                        .Select(x => x.PrerequisiteSubjectInfo?.SubjectCode ?? "UNKNOWN")
+                        .ToList();
+
+                    var conditionType = group.First().ConditionType.ToString(); // AND / OR
+
+                    var expression = string.Join($" {conditionType} ", groupItems);
+                    if (groupItems.Count > 1)
+                    {
+                        expression = $"({expression})";
+                    }
+
+                    groupExpressions.Add(expression);
+                }
+
+                var finalExpression = string.Join($" {prerequisiteConstraint.GroupCombinationType} ", groupExpressions);
+
+                var subjectList = prerequisiteSubjectList
+                    .Select(x => x.PrerequisiteSubjectInfo)
+                    .DistinctBy(x => x.SubjectId)
+                    .ToList();
+                dto.Data = new
+                {
+                    Expression = finalExpression,
+                    MainSubject = prerequisiteConstraint.Subject,
+                    PrerequisiteSubjects = subjectList
+                };
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.INSERT_SUCESSFULLY;
-                dto.Data = prerequisiteSubjectList;
                 dto.Message = "Prerequisite Subjects added to prerequisite Constrain successfully";
             }
             catch (Exception ex)
@@ -455,7 +500,10 @@ namespace AcademicChatBot.Service.Implementation
             try
             {
                 // Lấy ràng buộc + danh sách môn tiên quyết
-                var constraint = await _prerequisiteConstraintRepository.GetById(prerequisiteConstrainId);
+                var constraint = await _prerequisiteConstraintRepository.GetFirstByExpression(
+                    filter: x => x.PrerequisiteConstraintId == prerequisiteConstrainId
+                    && !x.IsDeleted,
+                    includeProperties: x => x.Subject);
                 if (constraint == null)
                 {
                     dto.IsSucess = false;
@@ -493,8 +541,19 @@ namespace AcademicChatBot.Service.Implementation
                 }
 
                 var finalExpression = string.Join($" {constraint.GroupCombinationType} ", groupExpressions);
+                // Chuẩn bị danh sách subject chi tiết
+                var subjectList = prerequisites.Items
+                    .Select(x => x.PrerequisiteSubjectInfo)
+                    .DistinctBy(x => x.SubjectId)
+                    .ToList();
 
-                dto.Data = finalExpression;
+                // Trả về cả biểu thức và danh sách subject
+                dto.Data = new
+                {
+                    Expression = finalExpression,
+                    MainSubject = constraint.Subject,
+                    PrerequisiteSubjects = subjectList
+                };
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Prerequisite expression retrieved successfully";
@@ -509,7 +568,7 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetReadablePrerequisiteExpressionOfSubjectInCurriculum(Guid subjectId, Guid curriculumId)
+        public async Task<Response> GetReadablePrerequisiteExpressionOfSubject(Guid subjectId)
         {
             Response dto = new Response();
 
@@ -517,7 +576,7 @@ namespace AcademicChatBot.Service.Implementation
             {
                 // Lấy ràng buộc + danh sách môn tiên quyết
                 var constraint = await _prerequisiteConstraintRepository.GetFirstByExpression(
-                    filter: x => x.SubjectId == subjectId && x.CurriculumId == curriculumId);
+                    filter: x => x.SubjectId == subjectId);
                 if (constraint == null)
                 {
                     dto.IsSucess = false;
@@ -555,8 +614,18 @@ namespace AcademicChatBot.Service.Implementation
                 }
 
                 var finalExpression = string.Join($" {constraint.GroupCombinationType} ", groupExpressions);
+                // Chuẩn bị danh sách subject chi tiết
+                var subjectList = prerequisites.Items
+                    .Select(x => x.PrerequisiteSubjectInfo)
+                    .DistinctBy(x => x.SubjectId)
+                    .ToList();
 
-                dto.Data = finalExpression;
+                // Trả về cả biểu thức và danh sách subject
+                dto.Data = new
+                {
+                    Expression = finalExpression,
+                    PrerequisiteSubjects = subjectList
+                };
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Prerequisite expression retrieved successfully";
@@ -571,5 +640,61 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
+        public async Task<List<object>> PrerequisiteExpressionForChat()
+        {
+            var allConstraints = await _prerequisiteConstraintRepository.GetAllDataByExpression(
+            filter: null,
+            pageNumber: 1,
+            pageSize: int.MaxValue,
+            orderBy: null,
+            isAscending: true,
+            includes: x => x.Subject);
+
+            List<object> results = new();
+
+            foreach (var constraint in allConstraints.Items)
+            {
+                var prerequisites = await _prerequisiteSubjectRepository.GetAllDataByExpression(
+                    filter: x => x.PrerequisiteConstraintId == constraint.PrerequisiteConstraintId,
+                    pageNumber: 1,
+                    pageSize: int.MaxValue,
+                    orderBy: null,
+                    isAscending: true,
+                    includes: x => x.PrerequisiteSubjectInfo);
+
+                var grouped = prerequisites.Items
+                    .GroupBy(x => x.RelationGroup)
+                    .OrderBy(g => g.Key)
+                    .ToList();
+
+                List<string> groupExpressions = new();
+
+                foreach (var group in grouped)
+                {
+                    var groupItems = group
+                        .Select(x => x.PrerequisiteSubjectInfo?.SubjectCode ?? "UNKNOWN")
+                        .ToList();
+
+                    var conditionType = group.First().ConditionType.ToString(); // AND / OR
+
+                    var expression = string.Join($" {conditionType} ", groupItems);
+                    if (groupItems.Count > 1)
+                    {
+                        expression = $"({expression})";
+                    }
+
+                    groupExpressions.Add(expression);
+                }
+
+                var finalExpression = string.Join($" {constraint.GroupCombinationType} ", groupExpressions);
+
+                results.Add(new
+                {
+                    MainSubject = constraint.Subject.SubjectCode,
+                    Expression = finalExpression,
+                });
+            }
+            return results;
+        }
     }
 }

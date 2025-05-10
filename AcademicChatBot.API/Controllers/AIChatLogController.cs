@@ -26,19 +26,12 @@ namespace AcademicChatBot.API.Controllers
             _jwtService = jwtService;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("ai-prototype")]
         public async Task<IActionResult> GetAiResponseAsync([FromQuery] string message)
         {
-            var userId = _jwtService.GetUserIdFromToken(HttpContext.Request, out var errorMessage);
-            if (userId == null) return Unauthorized(new Response
-            {
-                IsSucess = false,
-                BusinessCode = BusinessCode.AUTH_NOT_FOUND,
-                Message = errorMessage
-            });
-
-            var chat = await _aiChatLogService.GenerateResponseAsync(userId, message, TopicChat.Default);
+            var chat = await _aiChatLogService.GenerateResponseAsync(null, message, TopicChat.Default);
             if (chat.IsSucess == false)
             {
                 if (chat.BusinessCode == BusinessCode.EXCEPTION)
@@ -52,7 +45,7 @@ namespace AcademicChatBot.API.Controllers
         public async Task<IActionResult> GetAllAIChatLogByTopic(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
-            [FromQuery] bool isDelete = false,
+            [FromQuery] bool isDeleted = false,
             [FromQuery] TopicChat topicChat = TopicChat.Default
         )
         {
@@ -65,7 +58,7 @@ namespace AcademicChatBot.API.Controllers
                 BusinessCode = BusinessCode.AUTH_NOT_FOUND,
                 Message = errorMessage
             });
-            var response = await _aiChatLogService.GetAllAIChatLogByTopic(userId, pageNumber, pageSize, isDelete, topicChat);
+            var response = await _aiChatLogService.GetAllAIChatLogByTopic(userId, pageNumber, pageSize, isDeleted, topicChat);
             if (response.IsSucess == false)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)

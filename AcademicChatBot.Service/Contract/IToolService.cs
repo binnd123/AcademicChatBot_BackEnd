@@ -13,7 +13,7 @@ namespace AcademicChatBot.Service.Contract
     {
         Task<Response> CreateTool(CreateToolRequest request);
         Task<Response> DeleteTool(Guid toolId);
-        Task<Response> GetAllTools(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete);
+        Task<Response> GetAllTools(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted);
         Task<Response> GetToolById(Guid toolId);
         Task<Response> UpdateTool(Guid toolId, UpdateToolRequest request);
     }

@@ -19,7 +19,7 @@ namespace AcademicChatBot.DAL.Models
         public string? Address { get; set; }
         public string? PhoneNumber { get; set; }
         public DateTime? DOB { get; set; }
-        public DateTime? IntakeYear { get; set; }
+        public int? IntakeYear { get; set; }
         public GenderType Gender { get; set; } = GenderType.Male;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
