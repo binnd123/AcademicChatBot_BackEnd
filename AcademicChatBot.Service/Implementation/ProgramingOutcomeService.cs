@@ -34,6 +34,15 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                var poE = await _programingOutcomeRepository.GetFirstByExpression(x => x.ProgramingOutcomeCode == request.ProgramingOutcomeCode);
+                if (poE != null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+                    dto.Message = "Programing Outcome is Existed!";
+                    return dto;
+                }
+
                 var program = await _programRepository.GetById(request.ProgramId);
                 if (program == null)
                 {
@@ -101,14 +110,14 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllProgramingOutcomes(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
+        public async Task<Response> GetAllProgramingOutcomes(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _programingOutcomeRepository.GetAllDataByExpression(
                     filter: p => (p.ProgramingOutcomeName.ToLower().Contains(search.ToLower()) || p.ProgramingOutcomeCode.ToLower().Contains(search.ToLower()))
-                    && p.IsDeleted == isDelete,
+                    && p.IsDeleted == isDeleted,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.ProgramingOutcomeName : s.ProgramingOutcomeCode,

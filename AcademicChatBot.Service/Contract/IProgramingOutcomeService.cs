@@ -13,7 +13,7 @@ namespace AcademicChatBot.Service.Contract
     {
         Task<Response> CreateProgramingOutcome(CreateProgramingOutcomeRequest request);
         Task<Response> DeleteProgramingOutcome(Guid programingOutcomeId);
-        Task<Response> GetAllProgramingOutcomes(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete);
+        Task<Response> GetAllProgramingOutcomes(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted);
         Task<Response> GetProgramingOutcomeById(Guid programingOutcomeId);
         Task<Response> UpdateProgramingOutcome(Guid programingOutcomeId, UpdateProgramingOutcomeRequest request);
     }

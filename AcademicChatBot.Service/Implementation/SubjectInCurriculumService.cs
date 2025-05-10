@@ -66,7 +66,7 @@ namespace AcademicChatBot.Service.Implementation
             try
             {
                 dto.Data = await _subjectInCurriculumRepository.GetAllDataByExpression(
-                    filter: x => x.CurriculumId == curriculumId && semesterNo == 0? true : x.SemesterNo == semesterNo,
+                    filter: x => x.CurriculumId == curriculumId && (semesterNo == 0? true : x.SemesterNo == semesterNo),
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: x => x.SemesterNo,

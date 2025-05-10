@@ -12,6 +12,5 @@ namespace AcademicChatBot.Common.BussinessModel.PrerequisiteConstraint
         public string? PrerequisiteConstraintCode { get; set; }
         public ConditionTypeName GroupCombinationType { get; set; } = ConditionTypeName.OR;
         public Guid? SubjectId { get; set; }
-        public Guid? CurriculumId { get; set; }
     }
 }

@@ -51,6 +51,13 @@ namespace AcademicChatBot.Service.Implementation
                     dto.Message = "Email is not correct";
                     return dto;
                 }
+                if (userDb.IsDeleted || !userDb.IsActive)
+                {
+                    dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+                    dto.IsSucess = false;
+                    dto.Message = "Access denied. Please contact support student.";
+                    return dto;
+                }
                 var isValid = BCrypt.Net.BCrypt.EnhancedVerify(loginRequest.Password, userDb.PasswordHash);
                 if (!isValid)
                 {
@@ -285,6 +292,13 @@ namespace AcademicChatBot.Service.Implementation
             }
             else
             {
+                if (user.IsDeleted || !user.IsActive)
+                {
+                    dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
+                    dto.IsSucess = false;
+                    dto.Message = "Access denied. Please contact support student.";
+                    return dto;
+                }
                 // Nếu user đã tồn tại và là tài khoản truyền thống (có mật khẩu), từ chối login bằng Google
                 if (!string.IsNullOrEmpty(user.PasswordHash))
                 {
@@ -317,63 +331,6 @@ namespace AcademicChatBot.Service.Implementation
                 AccessToken = accessToken,
                 RefreshToken = refreshToken
             };
-
-            return dto;
-        }
-        public async Task<Response> CreateAdminIfNotExistsAsync()
-        {
-            var dto = new Response();
-            try
-            {
-                var email = _configuration["AdminAccount:Email"];
-                var password = _configuration["AdminAccount:Password"];
-
-                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
-                {
-                    dto.IsSucess = false;
-                    dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
-                    dto.Message = "Admin email or password is missing in config";
-                    return dto;
-                }
-
-                var adminDb = await _userRepository.GetByExpression(
-                    a => a.Email == email && 
-                    a.Role == RoleName.Admin && 
-                    a.IsDeleted == false && 
-                    a.IsActive == true);
-                if (adminDb != null)
-                {
-                    dto.IsSucess = false;
-                    dto.BusinessCode = BusinessCode.EXISTED_USER;
-                    dto.Message = "Admin account already exists";
-                    return dto;
-                }
-
-                var passHash = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 12);
-                var admin = new User
-                {
-                    UserId = Guid.NewGuid(),
-                    Email = email,
-                    PasswordHash = passHash,
-                    Role = RoleName.Admin,
-                    IsActive = true,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                };
-
-                await _userRepository.Insert(admin);
-                await _unitOfWork.SaveChangeAsync();
-
-                dto.IsSucess = true;
-                dto.BusinessCode = BusinessCode.SIGN_UP_SUCCESSFULLY;
-                dto.Message = "Admin account created successfully";
-            }
-            catch (Exception ex)
-            {
-                dto.IsSucess = false;
-                dto.BusinessCode = BusinessCode.EXCEPTION;
-                dto.Message = ex.Message;
-            }
 
             return dto;
         }
@@ -571,59 +528,5 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> DeleteUser(Guid? userId)
-        {
-            Response dto = new Response();
-            try
-            {
-                var userDb = await _userRepository.GetById(userId);
-                if (userDb == null)
-                {
-                    dto.BusinessCode = BusinessCode.AUTH_NOT_FOUND;
-                    dto.IsSucess = false;
-                    dto.Message = "User not found";
-                    return dto;
-                }
-                userDb.IsDeleted = true;
-                userDb.DeletedAt = DateTime.Now;
-                userDb.IsActive = false;
-                userDb.UpdatedAt = DateTime.Now;
-                if (userDb.Role == RoleName.Student)
-                {
-                    var studentDb = await _studentRepository.GetByExpression(a => a.UserId == userDb.UserId);
-                    if (studentDb != null)
-                    {
-                        studentDb.IsDeleted = true;
-                        studentDb.DeletedAt = DateTime.Now;
-                        studentDb.UpdatedAt = DateTime.Now;
-                        await _studentRepository.Update(studentDb);
-                    }
-                }
-                var userResponse = new UserAccountResponse()
-                {
-                    UserId = userDb.UserId,
-                    Email = userDb.Email,
-                    Role = userDb.Role,
-                    IsActive = userDb.IsActive,
-                    CreatedAt = userDb.CreatedAt,
-                    UpdatedAt = userDb.UpdatedAt,
-                    IsDeleted = userDb.IsDeleted,
-                    DeletedAt = userDb.DeletedAt,
-                };
-                await _userRepository.Update(userDb);
-                await _unitOfWork.SaveChangeAsync();
-                dto.Data = userResponse;
-                dto.IsSucess = true;
-                dto.BusinessCode = BusinessCode.DELETE_SUCCESSFULLY;
-                dto.Message = "User deleted successfully";
-            }
-            catch (Exception ex)
-            {
-                dto.IsSucess = false;
-                dto.BusinessCode = BusinessCode.EXCEPTION;
-                dto.Message = "An error occurred while delete the user profile";
-            }
-            return dto;
-        }
     }
 }

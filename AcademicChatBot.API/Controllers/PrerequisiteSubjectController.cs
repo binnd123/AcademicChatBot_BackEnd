@@ -37,12 +37,11 @@ namespace AcademicChatBot.API.Controllers
         }
 
         // Lấy thông tin prerequisite expression của môn học trong chương trình học
-        [HttpGet("expressions-of-subject-in-curriculum")]
-        public async Task<IActionResult> GetReadablePrerequisiteExpressionOfSubjectInCurriculum(
-            [FromQuery] Guid subjectId,
-            [FromQuery] Guid curriculumId)
+        [HttpGet("expressions-of-subject")]
+        public async Task<IActionResult> GetReadablePrerequisiteExpressionOfSubject(
+            [FromQuery] Guid subjectId)
         {
-            var response = await _prerequisiteSubjectService.GetReadablePrerequisiteExpressionOfSubjectInCurriculum(subjectId, curriculumId);
+            var response = await _prerequisiteSubjectService.GetReadablePrerequisiteExpressionOfSubject(subjectId);
             if (!response.IsSucess)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)

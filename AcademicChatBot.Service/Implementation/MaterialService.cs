@@ -31,6 +31,15 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                var materialE = await _materialRepository.GetFirstByExpression(x => x.MaterialCode == request.MaterialCode);
+                if (materialE != null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+                    dto.Message = "Material is Existed!";
+                    return dto;
+                }
+
                 var subject = await _subjectRepository.GetById(request.SubjectId);
                 if (subject == null)
                 {
@@ -106,7 +115,7 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllMaterials(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
+        public async Task<Response> GetAllMaterials(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted)
         {
             Response dto = new Response();
             try
@@ -115,7 +124,7 @@ namespace AcademicChatBot.Service.Implementation
                     filter: m => (m.MaterialCode.ToLower().Contains(search.ToLower())
                     || m.MaterialName.ToLower().Contains(search.ToLower())
                     || m.MaterialDescription.ToLower().Contains(search.ToLower()))
-                    && m.IsDeleted == isDelete,
+                    && m.IsDeleted == isDeleted,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: m => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? m.MaterialName : m.MaterialCode,

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,8 +8,8 @@ using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.BussinessModel.Subjects;
 using AcademicChatBot.Common.Enum;
+using AcademicChatBot.DAL.BussinessModel.Subjects;
 using AcademicChatBot.DAL.Contract;
-using AcademicChatBot.DAL.Implementation;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
 using Azure.Core;
@@ -18,11 +19,21 @@ namespace AcademicChatBot.Service.Implementation
     public class SubjectService : ISubjectService
     {
         private readonly IGenericRepository<Subject> _subjectRepository;
+        private readonly IGenericRepository<Assessment> _asessmentRepository;
+        private readonly IGenericRepository<CourseLearningOutcome> _courseLearningOutcomeRepository;
+        private readonly IGenericRepository<ToolForSubject> _toolForSubjectRepository;
+        private readonly IGenericRepository<Material> _materialRepository;
+        private readonly IPrerequisiteSubjectService _prerequisiteSubjectService;
         private readonly IUnitOfWork _unitOfWork;
 
-        public SubjectService(IGenericRepository<Subject> subjectRepository, IUnitOfWork unitOfWork)
+        public SubjectService(IGenericRepository<Subject> subjectRepository, IGenericRepository<Assessment> asessmentRepository, IGenericRepository<CourseLearningOutcome> courseLearningOutcomeRepository, IGenericRepository<ToolForSubject> toolForSubjectRepository, IGenericRepository<Material> materialRepository, IPrerequisiteSubjectService prerequisiteSubjectService, IUnitOfWork unitOfWork)
         {
             _subjectRepository = subjectRepository;
+            _asessmentRepository = asessmentRepository;
+            _courseLearningOutcomeRepository = courseLearningOutcomeRepository;
+            _toolForSubjectRepository = toolForSubjectRepository;
+            _materialRepository = materialRepository;
+            _prerequisiteSubjectService = prerequisiteSubjectService;
             _unitOfWork = unitOfWork;
         }
 
@@ -31,6 +42,15 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                var subjectE = await _subjectRepository.GetFirstByExpression(x => x.SubjectCode == request.SubjectCode);
+                if (subjectE != null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+                    dto.Message = "Subject is Existed!";
+                    return dto;
+                }
+
                 var subject = new Subject
                 {
                     SubjectId = Guid.NewGuid(),
@@ -100,14 +120,14 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllSubjects(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
+        public async Task<Response> GetAllSubjects(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _subjectRepository.GetAllDataByExpression(
                     filter: s => (s.SubjectCode.ToLower().Contains(search.ToLower()) || s.SubjectName.ToLower().Contains(search.ToLower()))
-                    && s.IsDeleted == isDelete, 
+                    && s.IsDeleted == isDeleted, 
                     pageNumber: pageNumber, 
                     pageSize: pageSize, 
                     orderBy: s => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? s.SubjectName : s.SubjectCode, 
@@ -131,14 +151,82 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                dto.Data = await _subjectRepository.GetById(subjectId);
-                if (dto.Data == null)
+                var subject = await _subjectRepository.GetById(subjectId);
+                if (subject == null)
                 {
                     dto.IsSucess = false;
                     dto.BusinessCode = BusinessCode.DATA_NOT_FOUND;
                     dto.Message = "Subject not found";
                     return dto;
                 }
+                var assessments = await _asessmentRepository.GetAllDataByExpression(
+                    filter: s => s.SubjectId == subjectId && !s.IsDeleted,
+                    pageNumber: 1,
+                    pageSize: 1000,
+                    orderBy: null,
+                    isAscending: true,
+                    includes: null);
+                var clos = await _courseLearningOutcomeRepository.GetAllDataByExpression(
+                    filter: s => s.SubjectId == subjectId && !s.IsDeleted,
+                    pageNumber: 1,
+                    pageSize: 1000,
+                    orderBy: null,
+                    isAscending: true,
+                    includes: null);
+                var tools = await _toolForSubjectRepository.GetAllDataByExpression(
+                    filter: s => s.SubjectId == subjectId,
+                    pageNumber: 1,
+                    pageSize: 1000,
+                    orderBy: null,
+                    isAscending: true,
+                    includes: t => t.Tool);
+                var materials = await _materialRepository.GetAllDataByExpression(
+                    filter: s => s.SubjectId == subjectId && !s.IsDeleted,
+                    pageNumber: 1,
+                    pageSize: 1000,
+                    orderBy: null,
+                    isAscending: true,
+                    includes: null);
+
+                var prerequisiteSubjectsResponse = await _prerequisiteSubjectService.GetReadablePrerequisiteExpressionOfSubject(subjectId);
+                var prerequisiteSubjects = (object)null;
+                if (prerequisiteSubjectsResponse.IsSucess)
+                {
+                    prerequisiteSubjects = prerequisiteSubjectsResponse.Data;
+                }
+                else
+                {
+                    prerequisiteSubjects = null;
+                }
+                dto.Data = new DetailSubjectResponse
+                {
+                    SubjectId = subject.SubjectId,
+                    SubjectCode = subject.SubjectCode,
+                    SubjectName = subject.SubjectName,
+                    SessionNo = subject.SessionNo,
+                    DecisionNo = subject.DecisionNo,
+                    IsActive = subject.IsActive,
+                    IsApproved = subject.IsApproved,
+                    CreatedAt = subject.CreatedAt,
+                    UpdatedAt = subject.UpdatedAt,
+                    DeletedAt = subject.DeletedAt,
+                    IsDeleted = subject.IsDeleted,
+                    NoCredit = subject.NoCredit,
+                    ApprovedDate = subject.ApprovedDate,
+                    SyllabusName = subject.SyllabusName,
+                    DegreeLevel = subject.DegreeLevel,
+                    TimeAllocation = subject.TimeAllocation,
+                    Description = subject.Description,
+                    StudentTasks = subject.StudentTasks,
+                    ScoringScale = subject.ScoringScale,
+                    MinAvgMarkToPass = subject.MinAvgMarkToPass,
+                    Note = subject.Note,
+                    Assessments = assessments.Items,
+                    CourseLearningOutcomes = clos.Items,
+                    Tools = tools.Items.Select(x => x.Tool).ToList(),
+                    Materials = materials.Items,
+                    PrerequisiteSubjects = prerequisiteSubjects
+                };
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Subject retrieved successfully";

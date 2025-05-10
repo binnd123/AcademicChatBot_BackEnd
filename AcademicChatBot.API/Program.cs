@@ -12,15 +12,17 @@ using System.Text.Json.Serialization;
 using AcademicChatBot.Service.HubService;
 using AcademicChatBot.Common.BussinessModel.Accounts;
 using AcademicChatBot.Common.MLModels;
+using Polly.Extensions.Http;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 builder.Services.AddSignalR();
 //Initial Model AI
 builder.Services.AddSingleton<IMLModel, MLModel>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProgramService, ProgramService>();
@@ -34,7 +36,7 @@ builder.Services.AddScoped<IClassificationService, ClassificationService>();
 builder.Services.AddScoped<IMaterialService, MaterialService>();
 builder.Services.AddScoped<IAssessmentService, AssessmentService>();
 builder.Services.AddScoped<IPOMappingPLOService, POMappingPLOService>();
-builder.Services.AddHttpClient<IGeminiAPIService, GeminiAPIService>();
+builder.Services.AddHttpClient<IGeminiAPIService, GeminiAPIService>().AddPolicyHandler(GetRetryPolicy());
 builder.Services.AddScoped<IIntentDetectorService, IntentDetectorService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IAIChatLogService, AIChatLogService>();
@@ -49,7 +51,12 @@ builder.Services.AddScoped<IPrerequisiteConstraintService, PrerequisiteConstrain
 builder.Services.AddScoped<IPrerequisiteSubjectService, PrerequisiteSubjectService>();
 builder.Services.AddScoped<IComboService, ComboService>();
 var secretKey = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]);
-
+IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Min(Math.Pow(2, retryAttempt), 5)));
+}
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

@@ -13,15 +13,16 @@ namespace AcademicChatBot.Service.Contract
     public interface IPrerequisiteSubjectService
     {
         //Task<Response> CreatePrerequisiteSubject(CreatePrerequisiteSubjectRequest request);
-        //Task<Response> GetAllPrerequisiteSubjects(int pageNumber, int pageSize, SortBy sortBy, SortType sortType, bool isDelete);
+        //Task<Response> GetAllPrerequisiteSubjects(int pageNumber, int pageSize, SortBy sortBy, SortType sortType, bool isDeleted);
         //Task<Response> UpdatePrerequisiteSubject(Guid id, UpdatePrerequisiteSubjectRequest request);
         //Task<Response> DeletePrerequisiteSubject(Guid id);
         Task<Response> GetPrerequisiteSubjectById(Guid id);
         Task<Response> GetReadablePrerequisiteExpression(Guid prerequisiteConstrainId);
-        Task<Response> GetReadablePrerequisiteExpressionOfSubjectInCurriculum(Guid subjectId, Guid curriculumId);
+        Task<Response> GetReadablePrerequisiteExpressionOfSubject(Guid subjectId);
         Task<Response> GetAllPrerequisiteSubjectsForPrerequisiteConstrain(Guid prerequisiteConstrainId, int pageNumber, int pageSize);
         Task<Response> AddPrerequisiteSubjectsToPrerequisiteConstrain(Guid prerequisiteConstrainId, List<PrerequisiteSubjectsToPrerequisiteConstrainRequest> requests);
         Task<Response> DeletePrerequisiteSubjectsFromPrerequisiteConstrain(Guid prerequisiteConstrainId, List<Guid> prerequisiteSubjectIds);
         Task<Response> DeleteAllPrerequisiteSubjectsFromPrerequisiteConstrain(Guid prerequisiteConstrainId);
+        public Task<List<object>> PrerequisiteExpressionForChat();
     }
 }

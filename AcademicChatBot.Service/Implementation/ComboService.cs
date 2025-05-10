@@ -31,6 +31,15 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                var comboE = await _comboRepository.GetFirstByExpression(x => x.ComboCode == request.ComboCode);
+                if (comboE != null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+                    dto.Message = "Combo is Existed!";
+                    return dto;
+                }
+
                 var program = await _programRepository.GetById(request.ProgramId);
                 if (program == null)
                 {
@@ -72,13 +81,13 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllCombos(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
+        public async Task<Response> GetAllCombos(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _comboRepository.GetAllDataByExpression(
-                    filter: c => (c.ComboName.ToLower().Contains(search.ToLower()) || c.ComboCode.ToLower().Contains(search.ToLower())) && c.IsDeleted == isDelete,
+                    filter: c => (c.ComboName.ToLower().Contains(search.ToLower()) || c.ComboCode.ToLower().Contains(search.ToLower())) && c.IsDeleted == isDeleted,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.ComboName : c.ComboCode,

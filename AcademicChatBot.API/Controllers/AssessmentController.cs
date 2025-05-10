@@ -41,12 +41,12 @@ namespace AcademicChatBot.API.Controllers
             [FromQuery] string search = "",
             [FromQuery] SortBy sortBy = SortBy.Default,
             [FromQuery] SortType sortType = SortType.Ascending,
-            [FromQuery] bool isDelete = false
+            [FromQuery] bool isDeleted = false
         )
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? 5 : pageSize;
-            var response = await _assessmentService.GetAllAssessments(pageNumber, pageSize, search, sortBy, sortType, isDelete);
+            var response = await _assessmentService.GetAllAssessments(pageNumber, pageSize, search, sortBy, sortType, isDeleted);
             if (response.IsSucess == false)
             {
                 if (response.BusinessCode == BusinessCode.EXCEPTION)

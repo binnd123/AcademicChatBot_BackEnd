@@ -22,8 +22,5 @@ namespace AcademicChatBot.DAL.Models
         public Guid? SubjectId { get; set; }
         [ForeignKey(nameof(SubjectId))]
         public Subject? Subject { get; set; }
-        public Guid? AssessmentId { get; set; }
-        [ForeignKey(nameof(AssessmentId))]
-        public Assessment? Assessment { get; set; }
     }
 }

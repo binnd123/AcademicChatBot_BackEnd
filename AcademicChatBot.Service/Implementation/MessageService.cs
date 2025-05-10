@@ -110,7 +110,7 @@ namespace AcademicChatBot.Service.Implementation
                 await _messageRepository.Insert(messageUserRequest);
 
                 // Gọi IChatService để generate câu trả lời từ AI  
-                var botResponse = await aIChatLogService.GenerateResponseAsync(senderId, content, aIChatLog.Topic);
+                var botResponse = await aIChatLogService.GenerateResponseAsync(aIChatLogId, content, aIChatLog.Topic);
 
                 // Tạo đối tượng tin nhắn của bot với nội dung trả lời từ AI  
                 var messageBotResponse = new Message

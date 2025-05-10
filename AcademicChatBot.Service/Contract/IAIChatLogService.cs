@@ -10,12 +10,12 @@ namespace AcademicChatBot.Service.Contract
 {
     public interface IAIChatLogService
     {
-        Task<Response> GetAllAIChatLogByTopic(Guid? userId, int pageNumber, int pageSize, bool isDelete, TopicChat topicChat);
+        Task<Response> GetAllAIChatLogByTopic(Guid? userId, int pageNumber, int pageSize, bool isDeleted, TopicChat topicChat);
         Task<Response> GetAIChatLogById(Guid? userId, Guid aIChatLogId);
         //Task<Response> GetAIChatLogActivedByUserId(Guid? userId);
         Task<Response> UpdateAIChatLog(Guid? userId, Guid aIChatLogId, string? aIChatLogName);
         Task<Response> CreateAIChatLog(Guid? userId, TopicChat topic);
-        Task<Response> GenerateResponseAsync(Guid? userId, string message, TopicChat topicChat);
+        Task<Response> GenerateResponseAsync(Guid? aIChatLogId, string message, TopicChat topicChat);
         Task<Response> DeleteAIChatLog(Guid? userId, Guid aIChatLogId);
         Task<string> GenerateTiltleAsync(string message);
     }

@@ -29,6 +29,15 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                var toolE = await _toolRepository.GetFirstByExpression(x => x.ToolCode == request.ToolCode);
+                if (toolE != null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+                    dto.Message = "Tool is Existed!";
+                    return dto;
+                }
+
                 var tool = new Tool
                 {
                     ToolId = Guid.NewGuid(),
@@ -89,14 +98,14 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllTools(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
+        public async Task<Response> GetAllTools(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _toolRepository.GetAllDataByExpression(
                     filter: t => (t.ToolName.ToLower().Contains(search.ToLower()) || t.ToolCode.ToLower().Contains(search.ToLower()))
-                    && t.IsDeleted == isDelete,
+                    && t.IsDeleted == isDeleted,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: t => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? t.ToolName : t.ToolCode,

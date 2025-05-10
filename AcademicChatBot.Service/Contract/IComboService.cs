@@ -12,7 +12,7 @@ namespace AcademicChatBot.Service.Contract
     public interface IComboService
     {
         Task<Response> CreateCombo(CreateComboRequest request);
-        Task<Response> GetAllCombos(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete);
+        Task<Response> GetAllCombos(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted);
         Task<Response> GetComboById(Guid id);
         Task<Response> UpdateCombo(Guid id, UpdateComboRequest request);
         Task<Response> DeleteCombo(Guid id);

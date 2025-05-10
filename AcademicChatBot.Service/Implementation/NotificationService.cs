@@ -103,14 +103,14 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllNotificationsOfUser(Guid userId, int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
+        public async Task<Response> GetAllNotificationsOfUser(Guid userId, int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted)
         {
             Response dto = new Response();
             try
             {
                 var notifications = await _notificationRepository.GetAllDataByExpression(
                     filter: t => (t.NotificationName.ToLower().Contains(search.ToLower()) || t.NotificationCode.ToLower().Contains(search.ToLower()))
-                    && t.IsDeleted == isDelete && t.UserId == userId,
+                    && t.IsDeleted == isDeleted && t.UserId == userId,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: t => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? t.NotificationName : t.NotificationCode,

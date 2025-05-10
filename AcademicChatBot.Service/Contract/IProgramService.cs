@@ -12,7 +12,7 @@ namespace AcademicChatBot.Service.Contract
 {
     public interface IProgramService
     {
-        Task<Response> GetAllPrograms(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete);
+        Task<Response> GetAllPrograms(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted);
         Task<Response> GetProgramById(Guid programId);
         public Task<Response> CreateProgram(CreateProgramRequest request);
         public Task<Response> UpdateProgram(Guid programId, UpdateProgramRequest request);

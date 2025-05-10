@@ -9,6 +9,7 @@ using AcademicChatBot.Common.BussinessModel;
 using AcademicChatBot.Common.Enum;
 using System.Globalization;
 using System.Linq.Expressions;
+using AcademicChatBot.DAL.BussinessModel.Curriculums;
 
 
 namespace AcademicChatBot.Service.Implementation
@@ -18,17 +19,15 @@ namespace AcademicChatBot.Service.Implementation
         private readonly IGenericRepository<Curriculum> _curriculumRepository;
         private readonly IGenericRepository<Major> _majorRepository;
         private readonly IGenericRepository<Program> _programRepository;
+        private readonly IGenericRepository<ProgramingLearningOutcome> _programingLearningOutcomeRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CurriculumService(
-            IGenericRepository<Curriculum> curriculumRepository,
-            IGenericRepository<Major> majorRepository,
-            IGenericRepository<Program> programRepository,
-            IUnitOfWork unitOfWork)
+        public CurriculumService(IGenericRepository<Curriculum> curriculumRepository, IGenericRepository<Major> majorRepository, IGenericRepository<Program> programRepository, IGenericRepository<ProgramingLearningOutcome> programingLearningOutcomeRepository, IUnitOfWork unitOfWork)
         {
             _curriculumRepository = curriculumRepository;
             _majorRepository = majorRepository;
             _programRepository = programRepository;
+            _programingLearningOutcomeRepository = programingLearningOutcomeRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -37,6 +36,15 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
+                var curriculumE = await _curriculumRepository.GetFirstByExpression(x => x.CurriculumCode == request.CurriculumCode);
+                if (curriculumE != null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+                    dto.Message = "Curriculum is Existed!";
+                    return dto;
+                }
+
                 var major = await _majorRepository.GetById(request.MajorId);
                 if (major == null)
                 {
@@ -119,7 +127,7 @@ namespace AcademicChatBot.Service.Implementation
             return dto;
         }
 
-        public async Task<Response> GetAllCurriculums(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDelete)
+        public async Task<Response> GetAllCurriculums(int pageNumber, int pageSize, string search, SortBy sortBy, SortType sortType, bool isDeleted)
         {
             Response dto = new Response();
             try
@@ -132,7 +140,7 @@ namespace AcademicChatBot.Service.Implementation
 
                 dto.Data = await _curriculumRepository.GetAllDataByExpression(
                     filter: c => (c.CurriculumName.ToLower().Contains(search.ToLower()) || c.CurriculumCode.ToLower().Contains(search.ToLower()))
-                    && c.IsDeleted == isDelete,
+                    && c.IsDeleted == isDeleted,
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.CurriculumName : c.CurriculumCode,
@@ -158,7 +166,13 @@ namespace AcademicChatBot.Service.Implementation
             Response dto = new Response();
             try
             {
-                var curriculum = await _curriculumRepository.GetById(curriculumId);
+                var curriculum = await _curriculumRepository.GetFirstByExpression(
+                    filter: x => x.CurriculumId == curriculumId,
+                    includeProperties: new Expression<Func<Curriculum, object>>[]
+                {
+                    c => c.Major,
+                    c => c.Program
+                });
                 if (curriculum == null)
                 {
                     dto.IsSucess = false;
@@ -166,8 +180,31 @@ namespace AcademicChatBot.Service.Implementation
                     dto.Message = "Curriculum not found";
                     return dto;
                 }
-
-                dto.Data = curriculum;
+                var plos = await _programingLearningOutcomeRepository.GetAllDataByExpression(
+                    filter: s => s.CurriculumId == curriculumId && !s.IsDeleted,
+                    pageNumber: 1,
+                    pageSize: 1000,
+                    orderBy: null,
+                    isAscending: true,
+                    includes: null);
+                dto.Data = new DetailCurriculumResponse
+                {
+                    CurriculumId = curriculum.CurriculumId,
+                    CurriculumCode = curriculum.CurriculumCode,
+                    CurriculumName = curriculum.CurriculumName,
+                    Description = curriculum.Description,
+                    DecisionNo = curriculum.DecisionNo,
+                    PreRequisite = curriculum.PreRequisite,
+                    IsActive = curriculum.IsActive,
+                    IsApproved = curriculum.IsApproved,
+                    CreatedAt = curriculum.CreatedAt,
+                    UpdatedAt = curriculum.UpdatedAt,
+                    DeletedAt = curriculum.DeletedAt,
+                    IsDeleted = curriculum.IsDeleted,
+                    Major = curriculum.Major,
+                    Program = curriculum.Program,
+                    ProgramingLearningOutcomes = plos.Items
+                };
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.Message = "Curriculum retrieved successfully";
@@ -247,13 +284,13 @@ namespace AcademicChatBot.Service.Implementation
             }
             return dto;
         }
-        public async Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode, SortBy sortBy, SortType sortType, bool isDelete)
+        public async Task<Response> GetCurriculumByCode(int pageNumber, int pageSize, string curriculumCode, SortBy sortBy, SortType sortType, bool isDeleted)
         {
             Response dto = new Response();
             try
             {
                 var curriculum = await _curriculumRepository.GetAllDataByExpression(
-                filter: c => c.CurriculumCode.Contains(curriculumCode) && c.IsDeleted == isDelete,
+                filter: c => c.CurriculumCode.Contains(curriculumCode) && c.IsDeleted == isDeleted,
                 pageNumber: pageNumber,
                 pageSize: pageSize,
                 orderBy: c => sortBy == SortBy.Default ? null : sortBy == SortBy.Name ? c.CurriculumName : c.CurriculumCode,

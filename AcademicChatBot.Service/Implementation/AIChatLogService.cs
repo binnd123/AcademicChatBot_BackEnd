@@ -7,13 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using AcademicChatBot.Common.BussinessCode;
 using AcademicChatBot.Common.BussinessModel;
+using AcademicChatBot.Common.BussinessModel.AIChatLogs;
 using AcademicChatBot.Common.Enum;
 using AcademicChatBot.Common.Utils;
 using AcademicChatBot.DAL.Contract;
 using AcademicChatBot.DAL.Models;
 using AcademicChatBot.Service.Contract;
-using Azure.Core;
-using static Azure.Core.HttpHeader;
 
 namespace AcademicChatBot.Service.Implementation
 {
@@ -24,53 +23,47 @@ namespace AcademicChatBot.Service.Implementation
         private readonly IGenericRepository<Subject> _subjectRepository;
         private readonly IGenericRepository<Major> _majorRepository;
         private readonly IGenericRepository<Program> _programRepository;
-        private readonly IGenericRepository<Tool> _toolRepository;
-        private readonly IGenericRepository<Material> _materialRepository;
-        private readonly IGenericRepository<PrerequisiteConstraint> _prerequisiteConstraintRepository;
         private readonly IGenericRepository<PrerequisiteSubject> _prerequisiteSubjectRepository;
+        private readonly IGenericRepository<PrerequisiteConstraint> _prerequisiteConstraintRepository;
         private readonly IGenericRepository<Combo> _comboRepository;
         private readonly IGenericRepository<ComboSubject> _comboSubjectRepository;
-        private readonly IGenericRepository<Notification> _notificationRepository;
-        private readonly IGenericRepository<ProgramingLearningOutcome> _programingLearningOutcomeRepository;
         private readonly IGenericRepository<ProgramingOutcome> _programingOutcomeRepository;
         private readonly IGenericRepository<CourseLearningOutcome> _courseLearningOutcomeRepository;
         private readonly IGenericRepository<Curriculum> _curriculumRepository;
         private readonly IGenericRepository<SubjectInCurriculum> _subjectInCurriculumRepository;
-        private readonly IGenericRepository<POMappingPLO> _pOMappingPLORepository;
         private readonly IGenericRepository<Assessment> _assessmentRepository;
+        private readonly IGenericRepository<Material> _materialRepository;
         private readonly IGenericRepository<ToolForSubject> _toolForSubjectRepository;
+        private readonly IGenericRepository<Tool> _toolRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IIntentDetectorService intentDetectorService;
         private readonly IGeminiAPIService geminiApiService;
+        private readonly IPrerequisiteSubjectService _prerequisiteSubjectService;
 
-        public AIChatLogService(IGenericRepository<AIChatLog> aIChatLogRepository, IGenericRepository<Message> messageRepository, IGenericRepository<Subject> subjectRepository, IGenericRepository<Major> majorRepository, IGenericRepository<Program> programRepository, IGenericRepository<Tool> toolRepository, IGenericRepository<Material> materialRepository, IGenericRepository<PrerequisiteConstraint> prerequisiteConstraintRepository, IGenericRepository<PrerequisiteSubject> prerequisiteSubjectRepository, IGenericRepository<Combo> comboRepository, IGenericRepository<ComboSubject> comboSubjectRepository, IGenericRepository<Notification> notificationRepository, IGenericRepository<ProgramingLearningOutcome> programingLearningOutcomeRepository, IGenericRepository<ProgramingOutcome> programingOutcomeRepository, IGenericRepository<CourseLearningOutcome> courseLearningOutcomeRepository, IGenericRepository<Curriculum> curriculumRepository, IGenericRepository<SubjectInCurriculum> subjectInCurriculumRepository, IGenericRepository<POMappingPLO> pOMappingPLORepository, IGenericRepository<Assessment> assessmentRepository, IGenericRepository<ToolForSubject> toolForSubjectRepository, IUnitOfWork unitOfWork, IIntentDetectorService intentDetectorService, IGeminiAPIService geminiApiService)
+        public AIChatLogService(IGenericRepository<AIChatLog> aIChatLogRepository, IGenericRepository<Message> messageRepository, IGenericRepository<Subject> subjectRepository, IGenericRepository<Major> majorRepository, IGenericRepository<Program> programRepository, IGenericRepository<PrerequisiteSubject> prerequisiteSubjectRepository, IGenericRepository<PrerequisiteConstraint> prerequisiteConstraintRepository, IGenericRepository<Combo> comboRepository, IGenericRepository<ComboSubject> comboSubjectRepository, IGenericRepository<ProgramingOutcome> programingOutcomeRepository, IGenericRepository<CourseLearningOutcome> courseLearningOutcomeRepository, IGenericRepository<Curriculum> curriculumRepository, IGenericRepository<SubjectInCurriculum> subjectInCurriculumRepository, IGenericRepository<Assessment> assessmentRepository, IGenericRepository<Material> materialRepository, IGenericRepository<ToolForSubject> toolForSubjectRepository, IGenericRepository<Tool> toolRepository, IUnitOfWork unitOfWork, IIntentDetectorService intentDetectorService, IGeminiAPIService geminiApiService, IPrerequisiteSubjectService prerequisiteSubjectService)
         {
             _aIChatLogRepository = aIChatLogRepository;
             _messageRepository = messageRepository;
             _subjectRepository = subjectRepository;
             _majorRepository = majorRepository;
             _programRepository = programRepository;
-            _toolRepository = toolRepository;
-            _materialRepository = materialRepository;
-            _prerequisiteConstraintRepository = prerequisiteConstraintRepository;
             _prerequisiteSubjectRepository = prerequisiteSubjectRepository;
+            _prerequisiteConstraintRepository = prerequisiteConstraintRepository;
             _comboRepository = comboRepository;
             _comboSubjectRepository = comboSubjectRepository;
-            _notificationRepository = notificationRepository;
-            _programingLearningOutcomeRepository = programingLearningOutcomeRepository;
             _programingOutcomeRepository = programingOutcomeRepository;
             _courseLearningOutcomeRepository = courseLearningOutcomeRepository;
             _curriculumRepository = curriculumRepository;
             _subjectInCurriculumRepository = subjectInCurriculumRepository;
-            _pOMappingPLORepository = pOMappingPLORepository;
             _assessmentRepository = assessmentRepository;
+            _materialRepository = materialRepository;
             _toolForSubjectRepository = toolForSubjectRepository;
+            _toolRepository = toolRepository;
             _unitOfWork = unitOfWork;
             this.intentDetectorService = intentDetectorService;
             this.geminiApiService = geminiApiService;
+            _prerequisiteSubjectService = prerequisiteSubjectService;
         }
-
-
 
         //private string BuildPrompt(IntentType intent, string userMessage, string contextData)
         //{
@@ -124,15 +117,17 @@ namespace AcademicChatBot.Service.Implementation
             - 🎓 Kỳ 9: đồ án tốt nghiệp (Capstone Project) thay cho môn Coursera.";
 
             string guidance = @"
-            🎯 Hãy đưa ra lời khuyên và định hướng học tập phù hợp dựa trên nội dung trên. Lưu ý:
-            1. Sử dụng emoji để tạo cảm giác thân thiện và dễ hiểu (ví dụ: 🎯, 💡, 👨‍🎓, ✅…).
-            2. Giọng văn gần gũi, rõ ràng nhưng vẫn mang tính chuyên môn. Đan xen một vài câu hài hước nhẹ nhàng 😄.
-            3. Tránh thông tin sai lệch hoặc ngôn ngữ trừu tượng.
-            4. Ưu tiên ví dụ thực tế hoặc gợi ý cụ thể.
-            5. Trình bày mạch lạc, chia đề mục rõ ràng.
-            6. Giữ độ dài khoảng 20 câu.
+            🎯 Hãy trả lời ngắn gọn, rõ ràng và đúng trọng tâm câu hỏi. Lưu ý:
+            1. Ưu tiên cung cấp thông tin thật sự cần thiết để sinh viên hiểu và ra quyết định.
+            2. Tránh lan man, suy diễn hoặc đưa thông tin không liên quan.
+            3. Độ dài tối ưu: 5–10 câu. Ưu tiên chất lượng hơn số lượng.
+            4. Trình bày mạch lạc, có thể chia đề mục nếu cần thiết.
+            5. Chỉ đưa ví dụ minh họa nếu câu hỏi yêu cầu rõ ràng.
+            6. Sử dụng emoji hợp lý để tạo cảm giác thân thiện và dễ hiểu (🎯, 💡, 👨‍🎓, ✅…).
+            7. Giữ giọng văn gần gũi, chuyên môn; tránh ngôn ngữ trừu tượng hoặc hài hước quá mức.
 
             Bắt đầu nhé! 🎉";
+
 
             string topicSpecificPrompt = intent switch
             {
@@ -209,7 +204,139 @@ Chỉ trả về đúng 1 tiêu đề khoảng 3-5 từ.
             return geminiResponse;
         }
 
-        public async Task<Response> GenerateResponseAsync(Guid? userId, string message, TopicChat topicChat)
+        private async Task<AcademicContext> BuildAcademicContextObjectAsync()
+        {
+            var programs = await _programRepository.GetAllDataByExpression(
+                filter: c => !c.IsDeleted,
+                pageNumber: 1,
+                pageSize: int.MaxValue,
+                orderBy: null,
+                isAscending: true,
+                includes: null);
+
+            var majors = await _majorRepository.GetAllDataByExpression(
+                filter: c => !c.IsDeleted,
+                pageNumber: 1,
+                pageSize: int.MaxValue,
+                orderBy: m => m.MajorName,
+                isAscending: true,
+                includes: null);
+
+            var curriculums = await _curriculumRepository.GetAllDataByExpression(
+                filter: c => !c.IsDeleted,
+                pageNumber: 1,
+                pageSize: int.MaxValue,
+                orderBy: null,
+                isAscending: true,
+                includes: c => c.Major);
+
+            var subjects = await _subjectRepository.GetAllDataByExpression(
+                filter: c => !c.IsDeleted,
+                pageNumber: 1,
+                pageSize: int.MaxValue,
+                orderBy: null,
+                isAscending: true,
+                includes: null);
+
+            var subjectInCurriculums = await _subjectInCurriculumRepository.GetAllDataByExpression(
+                filter: null,
+                pageNumber: 1,
+                pageSize: int.MaxValue,
+                orderBy: null,
+                isAscending: true,
+                includes: new Expression<Func<SubjectInCurriculum, object>>[]
+                {
+                  c => c.Subject,
+                  c => c.Curriculum
+                });
+
+            var comboSubjects = await _comboSubjectRepository.GetAllDataByExpression(
+                filter: null,
+                pageNumber: 1,
+                pageSize: int.MaxValue,
+                orderBy: null,
+                isAscending: true,
+                includes: new Expression<Func<ComboSubject, object>>[]
+                {
+                  c => c.Subject,
+                  c => c.Combo
+                });
+
+            var combos = await _comboRepository.GetAllDataByExpression(
+                filter: c => !c.IsDeleted,
+                pageNumber: 1,
+                pageSize: int.MaxValue,
+                orderBy: null,
+                isAscending: true,
+                includes: c => c.Program);
+
+            var prerequisiteSubjects = await _prerequisiteSubjectService.PrerequisiteExpressionForChat();
+
+            return new AcademicContext
+            {
+                Majors = majors.Items.Select(m => new
+                {
+                    m.MajorCode,
+                    m.MajorName,
+                }).ToList(),
+
+                Curriculums = curriculums.Items.Select(m => new
+                {
+                    m.CurriculumCode,
+                    m.CurriculumName,
+                    m.Description,
+                    MajorCode = m.Major?.MajorCode ?? string.Empty, // Fix for CS8602  
+                }).ToList(),
+
+                Subjects = subjects.Items.Select(m => new
+                {
+                    m.SubjectCode,
+                    m.SubjectName,
+                    m.DegreeLevel,
+                    m.Description,
+                    m.SessionNo,
+                    m.SyllabusName,
+                    m.MinAvgMarkToPass,
+                    m.NoCredit,
+                    m.TimeAllocation,
+                    m.ScoringScale,
+                    m.StudentTasks,
+                    m.Note,
+                }).ToList(),
+
+                PrerequisiteSubjects = prerequisiteSubjects,
+
+                SubjectInCurriculums = subjectInCurriculums.Items.Select(m => new
+                {
+                    m.SemesterNo,
+                    CurriculumCode = m.Curriculum?.CurriculumCode ?? string.Empty, 
+                    SubjectCode = m.Subject?.SubjectCode ?? string.Empty, 
+                }).ToList(),
+
+                Programs = programs.Items.Select(m => new
+                {
+                    m.ProgramCode,
+                    m.ProgramName,
+                }).ToList(),
+
+                Combos = combos.Items.Select(m => new
+                {
+                    m.ComboCode,
+                    m.ComboName,
+                    m.Description,
+                    ProgramCode = m.Program?.ProgramCode ?? string.Empty, 
+                }).ToList(),
+
+                ComboSubjects = comboSubjects.Items.Select(m => new
+                {
+                    m.SemesterNo,
+                    ComboCode = m.Combo?.ComboCode ?? string.Empty, 
+                    SubjectCode = m.Subject?.SubjectCode ?? string.Empty, 
+                }).ToList(),
+            };
+        }
+
+        public async Task<Response> GenerateResponseAsync(Guid? aIChatLogId, string message, TopicChat topicChat)
         {
             Response dto = new Response();
             try
@@ -231,88 +358,21 @@ Chỉ trả về đúng 1 tiêu đề khoảng 3-5 từ.
                 {
                     case IntentType.AskMajorAdvice:
                         {
-                            var majors = await _majorRepository.GetAllDataByExpression(
-                                filter: c => !c.IsDeleted
-                                , pageNumber: 1
-                                , pageSize: int.MaxValue
-                                , orderBy: m => m.MajorName
-                                , isAscending: true
-                                , includes: null); // Lấy danh sách ngành
-                            var curriculums = await _curriculumRepository.GetAllDataByExpression(
-                                filter: c => !c.IsDeleted
-                                , pageNumber: 1
-                                , pageSize: int.MaxValue
-                                , orderBy: null
-                                , isAscending: true
-                                , includes: c => c.Major); // Lấy danh sách khung chương trình
-                            contextData = JsonSerializerHelper.SerializeData(new
-                            {
-                                Majors = majors.Items,
-                                Curriculums = curriculums.Items,
-                            });
+                            var academicContext = await BuildAcademicContextObjectAsync();
+                            contextData = JsonSerializerHelper.SerializeData(academicContext);
                             break;
                         }
 
                     case IntentType.AskSpecializationCombo:
                         {
-                            var comboSubjects = await _comboSubjectRepository.GetAllDataByExpression(
-                                filter: null,
-                                pageNumber: 1,
-                                pageSize: int.MaxValue,
-                                orderBy: null,
-                                isAscending: true,
-                                includes: new Expression<Func<ComboSubject, object>>[]
-                                {
-                                    c => c.Subject,
-                                    c => c.Combo
-                                }); // Lấy danh sách tổ hợp
-                            var combos = await _comboRepository.GetAllDataByExpression(
-                                filter: null,
-                                pageNumber: 1,
-                                pageSize: int.MaxValue,
-                                orderBy: null,
-                                isAscending: true,
-                                includes: c => c.Program); // Lấy danh sách tổ hợp
-                            var prerequisiteSubjects = await _prerequisiteSubjectRepository.GetAllDataByExpression(
-                                filter: null,
-                                pageNumber: 1,
-                                pageSize: int.MaxValue,
-                                orderBy: null,
-                                isAscending: true,
-                                includes: new Expression<Func<PrerequisiteSubject, object>>[]
-                                {
-                                    c => c.PrerequisiteSubjectInfo,
-                                    c => c.PrerequisiteConstraint
-                                });
-                            contextData = JsonSerializerHelper.SerializeData(new
-                            {
-                                Combos = combos.Items,
-                                ComboSubjects = comboSubjects.Items,
-                                PrerequisiteSubjects = prerequisiteSubjects.Items,
-                            });
+                            var academicContext = await BuildAcademicContextObjectAsync();
+                            contextData = JsonSerializerHelper.SerializeData(academicContext);
                             break;
                         }
 
                     case IntentType.AskProgram:
                         {
-                            var programs = await _programRepository.GetAllDataByExpression(
-                                filter: c => !c.IsDeleted,
-                                pageNumber: 1,
-                                pageSize: int.MaxValue,
-                                orderBy: null,
-                                isAscending: true,
-                                includes: null); // Lấy danh sách chương trình học
-                            var subjectInCurriculums = await _subjectInCurriculumRepository.GetAllDataByExpression(
-                                filter: null,
-                                pageNumber: 1,
-                                pageSize: int.MaxValue,
-                                orderBy: null,
-                                isAscending: true,
-                                includes: new Expression<Func<SubjectInCurriculum, object>>[]
-                                {
-                                    c => c.Subject,
-                                    c => c.Curriculum
-                                }); // Lấy khung chương trình học
+                            var academicContext = await BuildAcademicContextObjectAsync();
                             var pOs = await _programingOutcomeRepository.GetAllDataByExpression(
                                 filter: c => !c.IsDeleted,
                                 pageNumber: 1,
@@ -320,58 +380,37 @@ Chỉ trả về đúng 1 tiêu đề khoảng 3-5 từ.
                                 orderBy: null,
                                 isAscending: true,
                                 includes: p => p.Program); // Lấy danh sách PO
-                            var pOMappingPLO = await _pOMappingPLORepository.GetAllDataByExpression(
-                                filter: null,
-                                pageNumber: 1,
-                                pageSize: int.MaxValue,
-                                orderBy: null,
-                                isAscending: true,
-                                includes: new Expression<Func<POMappingPLO, object>>[]
-                                {
-                                    c => c.ProgramingOutcome,
-                                    c => c.ProgramingLearningOutcome
-                                }); // Lấy danh sách PO-PLO
                             contextData = JsonSerializerHelper.SerializeData(new
                             {
-                                Program = programs.Items,
-                                POs = pOs.Items,
-                                POMappingPLO = pOMappingPLO.Items,
-                                SubjectInCurriculums = subjectInCurriculums.Items,
+                                academicContext.Majors,
+                                academicContext.Curriculums,
+                                academicContext.Subjects,
+                                academicContext.PrerequisiteSubjects,
+                                academicContext.SubjectInCurriculums,
+                                academicContext.Programs,
+                                academicContext.Combos,
+                                academicContext.ComboSubjects,
+                                POs = pOs.Items.Select(m => new
+                                {
+                                    m.ProgramingOutcomeCode,
+                                    m.ProgramingOutcomeName,
+                                    m.Description,
+                                    ProgramCode = m.Program?.ProgramCode ?? string.Empty,
+                                }).ToList(),
                             });
                             break;
                         }
 
                     case IntentType.AskSubject:
                         {
-                            var subjectInCurriculums = await _subjectInCurriculumRepository.GetAllDataByExpression(
-                                filter: null, 
-                                pageNumber: 1, 
-                                pageSize: int.MaxValue, 
-                                orderBy: s => s.SemesterNo, 
-                                isAscending: true, 
-                                includes: new Expression<Func<SubjectInCurriculum, object>>[]
-                                {
-                                    c => c.Subject,
-                                    c => c.Curriculum
-                                });
-                            var subjects= await _subjectRepository.GetAllDataByExpression(
-                                filter: null,
+                            var academicContext = await BuildAcademicContextObjectAsync();
+                            var tools = await _toolRepository.GetAllDataByExpression(
+                                filter: c => !c.IsDeleted,
                                 pageNumber: 1,
                                 pageSize: int.MaxValue,
                                 orderBy: null,
                                 isAscending: true,
                                 includes: null);
-                            var cLOs = await _courseLearningOutcomeRepository.GetAllDataByExpression(
-                                filter: null,
-                                pageNumber: 1,
-                                pageSize: int.MaxValue,
-                                orderBy: null,
-                                isAscending: true,
-                                includes: new Expression<Func<CourseLearningOutcome, object>>[]
-                                {
-                                    c => c.Subject,
-                                    c => c.Assessment
-                                });
                             var toolForSubjects = await _toolForSubjectRepository.GetAllDataByExpression(
                                 filter: null,
                                 pageNumber: 1,
@@ -383,43 +422,106 @@ Chỉ trả về đúng 1 tiêu đề khoảng 3-5 từ.
                                     c => c.Subject,
                                     c => c.Tool
                                 });
-                            var prerequisiteSubjects = await _prerequisiteSubjectRepository.GetAllDataByExpression(
-                                filter: null,
+                            var cLOs = await _courseLearningOutcomeRepository.GetAllDataByExpression(
+                                filter: c => !c.IsDeleted,
                                 pageNumber: 1,
                                 pageSize: int.MaxValue,
                                 orderBy: null,
                                 isAscending: true,
-                                includes: new Expression<Func<PrerequisiteSubject, object>>[]
-                                {
-                                    c => c.PrerequisiteSubjectInfo,
-                                    c => c.PrerequisiteConstraint
-                                });
+                                includes: c => c.Subject);
+                            var assessments = await _assessmentRepository.GetAllDataByExpression(
+                                filter: c => !c.IsDeleted,
+                                pageNumber: 1,
+                                pageSize: int.MaxValue,
+                                orderBy: null,
+                                isAscending: true,
+                                includes: c => c.Subject);
+                            var materials = await _materialRepository.GetAllDataByExpression(
+                                filter: c => !c.IsDeleted,
+                                pageNumber: 1,
+                                pageSize: int.MaxValue,
+                                orderBy: null,
+                                isAscending: true,
+                                includes: c => c.Subject);
                             contextData = JsonSerializerHelper.SerializeData(new
                             {
-                                Subject = subjects.Items,
-                                ToolForSubjects = toolForSubjects.Items,
-                                CLOs = cLOs.Items,
-                                SubjectInCurriculums = subjectInCurriculums.Items,
-                                PrerequisiteSubjects = prerequisiteSubjects.Items,
+                                academicContext.Majors,
+                                academicContext.Curriculums,
+                                academicContext.Subjects,
+                                academicContext.PrerequisiteSubjects,
+                                academicContext.SubjectInCurriculums,
+                                academicContext.Programs,
+                                academicContext.Combos,
+                                academicContext.ComboSubjects,
+                                Tools = tools.Items.Select(m => new
+                                {
+                                    m.ToolCode,
+                                    m.ToolName,
+                                    m.Description,
+                                }).ToList(),
+                                ToolForSubjects = toolForSubjects.Items.Select(m => new
+                                {
+                                    ToolCode = m.Tool?.ToolCode ?? string.Empty,
+                                    SubjectCode = m.Subject?.SubjectCode ?? string.Empty,
+                                }).ToList(),
+                                CLOs = cLOs.Items.Select(m => new
+                                {
+                                    m.CourseLearningOutcomeCode,
+                                    m.CourseLearningOutcomeName,
+                                    m.CourseLearningOutcomeDetail,
+                                    SubjectCode = m.Subject?.SubjectCode ?? string.Empty,
+                                }).ToList(),
+                                Assessments = assessments.Items.Select(m => new
+                                {
+                                    m.Category,
+                                    m.Type,
+                                    m.Part,
+                                    m.Weight,
+                                    m.CompletionCriteria,
+                                    m.Duration,
+                                    m.QuestionType,
+                                    m.NoQuestion,
+                                    m.KnowledgeAndSkill,
+                                    m.GradingGuide,
+                                    m.Note,
+                                    SubjectCode = m.Subject?.SubjectCode ?? string.Empty,
+                                }).ToList(),
+                                Materials = materials.Items.Select(m => new
+                                {
+                                    m.MaterialCode,
+                                    m.MaterialName,
+                                    m.MaterialDescription,
+                                    m.Edition,
+                                    m.Note,
+                                    m.IsHardCopy,
+                                    m.IsOnline,
+                                    SubjectCode = m.Subject?.SubjectCode ?? string.Empty,
+                                }).ToList(),
                             });
-
                             break;
                         }
-
                     default:
                         {
                             contextData = "No Data";
                             break;
                         }
                 }
-
+                
                 // Bước 3: Tạo prompt gửi đến AI
                 var finalPrompt = message;
                 if (!string.IsNullOrEmpty(contextData))
                 {
                     finalPrompt = BuildPrompt(intent, message, contextData);
                 }
-
+                // Thêm lịch sử chat vào prompt nếu có
+                if (aIChatLogId != null)
+                {
+                    var lastMessages = await GetLastMessagesAsync(aIChatLogId.Value, 4);
+                    finalPrompt = $@"
+                    Lịch sử hội thoại gần đây:
+                    {FormatMessageHistory(lastMessages)}
+                    {finalPrompt}";
+                }
                 // Bước 4: Gọi API Gemini (hoặc dịch vụ AI khác)
                 var geminiResponse = await geminiApiService.GenerateResponseAsync(finalPrompt);
 
@@ -437,6 +539,14 @@ Chỉ trả về đúng 1 tiêu đề khoảng 3-5 từ.
             }
             return dto;
         }
+
+        private string FormatMessageHistory(List<Message> messages)
+        {
+            return string.Join("\n", messages
+                .OrderBy(m => m.SentTime)
+                .Select(m => $"[{m.SentTime:HH:mm}] {(m.IsBotResponse ? "🤖 Bot" : "🧑‍🎓 User")}: {m.MessageContent}"));
+        }
+
 
         public async Task<Response> GetAIChatLogById(Guid? userId, Guid aIChatLogId)
         {
@@ -517,14 +627,28 @@ Chỉ trả về đúng 1 tiêu đề khoảng 3-5 từ.
         //    return dto;
         //}
 
-        public async Task<Response> GetAllAIChatLogByTopic(Guid? userId, int pageNumber, int pageSize, bool isDelete, TopicChat topicChat)
+        private async Task<List<Message>> GetLastMessagesAsync(Guid aIChatLogId, int count = 4)
+        {
+            // Lấy 4 tin nhắn gần nhất từ cơ sở dữ liệu
+            var messages = await _messageRepository.GetAllDataByExpression(
+                filter: m => m.AIChatLogId == aIChatLogId,
+                pageNumber: 1,
+                pageSize: count,
+                orderBy: m => m.SentTime,
+                isAscending: false, // Lấy tin nhắn gần đây nhất
+                includes: null);
+
+            return messages.Items.ToList();
+        }
+
+        public async Task<Response> GetAllAIChatLogByTopic(Guid? userId, int pageNumber, int pageSize, bool isDeleted, TopicChat topicChat)
         {
             Response dto = new Response();
             try
             {
                 dto.Data = await _aIChatLogRepository.GetAllDataByExpression(
                     filter: a => a.UserId == userId
-                    && a.IsDeleted == isDelete
+                    && a.IsDeleted == isDeleted
                     && a.Topic == topicChat,
                     pageNumber: pageNumber,
                     pageSize: pageSize,

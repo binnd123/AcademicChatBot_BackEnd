@@ -223,9 +223,6 @@ namespace AcademicChatBot.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("AssessmentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("CourseLearningOutcomeCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -254,8 +251,6 @@ namespace AcademicChatBot.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("CourseLearningOutcomeId");
-
-                    b.HasIndex("AssessmentId");
 
                     b.HasIndex("SubjectId");
 
@@ -532,9 +527,6 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CurriculumId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
@@ -555,8 +547,6 @@ namespace AcademicChatBot.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("PrerequisiteConstraintId");
-
-                    b.HasIndex("CurriculumId");
 
                     b.HasIndex("SubjectId");
 
@@ -732,8 +722,8 @@ namespace AcademicChatBot.DAL.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("IntakeYear")
-                        .HasColumnType("datetime2");
+                    b.Property<int?>("IntakeYear")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1024,15 +1014,9 @@ namespace AcademicChatBot.DAL.Migrations
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.CourseLearningOutcome", b =>
                 {
-                    b.HasOne("AcademicChatBot.DAL.Models.Assessment", "Assessment")
-                        .WithMany()
-                        .HasForeignKey("AssessmentId");
-
                     b.HasOne("AcademicChatBot.DAL.Models.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId");
-
-                    b.Navigation("Assessment");
 
                     b.Navigation("Subject");
                 });
@@ -1096,15 +1080,9 @@ namespace AcademicChatBot.DAL.Migrations
 
             modelBuilder.Entity("AcademicChatBot.DAL.Models.PrerequisiteConstraint", b =>
                 {
-                    b.HasOne("AcademicChatBot.DAL.Models.Curriculum", "Curriculum")
-                        .WithMany()
-                        .HasForeignKey("CurriculumId");
-
                     b.HasOne("AcademicChatBot.DAL.Models.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId");
-
-                    b.Navigation("Curriculum");
 
                     b.Navigation("Subject");
                 });
